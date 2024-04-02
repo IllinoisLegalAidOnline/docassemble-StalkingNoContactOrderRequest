@@ -1,0 +1,1363 @@
+metadata:
+  title: SNCO - Stalking No Contact Order request
+  short title: SNCO request
+  comment: This program helps you ask the court to order someone making you fearful for your safety or causing you emotional distress to stop stalking you.
+  authors:
+    - Vivian McNaughton
+    - Matt Newsted
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALToolbox:escape_button.yml  
+  - docassemble.ILAO:ilao-interview-framework.yml
+  - docassemble.ILAO:shared-basic-questions.yml
+---
+default screen parts:
+  under: |
+    **Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate.
+    % if not user_logged_in():
+    
+    [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} **Sign in**](${url_of('login', next=interview_url())}) or [**create**](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
+    % endif
+    
+    Feedback, suggestions, or comments? [**Let us know**](${ interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url , easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1) } ){:target="_blank"}.
+---
+objects:
+  - users: ALPeopleList.using(there_are_any=True)
+  - other_parties: ALPeopleList.using(there_are_any=True)
+  - others_protected: ALPeopleList.using(complete_attribute='complete')
+  - other_parties[0].employer_address: ALAddress
+  - other_parties[0].service_address: ALAddress
+  - other_parties[0].bonus_service_address: ALAddress
+  - employers_schools: ALPeopleList.using(complete_attribute='complete')
+  - stalking_events: DAList.using(object_type=Thing, there_are_any=True)
+  - home_address: ALAddress
+---
+code: |
+  ilao_easy_form_title = "SNCO - Stalking No Contact Order request"
+  ilao_easy_form_url = "https://www.illinoislegalaid.org/legal-information/stalking-no-contact-order-request"
+  form_name = "Stalking No Contact Order request"
+  al_form_type = 'new_case'
+  user_ask_role = 'plaintiff'
+  github_user = 'IllinoisLegalAidOnline'
+  github_repo_name = 'docassemble-StalkingNoContactOrderRequest'
+  allowed_courts = ['Circuit']
+---
+# Road map
+sections:
+  - section_intro: Start
+  - section_petitioner: People you want to protect
+  - section_incidents: What happened
+  - section_protections: Protections
+  - section_respondent: About the person who caused abuse
+  - section_filing_info: Filing and service details
+  - section_download: Download
+---
+# interview order block
+mandatory: True
+code: |
+  nav.set_section('section_intro')
+  sees_nav_bar
+  instructions
+  whats_next
+  accept_terms
+  if in_illinois == False:
+    not_in_illinois
+  if two_times_check == False:
+    two_times_kickout
+  trial_court
+  if jurisdiction_type.all_false():
+    other_jurisdiction_location
+    
+  nav.set_section('section_petitioner')
+  users[0].name.first
+  hide_address
+  users[0].address.address
+  if user_relationship != "unrelated":
+    related_note
+  users[0].birthdate
+  if any_others == True:
+    others_protected.gather()
+  
+  nav.set_section('section_incidents')
+  
+  nav.set_section('section_protections')
+  
+  nav.set_section('section_respondent')
+  
+  nav.set_section('section_filing_info')
+  users[0].has_email_address
+  
+  nav.set_section('section_download')
+---
+#other parties gather code block
+code: |
+  others_protected[i].name.first
+  others_protected[i].birth
+  if others_protected[i].is_survivor == False and trial_court.address.county == "Cook":
+    others_protected[i].relation_to_user
+    others_protected[i].protection_reason
+  if hide_address == False or others_protected[i].use_safe_address == False:
+    others_protected[i].address.address
+  others_protected[i].complete = True
+---
+id: welcome
+question: |
+  SNCO - Stalking No Contact Order Request
+subquestion: |
+  Welcome to Illinois Legal Aid Online's **SNCO - Stalking No Contact Order Request** Easy Form.
+
+  This program will help you make forms to get a Stalking No Contact Order against someone who has done things that made you fearful for your safety or caused you emotional distress. The forms you make with this program can only be used in Illinois.
+
+  If the victim of stalking is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the victim.
+
+  To learn more, read ILAO's article about [**Getting a no contact order for stalking**](https://www.illinoislegalaid.org/legal-information/getting-no-contact-order-stalking).
+  
+  #### Your safety is important
+  
+  * If you are in immediate danger, call 911.
+  * If you need to exit this program, click the red **Escape** button at the top of the screen.
+  * Learn about [**safety while using the Internet**](https://www.thehotline.org/help/tech-social-media-safety/).
+field: sees_nav_bar
+---
+id: instructions
+continue button field: instructions
+question: |
+  Instructions
+subquestion: |
+  To use this program:
+
+  * The stalker cannot be a family member, current or ex-spouse, or current or ex-boyfriend or girlfriend (use the Order of Protection program instead),
+  * The stalker must have done something that made you fearful or caused emotional distress at least two separate times, and
+  * You must file your forms in the county were the stalking took place or in the county where you live or where the stalker lives.
+  
+  To complete this program you will need to know:
+  
+  * An alternative address where you can receive court documents if you do not want the stalker to know the address where you are staying,
+  * The stalker's name, gender, and race, and
+  * Details about the stalking and when it took place.
+  
+  Set aside 10 to 20 minutes to finish this program. You can login and save your work to return to later. 
+ 
+  ${ collapse_template(help_example) }  
+
+  Click on **{green words}** to learn what they mean. Some questions have a question mark in a circle ${ fa_icon("question-circle", color_css="#0dcaf0" ) } that also gives help.
+---
+template: help_example
+subject: |
+  **You can expand sections like this to show more information.**
+content: |  
+  This is an example of help. Click again to hide.
+---
+id: whats next
+continue button field: whats_next
+question: |
+  After you finish this program
+subquestion: |
+  After you download your ${ form_name } forms, you must file them with the court clerk's office. This program does not file your ${ form_name } forms for you.
+  
+  You can also download "How to ask for an Order of Protection" instructions at the end of this program. The instructions can guide you through filing your forms and going to court.
+---
+id: two times check
+question: |
+  Has the stalker done things which made you fearful or caused you emotional distress at least two separate times?
+subquestion: |
+  ${collapse_template(distress_explainer)}
+fields:
+  - no label: two_times_check
+    datatype: yesnoradio
+---
+template: distress_explainer
+subject: |
+  **What counts as emotional distress or stalking?**
+content: |  
+  **Emotional distress** means feeling a lot of mental pain, worry, or fear.
+
+  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset. Stalking does not include an exercise of the right to free speech or assembly. It does not include lawful picketing at the workplace. 
+---
+id: two times kickout
+event: two_times_kickout
+question: |
+  Sorry
+subquestion: |
+  To qualify for a ${form_name}, you must have suffered at least two separate incidents, and describe these incidents to the court.
+  
+  A different protective order may work for your situation. Read ILAO's article [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) to learn more.
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: in illinois
+question: |
+  Do you want to file for a Stalking No Contact Order in Illinois?
+subquestion: |
+  You can file in Illinois if:
+
+  * You live in Illinois,
+  * The person you are filing against lives in Illinois,
+  * The abuse took place in Illinois, or
+  * You are in Illinois to avoid abuse elsewhere.
+fields:
+  - no label: in_illinois
+    datatype: yesnoradio
+---
+id: not in illinois
+event: not_in_illinois
+question: |
+  Sorry
+subquestion: |
+  This program is only for people who want a Stalking No Contact Order in Illinois.
+  
+  You can use the [**Legal Services Corporation website**](https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help) to find a legal aid organization near you.
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: county
+continue button field: case_county
+question: |
+  In which county will you file your ${ form_name }?
+subquestion: |
+  You can file your case in the county:
+  
+  * Where you live,
+  * Where the person who caused the abuse lives,
+  * Where the abuse occurred, or
+  * Where you are staying to avoid abuse.
+fields:
+  - no label: trial_court_index
+    datatype: integer
+    code: |
+      court_county_lookup()
+  - note: |
+      ${ collapse_template(county_lookup_help) }  
+---
+template: county_lookup_help
+subject: |
+  **What if I need help finding the county?**
+content: |  
+    You can use this [**City-to-County Finder**](https://www.statsamerica.org/CityCountyFinder/) to find the county.
+---
+depends on:
+  - trial_court_index
+code: |
+  trial_court = court_list.as_court('trial_court', trial_court_index)
+---
+code: |
+  def court_county_lookup(lowercase=False):
+    all_court_counties = court_list._load_courts()['address_county'].items()
+    filtered_courts = [(-1, "cook")] if lowercase else [(-1, "Cook")]
+    for court in all_court_counties:
+      if court[1] != "Cook":
+        court_name = court[1].lower() if lowercase else court[1]
+        filtered_courts.append((court[0],court_name))
+    return sorted( filtered_courts, key=lambda y: y[1])
+---
+depends on:
+  - trial_court_index
+code: |
+  if trial_court_index == -1:
+    trial_court = court_list.as_court('trial_court', 15)
+    trial_court.address.county = "Cook"
+  else:
+    trial_court = court_list.as_court('trial_court', trial_court_index)
+---
+id: jurisdiction
+#continue button field: jurisdiction
+question: |
+  Why do you want to file in ${ trial_court.address.county } County?
+subquestion: |
+  Check all that apply.
+fields:
+  - no label: jurisdiction_type
+    datatype: checkboxes
+    choices:
+      - I live in ${ trial_court.address.county } County.: I live here
+      - The person I am filing against lives in ${ trial_court.address.county } County.: Respondent lives here
+      - The abuse took place in ${ trial_court.address.county } County.: Abuse was here
+---
+id: not proper location
+event: other_jurisdiction_location
+question: |
+  Sorry
+subquestion: |
+  You can file your case in the Illinois county:
+  
+  * Where you live,
+  * Where the person who caused the abuse lives, or
+  * Where the abuse occurred.
+
+  If Illinois is not the right place to ask for a Stalking No Contact Order, you can use the [**Legal Services Corporation website**](https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help) to find a legal aid organization near you.
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: protect whom
+question: |
+  Who do you want this Stalking No Contact Order to protect?
+subquestion: |
+  Check all that apply.
+fields:
+  - no label: protect_whom
+    datatype: checkboxes
+    choices:
+      - Myself: me
+      - A minor child: minor
+      - An adult who cannot file due to age, disablility or health : adult
+---
+id: petitioner name
+sets:
+    - users[0].name.first
+    - users[0].name.last
+    - users[0].name.middle
+    - users[0].name.suffix
+question:  |
+  What is your name?
+subquestion: |
+  Enter your name, even if you are filing the Stalking No Contact Order on behalf of your family or household members. In court and on the forms, you will be listed as the **Petitioner**.
+fields:
+  - code: |
+      users[0].name_fields()
+---
+id: hide address
+question: |
+  Do you want to keep your address hidden?
+subquestion: |
+  You do not need to list where you are staying on your court papers. You can use an address where you can receive court notices instead.
+field: hide_address
+choices:
+  - Yes: True
+  - No: False
+---
+id: get address
+question: |
+  % if hide_address:
+  What is your mailing address?
+  % else:
+  What is your home address?
+  % endif
+subquestion: |
+  % if hide_address:
+  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+  % else:
+  **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
+  % endif
+fields:
+  - Street address: users[0].address.address
+    address autocomplete: True
+  - Address line 2: users[0].address.unit
+    required: False
+  - City: users[0].address.city
+  - State: users[0].address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: users[0].address.zip
+---
+id: relationship
+question: |
+  How are you related to the person you are filing the Stalking No Contact Order against?
+field: user_relationship
+choices:
+  - We are not related.: unrelated
+  - I am their spouse.: se
+  - I am their ex-spouse.: xs
+  - I am their boyfriend, girlfriend, or romantic partner (including ex-).: bg
+  - We have a child in common (never married).: cc
+  - We share or shared a living space.: cs
+    help: |
+      Example: We share a common area like a kitchen. This would not apply if you just had apartments in the same building.
+  - I am their child.: ch
+  - I am their parent.: pa
+  - I am their brother, sister, or sibling.: sb
+  - They are another family member.: of
+    help: |
+      Examples: Uncle, aunt, or cousin.
+  - I am their step child.: sc
+  - I am their step brother, step sister, or step sibling.: ss
+  - I am their step parent.: sp
+  - I am their grandchild.: gc
+  - I am their grandparent.: gp
+  - I am their in-law.: il
+  - I have a disability and receive care from the abuser.: pd
+  - I am a high-risk adult with disabilities and the abuser is my personal caregiver.: pc
+    help: |
+      A **high risk adult with disabilities** is a person aged 18 or over whose physical or mental disability keeps them from protecting themself from abuse, neglect, or exploitation.
+  - I have a disability and the abuser is my personal assistant or caregiver.: pr
+  - The abuser is a family or household member of my foster child.: f
+  - The abuser is a family or household member of my adopted child, or of my prospective adopted child.: a
+  - The abuser is a family or household member of a child that I am the legally-appointed custodian of.: l
+---
+id: related note
+continue button field: related_note
+question: |
+  Other protective orders
+subquestion: |
+  If the person stalking you is family member, household member, boyfriend, girlfriend, or ex, you may want to file for an Order of Protection or a Civil No Contact Order instead. 
+  
+  ILAO's article on [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) can help you find the protective order for your situation.
+---
+id: user birthdate
+question: |
+  When were you born?
+fields:
+  - Your date of birth: users[0].birthdate
+    datatype: BirthDate
+    alMax: today()
+---
+id: your contact information
+question: |
+  What is your contact information?
+subquestion: |
+  ${ collapse_template(contact_info_help) }  
+fields:  
+  - Phone number: users[0].phone_number
+    datatype: al_international_phone
+    required: False
+  - label: |
+      I have an email address
+    field: users[0].has_email_address      
+    datatype: yesnoradio
+  - note: |
+      This email address will appear on your court forms. Be sure to check 
+      this email daily, otherwise you may miss important information about 
+      your case.
+    show if: x.has_email_address      
+  - Email address: users[0].email    
+    datatype: email
+    show if: 
+      variable: users[0].has_email_address
+      is: True
+validation code: |
+  if (not showifdef('users[0].phone_number') and \
+      (users[0].has_email_address == False)):
+    validation_error(word("You need to provide at least one contact method."), field="users[0].other_contact_method")
+---
+template: contact_info_help
+subject: |
+  **Why do I need to include this?**
+content: |  
+  The court must be able to reach you, so you need to include some contact information.
+---
+id: any others protected
+question: |
+  Do you want the Stalking No Contact Order to protect anyone else?
+subquestion: |
+  This is who you can protect with this order:
+  
+  * Children who were victims of the stalking, and
+  * Adults who were victims of the stalking and who cannot file for themselves due to age, disability, or poor health.
+fields:
+  - no label: any_others
+    datatype: yesnoradio
+---
+sets:
+    - others_protected[i].name.first
+    - others_protected[i].name.last
+    - others_protected[i].name.middle
+    - others_protected[i].name.suffix
+id: others protected name
+question: |
+  What is the name of the ${ordinal(i)} other person you want to protect?
+fields:
+  - code: |
+      others_protected[i].name_fields()
+---
+id: others protected birthday
+question: |
+  What was ${others_protected[i].name.full(middle='full')} born? 
+fields:
+  - Their date of birth: others_protected[i].birth
+    datatype: BirthDate
+    alMax: today()
+---
+id: others protected sexual assualt cook county
+question: |
+  Is ${others_protected[i].name.full(middle='full')} a survivor of rape, sexual assault, or sexual abuse?
+fields:
+  - no label: others_protected[i].is_survivor
+    datatype: yesnoradio
+---
+id: others protected relation to user cook county
+question: |
+  What is ${others_protected[i].name.full(middle='full')}'s relationship to you?
+fields:
+  - They are my: others_protected[i].relationship_radio
+    input type: radio
+    choices:
+    - Child
+    - Stepchild
+    - Grandchild
+    - Parent
+    - Grandparent
+    - Aunt or uncle
+    - Niece or nephew
+    - Sibling
+    - Cousin
+    - Other
+  - Other: others_protected[i].relationship
+    show if: 
+      variable: others_protected[i].relationship_radio
+      is: "Other"     
+---
+#review amount of space available and figure out max length
+id: protection reason cook county
+question: |
+  Why are you including ${others_protected[i].name.full(middle='full')} in the Stalking No Contact Order?
+subquestion: |
+  ${collapse_template(cook_reason_example)}
+fields:
+  - no label: others_protected[i].protection_reason
+    input type: area
+    rows: 2
+    maxlength: 200
+---
+template: cook_reason_example
+subject: |
+  **What should my answer look like?**
+content: |
+  Here are some examples:
+  
+  * They were included in a threat of violence
+  * They witnessed harassment.
+---
+id:  others protected safe address check
+question: |
+  Do you want to use the safe mailing address for ${others_protected[i].name.full(middle='full')}?
+subquestion: |
+  The safe mailing address you entered is:
+  
+  ${users[0].address.line_one(bare=True)}
+  ${users[0].address.line_two()}
+fields:
+  - no label: others_protected[i].use_safe_address
+    datatype: yesnoradio
+---
+id: others protected address
+question: |
+  What is ${others_protected[i].name.full(middle='full')}'s address?
+fields:
+  - Street address: others_protected[0].address.address
+    address autocomplete: True
+  - Address line 2: others_protected[0].address.unit
+    required: False
+  - City: others_protected[0].address.city
+  - State: others_protected[0].address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: others_protected[0].address.zip
+---
+id: any others protected
+question: |
+  Do you want the Stalking No Contact Order to protect anyone else?
+subquestion: |
+  So far you have told us about ${comma_and_list(others_protected)}.
+
+  This is who you can protect with this order:
+  
+  * Children who were victims of the stalking, and
+  * Adults who were victims of the stalking and who cannot file for themselves due to age, disability, or poor health.
+fields:
+  - no label: others_protected.there_is_another
+    datatype: yesnoradio
+---
+id: other parties name
+question: |
+  Who do you want to file a Stalking No Contact Order against?
+fields:
+  - code: |
+      other_parties[0].name_fields()
+---
+id: stalker gender
+question: |
+  What gender is ${other_parties[0].name.full(middle='full')}?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - Gender: other_parties[0].gender
+    input type: radio
+    choices:
+      - Male
+      - Female
+      - Other
+    required: False
+  - Other: other_parties[0].other_gender
+    maxlength: 20
+    required: False
+    show if: 
+      variable: other_parties[0].gender
+      is: "Other"  
+---
+id: stalker race
+question: |
+  What race is ${other_parties[0].name.full(middle='full')}?
+subquestion: |
+    If you do not know, you can leave this blank.
+fields:
+  - Race: other_parties[0].race
+    input type: radio
+    choices:
+      - Asian: Asian
+      - Black: Black
+      - Hispanic: Hispanic
+      - Latino: Latino
+      - Middle Eastern: Middle Eastern 
+      - Native American: Native American
+      - Native Hawaiian: Native Hawaiian
+      - North African: North African
+      - Pacific Islander: Pacific Islander
+      - White: White
+      - 2 or more races: Multiracial
+      - Other: Other
+  - Other: other_parties[0].other_race
+    maxlength: 20
+    show if: 
+      variable: other_parties[0].race
+      is: "Other"  
+---
+id: stalker skin tone
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s skin tone?
+subquestion: |
+    If you do not know, you can leave this blank.
+fields:
+  - Skin tone: other_parties[0].skin_tone
+    input type: radio
+    choices:
+      - Very light: very_light
+      - Light: light
+      - Light brown: light_brown
+      - Olive: olive
+      - Brown: brown
+      - Dark brown: dark_brown
+      - Other: other
+  - Other: other_parties[0].other_skin_tone
+    maxlength: 20
+    show if: 
+      variable: other_parties[0].skin_tone
+      is: "Other"  
+---
+id: stalker any other names
+question: |
+  Has ${other_parties[0].name.full(middle='full')} gone by any other names?
+subquestion: |
+  If you know of any old legal name, nickname, or alias that ${other_parties[0].name.full(middle='full')} has used, click **Yes**.
+fields:
+  - no label: other_parties[0].any_other_names
+    datatype: yesnomaybe
+---
+id: stalker other names
+question: |
+  % if i == 0:
+  What other name has ${other_parties[0].name.full(middle='full')} gone by?
+  % else:
+  What is the ${ordinal(i)} other name has ${other_parties[0].name.full(middle='full')} gone by?
+  % endif
+subquestion: |
+  This can be an old legal name, nickname, or alias.
+  
+  % if i != 0:
+  So far you have told us about ${comma_and_list(other_parties[0].other_names)}.
+  % endif
+fields:
+  - First: other_parties[0].other_names[i].name.first
+  - Middle: other_parties[0].other_names[i].name.middle
+    required: False
+  - Last: other_parties[0].other_names[i].name.last
+    required: False
+  - Suffix: other_parties[0].other_names[i].name.suffix
+    required: False
+    code: |
+      name_suffix()
+---
+id: stalker other names there is another
+question: |
+  Has ${other_parties[0].name.full(middle='full')} gone by any other names?
+subquestion: |
+  This can be an old legal name, nickname, or alias.
+  
+  So far you have told us about ${comma_and_list(other_parties[i].other_names)}.
+fields:
+  - no label: other_parties[0].other_names.there_is_another
+    datatype: yesnoradio
+---
+id: stalker ssn
+question: |
+  What are the last four digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - SSN: other_parties[0].ssn
+    maxlength: 4
+    required: False
+---
+id: stalker birth date
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s birth date?
+subquestion: |
+  If you do not know, you can leave this blank. 
+fields:
+  - Their date of birth: other_parties[0].birthdate
+    datatype: BirthDate
+    alMax: today()
+    required: False
+---
+id: stalker height stalker weight
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s height and weight?
+subquestion: |
+  If you do not know, you can leave this blank. 
+fields:
+  - Feet: other_parties[0].height_feet
+    maxlength: 2
+    required: False
+  - Inches: other_parties[0].height_inches
+    maxlength: 2
+    required: False
+  - Weight (in pounds): other_parties[0].weight
+    maxlength: 4
+    required: False
+---
+id: stalker eyes
+question: |
+  What color are ${other_parties[0].name.full(middle='full')}'s eyes?
+subquestion: |
+  If you do not know, you can leave this blank. 
+fields:
+  - Eye color: other_parties[0].eye_color
+    maxlength: 20
+    required: False
+  - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].wear_glasses
+    input type: radio
+    required: False
+    choices:
+      - Yes: True
+      - No: False
+      - Sometimes: sometimes
+      - I do not know: dont_know
+---
+#check how much space is available
+id: stalker distinguishing features
+question: |
+  What are ${other_parties[0].name.full(middle='full')}'s distinguishing features?
+subquestion: |
+  Scars, tattoos, or birthmarks are all distinguishing features.
+  
+  If you do not know any, you can leave this blank.
+fields:
+  - Features: other_parties[0].features
+    input type: area
+    required: False
+---
+id: stalker drivers license
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s driver's license number?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - License number: other_parties[0].drivers_license
+    required: False
+---
+id: stalker access to vehicle
+question: |
+  Does ${other_parties[0].name.full(middle='full')}'s have access to a vehicle?
+fields:
+  - no label: other_parties[0].has_vehicle
+    datatype: yesnomaybe
+---
+id: stalker vehicle details
+question: |
+  Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s vehicle.
+subquestion: |
+  If ${other_parties[0].name.full(middle='full')} has more than one car, describe the car they use most often.
+
+  If you do not know the answer to something, you can leave it blank.
+fields:
+  - Year: other_parties[0].vehicle_year
+    required: False
+    maxlength: 4
+  - Make: other_parties[0].vehicle_make
+    required: False
+    help: |
+      This is the brand that made the vehicle. For example, Ford, Chevy, and Toyota are all makes.
+  - Model: other_parties[0].vehicle_model
+    required: False
+    help: |
+      This is the vehicle's type. For example, Explorer, Suburban, and Camry are all models.
+  - Color: other_parties[0].vehicle_color
+    required: False
+  - License plate number: other_parties[0].license_plate
+    required: False
+  - State: other_parties[0].vehicle_state
+    required: False
+    code: |
+      states_list()
+---
+id: stalker another number check
+question: |
+  Do you know another number that can identify ${other_parties[0].name.full(middle='full')}?
+subquestion: |
+  This could be a passport number, a military ID number, or something similar.
+fields:
+  - no label: other_parties[0].another_number_check
+    datatype: yesnoradio
+---
+id: stalker another number
+question: |
+  What is ${other_parties[0].name.full(middle='full')} other identifying number?
+fields:
+  - Number: other_parties[0].another_number
+  - Describe the ID number: other_parties[0].another_number_description
+    help: |
+      For example, this could be "military ID number" or "passport number."
+---
+id: stalker phone number
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s phone number?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - Phone number: other_parties[0].phone_number
+    datatype: al_international_phone
+    required: False
+---
+id: stalker email address
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s email address?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - Email address: other_parties[0].email_address
+    datatype: email
+    required: False
+---
+id: stalker address known
+question: |
+  Do you know ${other_parties[0].name.full(middle='full')}'s address?
+fields:
+  - no label: other_parties[0].address_known
+    datatype: yesnoradio
+---
+id: unknown address note
+continue button field: unknown_address_note
+question: |
+  Note about the unkown address
+subquestion: |
+  If you do not know ${other_parties[0].name.full(middle='full')}'s address, you may still file. However, you may need to show the court that you made a good effort to find their address. You can do this by filing written statement called an “affidavit” telling how you tried to find Nerd Nerd's address. If you need to file one of these, the judge or court clerk will provide it.
+---
+id: stalker address
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s address?
+fields:
+  - Street address: other_parties[0].address.address
+    address autocomplete: True
+  - Address line 2: other_parties[0].address.unit
+    required: False
+  - City: other_parties[0].address.city
+  - State: other_parties[0].address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: other_parties[0].address.zip
+---
+id: stalker currently employed
+question: |
+  Do you know if ${other_parties[0].name.full(middle='full')} is employed?
+fields:
+  - no label: other_parites[0].has_job
+    datatype: yesnoradio
+---
+#what if they have more than one employer?
+id: stalker employer
+question: |
+  Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s employer.
+subquestion: |
+  If you do not know who ${other_parties[0].name.full(middle='full')}'s employer is, enter "Unknown" for the employer name and leave the other fields blank.
+fields:
+  - Employer name: other_parties[0].employer_name
+  - Standard work hours: other_parties[0].work_hours
+    required: False
+    help: |
+      For example, 9:00 a.m. to 5:00 p.m.
+  - Street address: other_parties[0].employer_address.address
+    address autocomplete: True
+    required: False
+  - Address line 2: other_parties[0].employer_address.unit
+    required: False
+  - City: other_parties[0].employer_address.city
+    required: False
+  - State: other_parties[0].employer_address.state
+    required: False
+    code: |
+      states_list()  
+  - ZIP code: other_parties[0].employer_address.zip
+    required: False
+--- 
+id: stalker suicide risk
+question: |
+  Do you think ${other_parties[0].name.full(middle='full')} is a suicide risk?
+fields:
+  - no label: other_parties[0].suicide_risk
+    datatype: yesnomaybe
+---
+id: stalker armed
+question: |
+  Do you think ${other_parties[0].name.full(middle='full')} is armed or dangerous to you or others?
+fields:
+  - no label: other_parties[0].armed
+    datatype: yesnomaybe
+---
+id: stalker mental illness
+question: |
+  Does ${other_parties[0].name.full(middle='full')} have a history of mental illness?
+fields:
+  - no label: other_parties[0].mental_illness
+    datatype: yesnomaybe
+---
+id: stalker alcohol
+question: |
+  Is ${other_parties[0].name.full(middle='full')} likely to be drunk or under the influence of alcohol?
+fields:
+  - no label: other_parties[0].alcohol
+    datatype: yesnomaybe
+---
+id: stalker drugs
+question: |
+  Is ${other_parties[0].name.full(middle='full')} likely to be high or under the influence of drugs?
+fields:
+  - no label: other_parties[0].drugs
+    datatype: yesnomaybe
+---
+id: stalker carrying weapon
+question: |
+  Is ${other_parties[0].name.full(middle='full')} likely to be carrying a weapon?
+fields:
+  - no label: other_parties[0].carrying_weapon
+    datatype: yesnoradio
+---
+id: stalker weapon info
+question: |
+  What kind of weapons does ${other_parties[0].name.full(middle='full')} have and where do they keep them?
+subquestion: |
+  If you do not know, you can leave this blank
+fields:
+  - Weapons: other_parties[0].weapons_info
+    input type: area
+    required: False
+---
+id: stalker user divorce
+question: |
+  Have you and ${other_parties[0].name.full(middle='full')} previously filed a divorce?
+fields:
+  - no label: other_parties[0].divorced_user
+    datatype: yesnoradio
+---
+id: divorce case info
+question: |
+  Enter information about the divorce case.
+fields:
+  - Date filed: other_parties[0].divorce_date
+    datatype: date
+    max: ${today()}
+  - Case number: other_parties[0].divorce_number
+  - Name of judge: other_parties[0].divorce_judge
+    help: |
+      Do not include the word "judge."
+---
+id: stalker parentage action
+question: |
+  Have you and ${other_parties[0].name.full(middle='full')} previously filed a parentage action?
+fields:
+  - no label: other_parties[0].parentage_action
+    datatype: yesnoradio
+---
+id: parentage action info
+question: |
+  Enter information about the parentage action.
+fields:
+  - Date filed: other_parties[0].parentage_date
+    datatype: date
+    max: ${today()}
+  - Case number: other_parties[0].parentage_number
+  - Name of judge: other_parties[0].parentage_judge
+    help: |
+      Do not include the word "judge."
+---
+id: stalker any order of protection
+question: |
+  Is there an Order of Protection against ${other_parties[0].name.full(middle='full')}?
+fields:
+  - no label: other_parties[0].order_of_protection
+    datatype: yesnomaybe
+---
+#test that the field show ifs are working properly
+id: stalker about order of protection
+question: |
+  Where was the Order of Protection issued against ${other_parties[0].name.full(middle='full')}?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
+  - State: other_parties[0].op_state
+    code: |
+      states_list()
+  - County: other_parties[0].op_in_state_county
+    datatype: integer
+    required: False
+    show if: other_parties[0].op_state == "IL"
+    code: |
+      court_county_lookup()
+  - County: other_parties[0].op_out_state_county
+    required: False
+    show if: other_parties[0].op_state != "IL"
+---
+id: stalker which address
+question: |
+  Where should the sheriff go to deliver court papers to ${other_parties[0].name.full(middle='full')}?
+fields: 
+  - no label: other_parties[0].which_address
+    choices:
+    - ${other_parties[0].address.on_one_line(bare=True)}: home_address
+      show if: other_parties[0].address_known
+    - An address I will enter: service_address
+  - Street address: other_parties[0].service_address.address
+    address autocomplete: True
+    show if: other_parties[0].which_address == "service_address"
+  - Address line 2: other_parties[0].service_address.unit
+    required: False
+    show if: other_parties[0].which_address == "service_address"
+  - City: other_parties[0].service_address.city
+    show if: other_parties[0].which_address == "service_address"
+  - State: other_parties[0].service_address.state
+    show if: other_parties[0].which_address == "service_address"
+    code: |
+      states_list()  
+  - ZIP code: other_parties[0].service_address.zip
+    show if: other_parties[0].which_address == "service_address"
+  - Phone number: other_parties[0].service_phone
+    show if: other_parties[0].which_address == "service_address"
+  - Email address: other_parties[0].service_email
+    show if: other_parties[0].which_address == "service_address"
+---
+id: list bonus service check
+question: |
+  Do you want to list another place where the sheriff could give court papers to ${other_parties[0].name.full(middle='full')}?
+fields:
+  - no label: other_parties[0].bonus_service_check
+    datatype: yesnoradio
+---
+id: bonus service address
+question: |
+  Where else can the sheriff go to deliver court papers to ${other_parties[0].name.full(middle='full')}?
+fields: 
+  - no label: other_parties[0].which_bonus_address
+    choices:
+    - ${other_parties[0].address.on_one_line(bare=True)}: home_address
+      show if: other_parties[0].address_known and other_parties[0].which_address != "home_address"
+    - An address I will enter: service_address
+  - Street address: other_parties[0].bonus_service_address.address
+    address autocomplete: True
+    show if: other_parties[0].which_bonus_address == "service_address"
+  - Address line 2: other_parties[0].bonus_service_address.unit
+    required: False
+    show if: other_parties[0].which_bonus_address == "service_address"
+  - City: other_parties[0].bonus_service_address.city
+    show if: other_parties[0].which_bonus_address == "service_address"
+  - State: other_parties[0].bonus_service_address.state
+    show if: other_parties[0].which_bonus_address == "service_address"
+    code: |
+      states_list()  
+  - ZIP code: other_parties[0].bonus_service_address.zip
+    show if: other_parties[0].which_bonus_address == "service_address"
+  - Phone number: other_parties[0].service_phone
+    show if: other_parties[0].which_bonus_address == "service_address"
+  - Email address: other_parties[0].service_email
+    show if: other_parties[0].which_bonus_address == "service_address"
+---
+id: stalking event intro
+continue button field: stalking_event_intro
+question: |
+  Reasons for the Stalking No Contact Order
+subquestion: |
+  The following questions will ask about what ${other_parties[0].name.full(middle='full')} did to make you afraid or distressed.
+  
+  You should be specific. Tell when and where each event happened, and how it affected you.
+  
+  You should enter the most recent event first.
+  
+  The judge will expect more details about recent events than past events. Enter exact dates if you can. For repeated events, you may tell how often the behavior took place.
+---
+id: stalking event date time
+question: |
+  When did the ${ordinal(i)} stalking event take place?
+subquestion: |
+  If you not remember the exact date, enter the month and year.
+fields:
+  - Date: stalking_events[i].text_date
+  - Time: stalking_events[i].time
+    datatype: time
+    required: False
+    help: |
+      If you do not remember this and do not have a good estimate, you can leave this blank.
+---
+id: stalking event place
+question: |
+  Where did the ${ordinal(i)} stalking event take place?
+fields:
+  - Place: stalking_events[i].place
+---
+id: stalking event description
+question: |
+  Describe the ${ordinal(i)} stalking event.
+subquestion: |
+  Be as specific as possible
+fields:
+  - Description: stalking_events[i].description
+    input type: area
+---
+id: stalking event police report
+question: |
+  Was a police report filed for the ${ordinal(i)} stalking event?
+fields:
+  - no label: stalking_events[i].police_check
+    datatype: yesnoradio
+  - Police report number: stalking_events[i].police_number
+    required: False
+    help: |
+      If you do not know, you can leave this blank.
+---
+id: stalking event is there another
+question: |
+  Do you want to include another stalking event?
+fields:
+  - no label: stalking_events.there_is_another
+    datatype: yesnoradio
+---
+#Is it a concern that the ILAO article talks about 3 types of protective order when only 2 are available here?
+id: order type
+question: |
+  What kind of Stalking No Contact Order do you want?
+subquestion: |
+  There are two kinds of SNCO: a Plenary Order and an Emergency Order. You can ask the court for both if you want.
+  
+  For a Plenary Order, the court will issue an order after a hearing at which the abuser can also present a case. This order can last a long time, usually two years. It can even be made permanent in some cases.
+
+  For an Emergency Order, the court will issue an order which takes effect immediately. The order can be issued even before your abuser knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the abuser can present a case to the court also. 
+  
+  To learn more, read ILAO's article about the [**3 types of Orders of Protection**](https://www.illinoislegalaid.org/legal-information/3-types-orders-protection).
+  
+fields:
+  - no label: order_type
+    datatype: checkboxes
+    none of the above: False
+    choices:
+      - Plenary Stalking No Contact Order: plenary
+      - Emergency Stalking No Contact Order: Emergency
+---
+#Can we dig up any examples or more information about what this should look like?
+#Check space limits on template
+id: emergency why
+question: |
+  Why should the court grant an *Emergency Order* without needing to tell ${other_parties[0].name.full(middle='full')}?
+subquestion: |
+  Use complete sentences and proper punctuation. Your response will appear in your forms exactly as you type it. 
+fields:
+  - no label: emergency_why
+    input type: area
+---
+id: stop doing what
+question: |
+  What do you want the court to make ${other_parties[0].name.full(middle='full')} stop doing?
+subquestion: |
+  ${collapse_template(stay_away_contact)}
+fields:
+  - I want the court to make ${other_parties[0].name.full(middle='full')} stop...: stop_doing_what
+    datatype: checkboxes
+    none of the above: True
+    choices:
+      - "Stop stalking and threatening the victim, victim's family and household members, and stop enlisting other people to stalk or threaten": stalking
+      - "Stop contacting the victim, victim's family and household members whether in person, by phone, by e-mail, by note or by sending messages through other people": contacting
+      - "Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare": away
+---
+template: stay_away_contact
+subject: |
+  **What do "stay away" and "contact" mean here?**
+content: |
+  **Stay Away**: to refrain from both physical presence and nonphysical contact with the Petitioner directly, indirectly, or through third parties who may or may not know of the order. "Nonphysical contact" includes, but is not limited to, telephone calls, mail, e-mail, fax, and written notes.
+
+  **Contact**: includes any contact with the victim, that is initiated or continued without the victim’s consent, or that is in disregard of the victim’s expressed desire that the contact be avoided or discontinued, including but not limited to being in the physical presence of the victim; appearing within the sight of the victim; approaching or confronting the victim in a public place or on private property; appearing at the workplace or residence of the victim; entering onto or remaining on property owned, leased, or occupied by the victim; or placing an object on, or delivering an object to, property owned, leased, or occupied by the victim.
+---
+id: distance away
+question: |
+  How far should ${other_parties[0].name.full(middle='full')} need to stay away?
+subquestion: |
+  You should enter a distance in feet.
+
+  For reference, a football field is 300 feet long. A car is about 15 feet long. A semi truck trailer is about 50 feet long. 
+fields:
+  - Distance (in feet): distance_away
+    datatype: integer
+---
+id: protected place types
+question: |
+  What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?
+subquestion: |
+  **Caution:** You must tell ${other_parties[0].name.full(middle='full')} the address of any place you want them to stay away from. If you do not want ${other_parties[0].name.full(middle='full')} to know an address, you should not list that location below.
+fields:
+  - no label: protected_place_types
+    datatype: checkboxes
+    none of the above: False
+    choices:
+      - Home
+      - Workplace
+      - School
+      - Day Care: day_care
+      - Other
+---
+id: safe home address
+question: |
+  What is your home address?
+subquestion: |
+  You answered earlier that you want to hide your real address.
+  
+  If you do not want ${other_parties[0].name.full(middle='full')} to know your home address, do not list it here. You may want to click **Back** and not include your home as a protected place.
+  
+  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+fields:
+  - Street address: home_address.address
+    address autocomplete: True
+  - Address line 2: home_address.unit
+    required: False
+  - City: home_address.city
+  - State: home_address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: home_address.zip
+---
+id: other places
+question: |
+  What other places do you want the court to order ${other_parties[0].name.full(middle='full')} to stay away from?
+fields:
+  - no label: other_places
+    input type: area
+---
+id: employers schools name
+question: |
+  What is the name and type of the ${ordinal(i)} place you want ${other_parties[0].name.full(middle='full')} to stay away from?
+fields:
+  - Type: employers_schools[i].type
+    choices:
+      - Work or job site: work
+        show if: protected_place_types['Workplace']
+      - School: school
+        show if: protected_place_types['School']
+      - Day care: day_care
+        show if: protected_place_types['day_care']
+  - Name: employers_schools[i].name.first
+---
+id: employers schools address
+question: |
+  What is ${employers_schools[i].name.first}'s address?
+fields:
+  - Street address: employers_schools[i].address.address
+    address autocomplete: True
+  - Address line 2: employers_schools[i].address.unit
+    required: False
+  - City: employers_schools[i].address.city
+  - State: employers_schools[i].address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: employers_schools[i].address.zip
+---
+id: employers schools there is another
+question: |
+  Do you want to add another place ${other_parties[0].name.full(middle='full')} should stay away from?
+subquestion: |
+  So far you have told us about ${comma_and_list(employers_schools.complete_elements().full_names())}.
+fields:
+  - no label: employers_schools.there_is_another
+    datatype: yesnoradio
+---
+id: live with stalker
+question: |
+  Does ${other_parties[0].name.full(middle='full')} live at the same address as you?
+subquestion: |
+  If you click **Yes**, your forms will ask to give you exclusive access to your home. This means the court **might** order ${other_parties[0].name.full(middle='full')} to stay away, even temporarily.
+fields:
+  - no label: live_with_stalker
+    datatype: yesnoradio
+---
+id: school with stalker
+question: |
+  Do you and ${other_parties[0].name.full(middle='full')} go to the same school?
+fields:
+  - no label: school_with_stalker
+    datatype: yesnoradio
+---
+id: which stalker school
+question: |
+  Which school do you and ${other_parties[0].name.full(middle='full')} go to?
+field: which_stalker_school
+datatype: checkboxes
+choices:
+  - code: |
+      school_list
+---
+depends on: 
+  - employers_schools[i].name.first
+  - employers_schools[i].type
+code: |
+  school_list = list()
+  school_list.clear()
+  work_list = list()
+  work_list.clear()
+  for place in employers_schools:
+    if place.type == "school":
+      school_list.append({place.name.first: place.name.first})
+    elif place.type == "work":
+      work_list.append({place.name.first: place.name.first})
+---
+id: which stalker work
+question: |
+  Which work place do you and ${other_parties[0].name.full(middle='full')} work at?
+field: which_stalker_work
+datatype: checkboxes
+choices:
+  - code: |
+      work_list
+---
+id: stalker prohibit firearms
+question: |
+  Do you want the court to stop ${other_parties[0].name.full(middle='full')} from having firearms or a Firearms Owner Identification Card?
+fields:
+  - no label: other_parties[0].prohibit_firearms
+    datatype: yesnoradio
+---
+id: stalker pay costs describe costs
+question: |
+  Do you want the court to make ${other_parties[0].name.full(middle='full')} pay any costs that were a result of their stalking?
+subquestion: |
+  This could include things like court costs, missing work, property damage, or having to pay to stay somewhere else to avoid stalking.
+  
+  You will need to prove that the costs were a direct result of stalking.
+fields: 
+  - no label: other_parties[0].pay_costs
+    datatype: yesnoradio
+  - What costs do you want ${other_parties[0].name.full(middle='full')} to pay?: other_parties[0].describe_costs
+    input type: area
+    show if: other_parties[0].pay_costs
+---
+id: stalker anything else
+question: |
+  Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?
+fields: 
+  - no label: other_parties[0].anything_else
+    datatype: yesnoradio
+  - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+    input type: area
+    show if: other_parties[0].anything_else
+---
+#add get docs screen!
+  
