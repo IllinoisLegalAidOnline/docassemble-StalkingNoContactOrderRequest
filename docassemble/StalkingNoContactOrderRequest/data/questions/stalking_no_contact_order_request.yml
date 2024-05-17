@@ -25,13 +25,22 @@ default screen parts:
 objects:
   - users: ALPeopleList.using(there_are_any=True)
   - other_parties: ALPeopleList.using(there_are_any=True)
+  - other_parties[i].other_names: ALPeopleList.using(complete_attribute='complete')
   - others_protected: ALPeopleList.using(complete_attribute='complete')
   - other_parties[0].employer_address: ALAddress
   - other_parties[0].service_address: ALAddress
   - other_parties[0].bonus_service_address: ALAddress
   - employers_schools: ALPeopleList.using(complete_attribute='complete')
-  - stalking_events: DAList.using(object_type=Thing, there_are_any=True)
-  - home_address: ALAddress
+  - stalking_events: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete')
+  - home: ALAddress
+  - report_numbers: DAList.using(object_type=Thing, there_are_any=False)
+  - others_with_minor_initials: ALPeopleList.using(there_are_any=False)
+  - away_address_list: DAList.using(object_type=Thing, there_are_any=False)
+  - no_remain_address_list: DAList.using(object_type=Thing, there_are_any=False)
+  - school_list: DAList.using(object_type=Thing, there_are_any=False)
+  - work_list: DAList.using(object_type=Thing, there_are_any=False)
+  - away_work_address_list: DAList.using(object_type=Thing, there_are_any=False)
+  - away_school_daycare_list: DAList.using(object_type=Thing, there_are_any=False)
 ---
 code: |
   ilao_easy_form_title = "SNCO - Stalking No Contact Order request"
@@ -47,9 +56,9 @@ code: |
 sections:
   - section_intro: Start
   - section_petitioner: People you want to protect
+  - section_respondent: About the person who caused abuse
   - section_incidents: What happened
   - section_protections: Protections
-  - section_respondent: About the person who caused abuse
   - section_filing_info: Filing and service details
   - section_download: Download
 ---
@@ -76,21 +85,113 @@ code: |
   if user_relationship != "unrelated":
     related_note
   users[0].birthdate
-  if any_others == True:
+  if others_protected.there_are_any:
     others_protected.gather()
   
-  nav.set_section('section_incidents')
-  
-  nav.set_section('section_protections')
-  
   nav.set_section('section_respondent')
+  other_parties[0].name.first
+  other_parties[0].gender
+  other_parties[0].race
+  if trial_court.address.county == "Cook":
+    other_parties[0].skin_tone
+    if other_parties[0].other_names.there_are_any:
+      other_parties[0].other_names.gather()
+  other_parties[0].ssn
+  knows_respondent_dob
+  other_parties[0].weight
+  other_parties[0].eye_color
+  other_parties[0].hair_color
+  other_parties[0].features
+  other_parties[0].drivers_license
+  if other_parties[0].has_vehicle:
+    other_parties[0].license_plate
+  if other_parties[0].another_number_check:
+    other_parties[0].another_number_description
+  other_parties[0].phone_number
+  other_parties[0].email_address
+  if other_parties[0].address_known == True:
+    other_parties[0].address.address
+  else:
+    unknown_address_note
+  if other_parties[0].has_job == True:
+    other_parties[0].employer_name
+  other_parties[0].suicide_risk
+  other_parties[0].armed
+  if trial_court.address.county == "Cook":
+    if other_parties[0].divorced_user:
+      other_parties[0].divorce_date
+    elif other_parties[0].parentage_action:
+      other_parties[0].parentage_date
+    other_parties[0].mental_illness
+    other_parties[0].alcohol
+    other_parties[0].drugs
+    other_parties[0].carrying_weapon
+    other_parties[0].home_weapon
+    if other_parties[0].carrying_weapon or other_parties.home_weapon:
+      other_parties[0].weapons_info
+    if other_parties[0].order_of_protection == True:
+      other_parties[0].op_state
+    respondent_on_probation
+  if other_parties[0].address_known == True:
+    other_parties[0].which_address
+  if other_parties[0].bonus_service_check == True:
+    other_parties[0].bonus_service_address.address
+  if trial_court.address.county == "Cook":  
+    service_information
+    
+  nav.set_section('section_incidents')
+  stalking_event_intro
+  stalking_events.gather()
+  if stalking_events.number_gathered() < 2:
+    two_times_kickout
+    
+  nav.set_section('section_protections')
+  if order_type['emergency'] and trial_court.address.county == "Cook":
+    emergency_reason
+  if protection_requested['away']:
+    distance_away
+    if protected_place_types['Home']:
+      run_home_address_block
+    if protected_place_types['School'] or protected_place_types['Workplace']: 
+      employers_schools.gather()  
+    if protected_place_types['Other']:
+      other_places
+    if trial_court.address.county == "Cook":
+      if live_with_stalker:
+        home.address
+      if school_with_stalker: 
+        if school_list.number_gathered() > 1:
+          which_stalker_school
+      if work_with_stalker:    
+        if work_list.number_gathered() > 1:
+          which_stalker_work
+  other_parties[0].prohibit_firearms
+   
+  other_parties[0].anything_else
+  if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
+    other_parties[0].no_protection_chosen
+  if trial_court.address.county == "Cook":
+    other_parties[0].pay_costs 
   
   nav.set_section('section_filing_info')
+  case_number
   users[0].has_email_address
+  e_signature
   
   nav.set_section('section_download')
+  check_ages
+  
+  if trial_court.address.county == "Cook":
+    make_report_list
+    with_initials
+    cook_stay_away_addresses
+    cook_no_remain_addresses
+  else:
+    state_stay_away_addresses
+    
+  get_docs_screen
 ---
-#other parties gather code block
+#others protected gather code block
 code: |
   others_protected[i].name.first
   others_protected[i].birth
@@ -100,6 +201,114 @@ code: |
   if hide_address == False or others_protected[i].use_safe_address == False:
     others_protected[i].address.address
   others_protected[i].complete = True
+---
+#stalkiing events gather code block
+code: |
+  stalking_events[i].name.text
+  stalking_events[i].place
+  stalking_events[i].description
+  stalking_events[i].police_check
+         
+  stalking_events[i].complete = True
+---
+#creates list of police report numbers and sets any police reports flag
+reconsider: True
+code: |
+  report_numbers.clear()
+  any_police_reports = False
+  for event in stalking_events:
+    if event.police_check:
+      any_police_reports = True
+      if event.police_number != "":
+        report_numbers.append(event.police_number)
+  report_numbers.there_is_another = False
+  make_report_list = True
+---
+#creates others protected list wherein minors are referred to by their initials. Used in Cook County's petition
+reconsider: True
+code: |
+  others_with_minor_initials.clear()
+  for index, other in enumerate(others_protected):
+    others_with_minor_initials.append(other)
+
+    if date_difference(starting=others_protected[index].birth, ending=today()).years < 18:
+      others_with_minor_initials[index].name.first = other.name.first[:1]
+      others_with_minor_initials[index].name.last = other.name.last[:1]
+  with_initials = True
+---
+# employers schools gather code block
+code: |  
+  employers_schools[i].name.first
+  employers_schools[i].address.address
+  employers_schools[i].complete = True
+---
+#list of "stay away" addresses for use in the Cook petition
+reconsider: True
+code: |
+  away_address_list.clear()
+  if protected_place_types['Home']:
+    away_address_list.append(home.on_one_line(bare=True))
+  if protected_place_types['School'] or protected_place_types['Workplace']: 
+    for place in employers_schools:
+      away_address_list.append(place.address.on_one_line(bare=True))
+  away_address_list.there_is_another = False
+  cook_stay_away_addresses = True
+---
+#list of "stay away" addresses for non-cook petition
+reconsider: True
+code: |
+  away_work_address_list.clear()
+  away_school_daycare_list.clear()
+  if protected_place_types['School'] or protected_place_types['Workplace']: 
+    for place in employers_schools:
+      if place.type == "work":
+        away_work_address_list.append(place.address.on_one_line(bare=True))
+      else:
+        away_school_daycare_list.append(place.address.on_one_line(bare=True))
+  away_work_address_list.there_is_another = False
+  away_school_daycare_list.there_is_another = False
+  state_stay_away_addresses = True
+---
+#list of "do not remain at" addresses for use in the cook petition
+reconsider: True
+code: |
+  no_remain_address_list.clear()
+  if live_with_stalker:
+    no_remain_address_list.append(home.on_one_line(bare=True))
+  if school_with_stalker:
+    make_lists
+    if school_list.number_gathered() == 1:
+      no_remain_address_list.append(school_list[0])
+    else:
+      no_remain_address_list.append(which_stalker_school)
+  if work_with_stalker:
+    make_lists
+    if work_list.number_gathered() == 1:
+      no_remain_address_list.append(work_list[0])
+    else:
+      no_remain_address_list.append(which_stalker_work)
+  no_remain_address_list.there_is_another = False
+  cook_no_remain_addresses = True
+---
+#gather block for stalker's other names
+code: |
+  other_parties[0].other_names[i].name.first
+  other_parties[0].other_names[i].complete = True
+---
+#flag tracking whether there are protected minors or protected adults
+reconsider: True
+code: |
+  any_minors = False
+  any_adults = False
+  if others_protected.number_gathered() > 0:
+    for other in others_protected:
+      if date_difference(starting=other.birth, ending=today()).years < 18:
+        any_minors = True
+      else:
+        any_adults = True
+  check_ages = True
+---
+
 ---
 id: welcome
 question: |
@@ -262,6 +471,45 @@ code: |
   else:
     trial_court = court_list.as_court('trial_court', trial_court_index)
 ---
+depends on:
+  - trial_court_index
+  - cook_district
+code: |
+  if trial_court_index == -1:
+    trial_court = court_list.as_court('trial_court', cook_district)
+  else:
+    trial_court = court_list.as_court('trial_court', trial_court_index)
+    
+  court_name = str(trial_court.name)
+  court_street_address = str(trial_court.address.address)
+  court_city = str(trial_court.address.city)
+  court_state = str(trial_court.address.state)
+  court_zip = str(trial_court.address.zip)
+  filing_county = str(trial_court.address.county)
+  courthouse_info = court_name + ", " + court_street_address + ", " + court_city + ", " + court_state + " " + court_zip
+---
+id: Cook County district
+question: |
+  In which Cook County courthouse is your case?
+subquestion: |
+  This information should be found near the top of your court papers.
+
+  ${ collapse_template(cook_district_help) }  
+field: cook_district
+choices:
+  - First Municipal District, Daley Center, 50 W. Washington Street, Chicago: 15
+  - Second Municipal District, 5600 Old Orchard Road, Skokie: 16
+  - Third Municipal District, 2121 Euclid Avenue, Rolling Meadows: 17
+  - Fourth Municipal District, 1500 Maybrook Drive, Maywood: 18
+  - Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview: 19
+  - Sixth Municipal District, 16501 South Kedzie Parkway, Markham: 20
+---
+template: cook_district_help
+subject: |
+  **What if I am not sure?**
+content: |  
+  Visit **[Illinois Court Help](https://www.ilcourthelp.gov/)**, or you can call or text (833) 411-1121 for assistance.
+---
 id: jurisdiction
 #continue button field: jurisdiction
 question: |
@@ -354,6 +602,40 @@ fields:
     default: IL      
   - ZIP code: users[0].address.zip
 ---
+depends on:
+  - hide_address
+  - users[0].address.address
+  - users[0].address.unit
+  - users[0].address.city
+  - users[0].address.state
+  - users[0].address.zip
+code: |
+  if hide_address:
+    home.address
+  else:
+    home = users[0].address
+  run_home_address_block = True
+---
+id: stay away home address
+question: |
+  What is your home address?
+subquestion: |
+  % if hide_address:
+  You said earlier you wanted to hide your address. **The address you enter here will be on your court papers.** If you want to keep your address secret, click **Back** and change your previous answer
+  % endif
+fields:
+  - Street address: home.address
+    address autocomplete: True
+  - Address line 2: home.unit
+    required: False
+  - City: home.city
+  - State: home.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: home.zip
+---
+#SME question: can an SNCO be issued against someone regardless of relationship, or only against someone the filer is not related to?
 id: relationship
 question: |
   How are you related to the person you are filing the Stalking No Contact Order against?
@@ -405,6 +687,15 @@ fields:
     datatype: BirthDate
     alMax: today()
 ---
+id: case number
+question: |
+  What is the case number?
+subquestion: |
+  If this is a new case, leave this blank. The clerk will give you a case number when you file.
+fields:
+  - Case number: case_number
+    required: False
+---
 id: your contact information
 question: |
   What is your contact information?
@@ -428,10 +719,6 @@ fields:
     show if: 
       variable: users[0].has_email_address
       is: True
-validation code: |
-  if (not showifdef('users[0].phone_number') and \
-      (users[0].has_email_address == False)):
-    validation_error(word("You need to provide at least one contact method."), field="users[0].other_contact_method")
 ---
 template: contact_info_help
 subject: |
@@ -448,7 +735,7 @@ subquestion: |
   * Children who were victims of the stalking, and
   * Adults who were victims of the stalking and who cannot file for themselves due to age, disability, or poor health.
 fields:
-  - no label: any_others
+  - no label: others_protected.there_are_any
     datatype: yesnoradio
 ---
 sets:
@@ -482,8 +769,8 @@ id: others protected relation to user cook county
 question: |
   What is ${others_protected[i].name.full(middle='full')}'s relationship to you?
 fields:
-  - They are my: others_protected[i].relationship_radio
-    input type: radio
+  - They are my: others_protected[i].relation_to_user
+    input type: combobox
     choices:
     - Child
     - Stepchild
@@ -493,12 +780,7 @@ fields:
     - Aunt or uncle
     - Niece or nephew
     - Sibling
-    - Cousin
-    - Other
-  - Other: others_protected[i].relationship
-    show if: 
-      variable: others_protected[i].relationship_radio
-      is: "Other"     
+    - Cousin 
 ---
 #review amount of space available and figure out max length
 id: protection reason cook county
@@ -562,12 +844,21 @@ fields:
   - no label: others_protected.there_is_another
     datatype: yesnoradio
 ---
-id: other parties name
+id: other parties name stalker name
 question: |
-  Who do you want to file a Stalking No Contact Order against?
+  What is the stalker's name?
+subquestion: |
+  This is the person you will file the Stalking No Contact Order against.
 fields:
-  - code: |
-      other_parties[0].name_fields()
+  - First: other_parties[0].name.first
+  - Middle: other_parties[0].name.middle
+    required: False
+  - Last: other_parties[0].name.last
+    required: False
+  - Suffix: other_parties[0].name.suffix
+    required: False
+    code: |
+      name_suffix()
 ---
 id: stalker gender
 question: |
@@ -588,6 +879,8 @@ fields:
     show if: 
       variable: other_parties[0].gender
       is: "Other"  
+---
+
 ---
 id: stalker race
 question: |
@@ -644,7 +937,7 @@ question: |
 subquestion: |
   If you know of any old legal name, nickname, or alias that ${other_parties[0].name.full(middle='full')} has used, click **Yes**.
 fields:
-  - no label: other_parties[0].any_other_names
+  - no label: other_parties[0].other_names.there_are_any
     datatype: yesnomaybe
 ---
 id: stalker other names
@@ -692,16 +985,35 @@ fields:
     maxlength: 4
     required: False
 ---
-id: stalker birth date
+id: know respondent birthdate
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s birth date?
-subquestion: |
-  If you do not know, you can leave this blank. 
-fields:
-  - Their date of birth: other_parties[0].birthdate
-    datatype: BirthDate
-    alMax: today()
-    required: False
+  Do you know ${other_parties[0].name.full(middle="full")}'s birthdate?
+fields:   
+  - no label: knows_respondent_dob
+    datatype: radio
+    choices:
+      - Yes, I will enter the date.: exact
+      - I know some of it.: some
+        help: |
+          For example, "June 3rd" or "Summer of 1990."
+      - I don't know it.: idk
+        help: |
+          % if trial_court_index == -1:
+          You can update the Cook County Sheriff's office when you have this information. Email them anytime at ccso.protectiveorders@ccsheriff.org or call them at 312-603-2134 or 312-603-3340 (Monday through Friday, 8AM to 5PM).
+          % else:
+          You may want to update the sheriff's office when you have this information.
+          % endif
+  - ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].birthdate
+    datatype: date
+    max: ${ today().format("yyyy-MM-dd") }
+    show if: 
+      variable: knows_respondent_dob
+      is: exact
+  - What you know about ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].birthdate_info
+    maxlength: 25
+    show if:
+      variable: knows_respondent_dob
+      is: some
 ---
 id: stalker height stalker weight
 question: |
@@ -710,14 +1022,26 @@ subquestion: |
   If you do not know, you can leave this blank. 
 fields:
   - Feet: other_parties[0].height_feet
-    maxlength: 2
+    datatype: integer
     required: False
+    min: 1
+    max: 9
+    help: |
+      Example: 5
   - Inches: other_parties[0].height_inches
-    maxlength: 2
+    datatype: integer
     required: False
+    min: 0
+    max: 11
+    help: |
+      Example: 8
   - Weight (in pounds): other_parties[0].weight
-    maxlength: 4
+    datatype: integer
     required: False
+    min: 1
+    max: 1500
+    help: |
+      Example: 170
 ---
 id: stalker eyes
 question: |
@@ -726,16 +1050,30 @@ subquestion: |
   If you do not know, you can leave this blank. 
 fields:
   - Eye color: other_parties[0].eye_color
-    maxlength: 20
+    maxlength: 30
     required: False
+    help: |
+      Examples: brown, blue, hazel, green
   - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].wear_glasses
-    input type: radio
+    datatype: radio
     required: False
     choices:
       - Yes: True
       - No: False
       - Sometimes: sometimes
       - I do not know: dont_know
+---
+id: stalker hair color
+question: |
+  What color is ${other_parties[0].name.full(middle='full')}'s hair?
+subquestion: |
+  If you do not know, you can leave this blank. 
+fields:
+  - Hair color: other_parties[0].hair_color
+    maxlength: 30
+    required: False
+    help: |
+      Examples: brown, black, blond, gray, bald or shaved
 ---
 #check how much space is available
 id: stalker distinguishing features
@@ -749,6 +1087,23 @@ fields:
   - Features: other_parties[0].features
     input type: area
     required: False
+---
+id: stalker probation
+question: |
+  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
+fields:
+  - no label: respondent_on_probation
+    datatype: radio
+    choices:
+      - Yes: Yes
+      - No: No
+      - I don't know.: idk
+  - Probation in which county?: respondent_probation_county
+    required: False
+    maxlength: 25
+    show if: 
+      variable: respondent_on_probation
+      is: "Yes"
 ---
 id: stalker drivers license
 question: |
@@ -865,7 +1220,7 @@ id: stalker currently employed
 question: |
   Do you know if ${other_parties[0].name.full(middle='full')} is employed?
 fields:
-  - no label: other_parites[0].has_job
+  - no label: other_parties[0].has_job
     datatype: yesnoradio
 ---
 #what if they have more than one employer?
@@ -873,9 +1228,15 @@ id: stalker employer
 question: |
   Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s employer.
 subquestion: |
-  If you do not know who ${other_parties[0].name.full(middle='full')}'s employer is, enter "Unknown" for the employer name and leave the other fields blank.
+  If you do not know who ${other_parties[0].name.full(middle='full')}'s employer is, you can leave this blank.
 fields:
   - Employer name: other_parties[0].employer_name
+    required: False
+  - Occupation or type of work: respondent_work_type
+    required: false
+    help: |
+      Describe their position, job title, or role where they work. Examples: Manager, cook, cashier
+    maxlength: 30
   - Standard work hours: other_parties[0].work_hours
     required: False
     help: |
@@ -934,7 +1295,14 @@ question: |
   Is ${other_parties[0].name.full(middle='full')} likely to be carrying a weapon?
 fields:
   - no label: other_parties[0].carrying_weapon
-    datatype: yesnoradio
+    datatype: yesnomaybe
+---
+id: stalker home weapon
+question: |
+  Does ${other_parties[0].name.full(middle='full')} have weapons at home?
+fields:
+  - no label: other_parties[0].home_weapon
+    datatype: yesnomaybe
 ---
 id: stalker weapon info
 question: |
@@ -1017,27 +1385,44 @@ question: |
 fields: 
   - no label: other_parties[0].which_address
     choices:
-    - ${other_parties[0].address.on_one_line(bare=True)}: home_address
-      show if: other_parties[0].address_known
-    - An address I will enter: service_address
+      - ${other_parties[0].address.on_one_line(bare=True)}: home_address
+        show if: other_parties[0].address_known
+      - ${other_parties[0].employer_address.on_one_line(bare=True)}: employer_address
+        show if: other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != ""
+      - An address I will enter: add_service_address
   - Street address: other_parties[0].service_address.address
     address autocomplete: True
-    show if: other_parties[0].which_address == "service_address"
+    show if:
+      variable: other_parties[0].which_address
+      is: "add_service_address" 
   - Address line 2: other_parties[0].service_address.unit
     required: False
-    show if: other_parties[0].which_address == "service_address"
+    show if:
+      variable: other_parties[0].which_address
+      is: "add_service_address" 
   - City: other_parties[0].service_address.city
-    show if: other_parties[0].which_address == "service_address"
+    show if:
+      variable: other_parties[0].which_address
+      is: "add_service_address" 
   - State: other_parties[0].service_address.state
-    show if: other_parties[0].which_address == "service_address"
+    show if:
+      variable: other_parties[0].which_address
+      is: "add_service_address" 
     code: |
       states_list()  
   - ZIP code: other_parties[0].service_address.zip
-    show if: other_parties[0].which_address == "service_address"
-  - Phone number: other_parties[0].service_phone
-    show if: other_parties[0].which_address == "service_address"
-  - Email address: other_parties[0].service_email
-    show if: other_parties[0].which_address == "service_address"
+    show if:
+      variable: other_parties[0].which_address
+      is: "add_service_address" 
+  #- Phone number: other_parties[0].service_phone
+  #  required: False
+  #- Email address: other_parties[0].service_email
+  #  required: False
+validation code: |
+  if other_parties[0].which_address == "home_address":
+    other_parties[0].service_address = other_parties[0].address
+  elif other_parties[0].which_address == "employer_address":
+    other_parties[0].service_address = other_parties[0].employer_address
 ---
 id: list bonus service check
 question: |
@@ -1054,25 +1439,42 @@ fields:
     choices:
     - ${other_parties[0].address.on_one_line(bare=True)}: home_address
       show if: other_parties[0].address_known and other_parties[0].which_address != "home_address"
+    - ${other_parties[0].employer_address.on_one_line(bare=True)}: employer_address
+      show if: other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != ""
     - An address I will enter: service_address
   - Street address: other_parties[0].bonus_service_address.address
     address autocomplete: True
-    show if: other_parties[0].which_bonus_address == "service_address"
+    show if:
+      variable: other_parties[0].which_bonus_address
+      is: "service_address" 
   - Address line 2: other_parties[0].bonus_service_address.unit
     required: False
-    show if: other_parties[0].which_bonus_address == "service_address"
+    show if:
+      variable: other_parties[0].which_bonus_address
+      is: "service_address" 
   - City: other_parties[0].bonus_service_address.city
-    show if: other_parties[0].which_bonus_address == "service_address"
+    show if:
+      variable: other_parties[0].which_bonus_address
+      is: "service_address" 
   - State: other_parties[0].bonus_service_address.state
-    show if: other_parties[0].which_bonus_address == "service_address"
+    show if:
+      variable: other_parties[0].which_bonus_address
+      is: "service_address" 
     code: |
       states_list()  
   - ZIP code: other_parties[0].bonus_service_address.zip
-    show if: other_parties[0].which_bonus_address == "service_address"
-  - Phone number: other_parties[0].service_phone
-    show if: other_parties[0].which_bonus_address == "service_address"
-  - Email address: other_parties[0].service_email
-    show if: other_parties[0].which_bonus_address == "service_address"
+    show if:
+      variable: other_parties[0].which_bonus_address
+      is: "service_address" 
+  #- Phone number: other_parties[0].bonus_service_phone
+  #  required: False
+  #- Email address: other_parties[0].bonus_service_email
+  #  required: False
+validation code: |
+  if other_parties[0].which_bonus_address == "home_address":
+    other_parties[0].bonus_service_address = other_parties[0].address
+  elif other_parties[0].which_bonus_address == "employer_address":
+    other_parties[0].bonus_service_address = other_parties[0].employer_address
 ---
 id: stalking event intro
 continue button field: stalking_event_intro
@@ -1093,7 +1495,7 @@ question: |
 subquestion: |
   If you not remember the exact date, enter the month and year.
 fields:
-  - Date: stalking_events[i].text_date
+  - Date: stalking_events[i].name.text
   - Time: stalking_events[i].time
     datatype: time
     required: False
@@ -1123,6 +1525,7 @@ fields:
     datatype: yesnoradio
   - Police report number: stalking_events[i].police_number
     required: False
+    show if: stalking_events[i].police_check
     help: |
       If you do not know, you can leave this blank.
 ---
@@ -1152,26 +1555,26 @@ fields:
     none of the above: False
     choices:
       - Plenary Stalking No Contact Order: plenary
-      - Emergency Stalking No Contact Order: Emergency
+      - Emergency Stalking No Contact Order: emergency
 ---
 #Can we dig up any examples or more information about what this should look like?
 #Check space limits on template
-id: emergency why
+id: emergency reason
 question: |
   Why should the court grant an *Emergency Order* without needing to tell ${other_parties[0].name.full(middle='full')}?
 subquestion: |
   Use complete sentences and proper punctuation. Your response will appear in your forms exactly as you type it. 
 fields:
-  - no label: emergency_why
+  - no label: emergency_reason
     input type: area
 ---
-id: stop doing what
+id: protection requested
 question: |
   What do you want the court to make ${other_parties[0].name.full(middle='full')} stop doing?
 subquestion: |
   ${collapse_template(stay_away_contact)}
 fields:
-  - I want the court to make ${other_parties[0].name.full(middle='full')} stop...: stop_doing_what
+  - I want the court to make ${other_parties[0].name.full(middle='full')} stop...: protection_requested
     datatype: checkboxes
     none of the above: True
     choices:
@@ -1214,6 +1617,14 @@ fields:
       - Day Care: day_care
       - Other
 ---
+depends on:
+  - protected_place_types
+code: |
+  if protected_place_types['Workplace'] or protected_place_types['School'] or protected_place_types['day_care']:
+    employers_schools.there_are_any = True
+  else:
+    employers_schools.there_are_any = False
+---
 id: safe home address
 question: |
   What is your home address?
@@ -1244,7 +1655,7 @@ fields:
 ---
 id: employers schools name
 question: |
-  What is the name and type of the ${ordinal(i)} place you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and type of the ${ordinal(i)} workplace, school, or day care you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - Type: employers_schools[i].type
     choices:
@@ -1273,7 +1684,7 @@ fields:
 ---
 id: employers schools there is another
 question: |
-  Do you want to add another place ${other_parties[0].name.full(middle='full')} should stay away from?
+  Do you want to add another workplace, school, or day care ${other_parties[0].name.full(middle='full')} should stay away from?
 subquestion: |
   So far you have told us about ${comma_and_list(employers_schools.complete_elements().full_names())}.
 fields:
@@ -1305,19 +1716,23 @@ choices:
   - code: |
       school_list
 ---
-depends on: 
-  - employers_schools[i].name.first
-  - employers_schools[i].type
+reconsider: True
 code: |
-  school_list = list()
   school_list.clear()
-  work_list = list()
   work_list.clear()
   for place in employers_schools:
     if place.type == "school":
       school_list.append({place.name.first: place.name.first})
     elif place.type == "work":
       work_list.append({place.name.first: place.name.first})
+  make_lists = True
+---
+id: work with stalker
+question: |
+  Do you and ${other_parties[0].name.full(middle='full')} have the same workplace?
+fields:
+  - no label: work_with_stalker
+    datatype: yesnoradio
 ---
 id: which stalker work
 question: |
@@ -1359,5 +1774,626 @@ fields:
     input type: area
     show if: other_parties[0].anything_else
 ---
-#add get docs screen!
+id: no protection chosen
+event: other_parties[0].no_protection_chosen
+question: |
+  Sorry
+subquestion: |
+  You have not chosen to ask for any of the protections a Stalking No Contact Order can give you.
   
+  If you have made a mistake, click **Back.**
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: additional service information cook
+question: |
+  What other information will help the sheriff deliver court papers to ${other_parties[0].name.full(middle="full")}?
+subquestion: |
+  You can add things like:
+  
+  * Best days and times to serve court papers,
+  * Details about the places where ${other_parties[0].name.full(middle="full")} can be found, and
+  * Information about other people at those locations that can help find ${other_parties[0].name.full(middle="full")}.
+
+  This will not appear on the forms that will be filed with the court. It goes on the Confidential Protective Order Information Sheet for the Sheriff.
+fields:
+  - no label: service_information
+    input type: area
+    rows: 2
+    maxlength: 150
+    required: False
+---
+id: signature
+question: |
+  Do you want to add your e-signature to your forms?
+subquestion: |
+  This program can put "**/s/ ${users[0].name.full(middle='full')}**" where you would sign your name. The court will accept this as your signature.
+  
+  If you do not add your **{e-signature}** now, you must sign your forms before you file them.
+  
+  <div class="alert alert-info ilao-info" role="alert">
+    <h6 class="alert-heading">What it means to sign your forms</h6>
+    <p>By signing your <i>Motion to Remove Eviction Court File from Public Record</i>, you are certifying that:
+  <p>
+  <p><ul>
+  <li>You read the document,</li>
+  <li>You believe it to be true and correct, and</li>
+  <li>You are not filing it for an improper purpose.</li>
+  </ul><p>
+  <p>See the <a href="https://ilcourtsaudio.blob.core.windows.net/antilles-resources/resources/9ce1fce9-895f-463e-b87d-f9b7631f8fde/Rule%20137.pdf"><b>Illinois Supreme Court Rule 137</b></a> for more information.</p>
+  </div>
+field: e_signature
+choices:
+  - Yes: True
+  - No, I will sign my forms later.: False
+terms:
+  - "e-signature": |
+      An e-signature is an electronic signature. It is a digital version of a signature that has the same effect as a hand-written signature.
+---
+id: get docs screen
+question: |
+  Download
+subquestion: |
+  Your forms are ready. View and download your forms below. Click **Make changes** to fix any mistakes.
+
+  This program does not file your ${ form_name } forms with the court. You will need to do this yourself.
+
+  ${ action_button_html(url_action('review_answers'), label=':edit: Make changes', color='success', size="md") }
+  
+  ${ al_user_bundle.download_list_html() }
+
+  &nbsp;
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+  **Note:** This program does not file your ${ form_name } forms with the court.
+  
+  Thank you for using ILAO Easy Forms!
+event: get_docs_screen
+under: |
+  **Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate.
+  % if not user_logged_in():
+  
+  [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} Sign-in](${url_of('login', next=interview_url())}) or [create](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
+  % endif 
+
+  &nbsp;
+  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
+---
+generic object: ALDocumentBundle
+template: x.send_email_template
+subject: |
+  Your forms
+content: |
+  Your forms are attached.
+  
+  Thanks for using ILAO Easy Forms!
+  
+  [Illinois Legal Aid Online](https://www.illinoislegalaid.org)
+---
+objects:
+  - snco_instructions: ALDocument.using(title="Instructions", filename="instructions.pdf", has_addendum=False)
+  - snco_petition: ALDocument.using(title="Petition", filename="petition.pdf", has_addendum=False)
+  #- op_schools: ALDocument.using(title="Confidential School or Daycare", filename="confidential_schools.pdf", has_addendum=False)
+  #- additional_incidents: ALDocument.using(title="Additional Incidents of Abuse", filename="additional_incidents.pdf", has_addendum=False)
+  #- additional_cases: ALDocument.using(title="Additional Case Information", filename="additional_cases.pdf", has_addendum=False)
+  #- emergency_op: ALDocument.using(title="Emergency Order of Protection (draft)", filename="emergency_op.pdf", has_addendum=False)
+  - snco_order: ALDocument.using(title="Order", filename="snco_order.pdf", has_addendum=False)
+  - snco_summons: ALDocument.using(title="Summons", filename="summons.pdf", has_addendum=False)
+  #- affidavit_pt_supervisor: ALDocument.using(title="Affidavit of Parenting Time Supervisor", filename="affidavit_pt_supervisor.pdf", has_addendum=False)
+  - efiling_exemption: ALDocument.using(title="E-filing exemption (optional)", filename="e-filing_exemption.pdf", has_addendum=False)
+  - cook_dv_cover_sheet: ALDocument.using(title="Domestic Violence Cover Sheet", filename="cook_dv_cover_sheet.pdf", has_addendum=False)
+  - cook_sheriff_info_sheet: ALDocument.using(title="Confidential Sheriff Information Sheet", filename="cook_sheriff_info_sheet.pdf", has_addendum=False)
+  - cook_petition: ALDocument.using(title="Petition", filename="cook_petition.pdf", has_addendum=False)
+  - cook_findings: ALDocument.using(title="Findings", filename="cook_findings.pdf", has_addendum=False)
+  - cook_disposition_order: ALDocument.using(title="Disposition order", filename="cook_disposition.pdf", has_addendum=False)
+  - others_protected_addendum: ALDocument.using(title="Others protected addendum", filename="others_protected_addendum.pdf", has_addendum=False)
+---
+objects: 
+  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, snco_petition, others_protected_addendum, cook_petition, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
+  - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, snco_petition, others_protected_addendum, cook_petition, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
+---
+code: |
+  snco_instructions.enabled = True
+  #op_schools.enabled = False
+  snco_summons.enabled = True
+  efiling_exemption.enabled = False
+  others_protected_addendum.enabled = False
+  
+  if trial_court_index == -1:
+    cook_dv_cover_sheet.enabled = True
+    cook_sheriff_info_sheet.enabled = True
+    cook_petition.enabled = True
+    cook_findings.enabled = True
+    cook_disposition_order.enabled = True
+    snco_petition.enabled = False
+    snco_order.enabled = False
+  else:
+    cook_dv_cover_sheet.enabled = False
+    cook_sheriff_info_sheet.enabled = False
+    cook_petition.enabled = False
+    cook_findings.enabled = False
+    cook_disposition_order.enabled = False
+    snco_petition.enabled = True
+    snco_order.enabled = True
+    if others_protected.number_gathered() > 2:
+      others_protected_addendum.enabled = True
+      
+---
+attachment:
+  variable name: snco_instructions[i]
+  name: instructions
+  filename: snco_instructions
+  docx template file: snco_instructions.docx
+---
+attachment:
+  variable name: others_protected_addendum[i]
+  name: others_protected_addendum
+  filename: others_protected_addendum
+  docx template file: others_protected_addendum.docx
+---
+attachment:
+  variable name: cook_dv_cover_sheet[i]
+  name: cook_dv_cover_sheet
+  filename: cook_dv_cover_sheet
+  skip undefined: True
+  editable: False
+  pdf template file: cook_dv_cover_sheet.pdf
+  fields:
+    - "petitioner__1": ${ users[0].name.full(middle="full") }
+    - "respondent": ${other_parties[0].name.full(middle="full")}
+    - "case_number__1": ${ case_number }
+    - "stalking_petition": ${ True }
+
+    - "involves_minors_yes": ${ True if any_minors else '' }
+    - "involves_minors_no": ${ True if not any_minors else '' }
+    - "previous_divorce_yes": ${ True if other_parties[0].divorced_user else '' }
+    - "previous_divorce_no": ${ True if not other_parties[0].divorced_user else '' }
+    - "previous_parentage_yes": ${ True if other_parties[0].parentage_action and not other_parties[0].divorced_user else '' }
+    - "previous_parentage_no": ${ True if other_parties[0].divorced_user or not other_parties[0].parentage_action else '' }
+    - "previous_cook_case_date": |  
+        % if other_parties[0].divorced_user:
+        ${ format_date(other_parties[0].divorce_date, format='MMM d, yyyy')}
+        % elif other_parties[0].parentage_action:
+        ${ format_date(other_parties[0].parentage_date, format='MMM d, yyyy')} 
+        % else: 
+        ${''} 
+        % endif
+    - "previous_cook_case_number": |
+        % if other_parties[0].divorced_user:
+        ${ other_parties[0].divorce_number}
+        % elif other_parties[0].parentage_action:
+        ${ other_parties[0].parentage_number} 
+        % else: 
+        ${''} 
+        % endif
+    - "previous_cook_case_judge": |
+        % if other_parties[0].divorced_user:
+        ${ other_parties[0].divorce_judge}
+        % elif other_parties[0].parentage_action:
+        ${ other_parties[0].parentage_judge} 
+        % else: 
+        ${''} 
+        % endif
+    - "pro_se_cb": ${ True }
+    - "petitioner__2": ${ users[0].name.full(middle="full") }
+    - "preparer_address_line_1": ${ users[0].address.line_one(bare=True) }
+    - "petitioner_city": ${ users[0].address.city }
+    - "petitioner_state": ${ users[0].address.state }
+    - "petitioner_zip": ${ users[0].address.zip }
+    - "preparer_phone": ${ phone_number_formatted(users[0].phone_number) }
+    - "preparer_email": ${ users[0].email if users[0].has_email_address else ""}
+---
+attachment:
+  variable name: cook_sheriff_info_sheet[i]
+  name: cook_sheriff_info_sheet
+  filename: cook_sheriff_info_sheet
+  skip undefined: True
+  editable: False
+  pdf template file: cook_sheriff_info_sheet.pdf
+  fields:
+    - "respondent": ${other_parties[0].name.full(middle="full")}
+    - "case_number__1": ${ case_number }
+    - "alias_names": ${ comma_and_list.other_parties[0].other_names}
+    - "respondent_gender": ${ other_parties[0].other_gender if other_parties[0].gender == 'other' else other_parties[0].gender }
+    - "respondent_race": ${ other_parties[0].other_race if other_parties[0].race == 'other' else other_parties[0].race }
+    - "respondent_dob": |
+        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
+        ${ other_parties[0].birthdate }
+        % elif knows_respondent_dob == 'some':
+        ${ other_parties[0].birthdate_info }
+        % else:
+        ${ "do not know" }
+        % endif
+    - "respondent_age": |
+        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
+        ${ other_parties[0].age_in_years() }
+        % endif
+    - "respondent_height": |
+        % if other_parties[0].height_feet > 1:
+        ${ str(other_parties[0].height_feet) + "\'" }
+        % if other_parties[0].height_inches > 0:
+        ${ str(other_parties[0].height_inches) + "\""}
+        % endif
+        % else:
+        ${""}
+        % endif
+    - "respondent_weight": ${ str(other_parties[0].weight) + " lbs." if other_parties[0].weight > 0 else '' }
+    - "respondent_skin": |
+        % if other_parties[0].skin != "":
+        ${ other_parties[0].other_skin_tone if other_parties[0].skin_tone == 'other' else other_parties[0].skin_tone }
+        % endif
+    - "respondent_hair": ${ other_parties[0].hair_color}
+    - "respondent_eyes": ${ other_parties[0].eye_color if other_parties[0].eye_color != "" else '' }
+    - "respondent_glasses": ${other_parties[0].wear_glasses if other_parties[0].wear_glasses != "" else ''}
+    - "respondent_tattoos": ${ other_parties[0].features if other_parties[0].features != "" else '' }
+    - "respondent_history_illness": ${ other_parties[0].mental_illness }
+    - "respondent_alcohol": ${ other_parties[0].alcohol}
+    - "respondent_drugs": ${ other_parties[0].drugs }
+    - "respondent_firearms_on_person": ${ other_parties[0].carrying_weapon }
+    - "respondent_weapons_in_home": ${ other_parties[0].home_weapon }
+    - "respondent_weapons_description": ${ other_parties[0].weapons_info if other_parties[0].carrying_weapon or other_parties[0].home_weapon == True else "" }        
+    - "respondent_suicidal": ${ other_parties[0].suicide_risk }    
+    - "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
+    - "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  } 
+    
+    - "respondent_employer": ${ other_parties[0].employer_name}
+    - "respondent_work_type": ${respondent_work_type}       
+    - "service_address_line_1": ${other_parties[0].servie_address.line_one(bare=True)}
+    - "service_city": ${other_parties[0].service_address.city}
+        
+    - "last_known_address": |
+        % if other_parties[0].address_known:
+        ${other_parties[0].address.line_one(bare=True)}
+        % endif       
+    - "last_known_city": |
+        % if other_parties[0].address_known:
+        ${other_parties[0].address.city}
+        % endif  
+    - "respondent_work_address": |
+        % if other_parties[0].has_job:
+        ${ other_parties[0].employer_address.line_one(bare=True) }
+        % else:
+        ${ "do not know" }
+        % endif
+    - "respondent_work_city": |
+        % if other_parties[0].has_job:
+        ${ other_parties[0].employer_address.city }
+        % else:
+        ${ "do not know" }
+        % endif
+    - "respondent_employer": ${other_parties[0].employer_name if other_parties[0].has_job else ""}
+    - "respondent_work_type": ${respondent_work_type if other_parties[0].has_job else ""}
+    - "service_alt_address_line_1": ${other_parties[0].bonus_service_address.line_one(bare=True) if other_parties[0].bonus_service_check else ""}
+    - "service_alt_city": ${other_parties[0].bonus_service_address.city if other_parties[0].bonus_service_check else ""}
+    - "respondent_phone": ${ phone_number_formatted(other_parties[0].phone_number) if other_parties[0].phone_number != "" else ""}
+    - "service_information": ${ service_information }
+    - "cook_vehicle_make": ${ other_parties[0].vehicle_make }
+    - "cook_vehicle_model": ${ other_parties[0].vehicle_model }
+    - "cook_vehicle_year": ${ other_parties[0].vehicle_year }
+    - "cook_vehicle_color": ${ other_parties[0].vehicle_color }
+    - "cook_vehicle_plate": ${ other_parties[0].license_plate }
+    - "cook_vehicle_state": ${ state_name(other_parties[0].vehicle_state) }
+
+    - "preparer_name": ${ users[0].name.full(middle="full") }
+    - "preparer_phone": ${ phone_number_formatted(users[0].phone_number)}
+---
+attachment:
+  variable name: cook_disposition_order[i]
+  name: cook_disposition_order
+  filename: cook_disposition_order
+  skip undefined: True
+  editable: False
+  pdf template file: cook_disposition_order.pdf
+  fields:
+    #What are these "on behalf of" fields in the template for?
+    - "on_behalf_1": ${""}
+    - "on_behalf_2": ${""}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    #Can the case number be known?
+    - "case_number": ${""}
+    #What is the leads number?
+    - "leads_number": ${""}
+    - "respondent_birth": ${other_parties[0].birthdate}
+    #What does it mean for an SNCO to be an independent proceeding, cirminal proceeding, or deliquency petition? 
+    - "independent": ${False}
+    - "criminal": ${False}
+    - "delinquency": ${False}
+    #Should these checkboxes be left blank for the court to mark?
+    - "emergency_check": ${order_type['emergency']}
+    - "plenary_check": ${order_type['plenary']}
+---
+attachment:
+  variable name: cook_findings[i]
+  name: cook_findings
+  filename: cook_findings
+  skip undefined: True
+  editable: False
+  pdf template file: cook_findings.pdf
+  fields:
+    #What are these "on behalf of" fields in the template for?
+    - "people_ex_rel": ${""}
+    - "on_behalf_of": ${""}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    #Can the case number be known?
+    - "case_number": ${""}
+    #What is the proceeding type?
+    - "independent": ${False}
+    - "other_proceeding_check": ${False}
+    - "other_proceeding_text": ${""}
+    - "criminal_proceeding": ${False}
+    - "juvenile": ${False}
+    #Should these checkboxes be left blank for the court to mark?
+    - "emergency_check": ${order_type['emergency']}
+    - "plenary_check": ${order_type['plenary']}
+---
+attachment:
+  variable name: cook_petition[i]
+  name: cook_petition
+  filename: cook_petition
+  skip undefined: True
+  editable: False
+  pdf template file: cook_petition.pdf
+  fields:
+    #What are these "on behalf of" fields in the template for?
+    - "people_ex_rel": ${""}
+    - "on_behalf_of": ${""}
+    - "self_name": ${""}
+    - "behalf_petitioner": ${users[0].name.full(middle='full')}
+    - "respondent": ${other_parties[0].name.full(middle='full')}
+    #Can the case number be known?
+    - "case_number": ${""}
+    - "respondent_birth": ${other_parties[0].birthdate}
+    #What does it mean for an SNCO to be an independent proceeding, cirminal proceeding, or deliquency petition? 
+    - "independent": ${False}
+    - "criminal": ${False}
+    - "juvenile": ${False}
+    - "emergency_check": ${order_type['emergency']}
+    - "plenary_check": ${order_type['plenary']}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    #These child name and adult name variables seem to be distinct from the others protected list. How should they be populated?
+    - "child_name": ${""}
+    - "adult_name": ${""}
+    - "safe_address": ${hide_address}
+    - "petitioner_address_line_one": ${users[0].address.line_one(bare=True)}
+    - "petitioner_city": ${users[0].address.city}
+    - "petitioner_state": ${ users[0].address.state}
+    - "petitioner_zip": ${users[0].address.zip}
+    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_address_line_one": ${other_parties[0].address.line_one(bare=True)}
+    - "respondent_city": ${other_parties[0].address.city}
+    - "respondent_state": ${ other_parties[0].address.state}
+    - "respondent_zip": ${other_parties[0].address.zip}
+    - "respondent_birth_date": ${other_parties[0].birthdate}
+    - "respondent_is_male": ${True if other_parties[0].gender == "Male" else False}
+    - "respondent_is_female": ${True if other_parties[0].gender == "Female" else False}
+    - "respondent_race": ${other_parties[0].other_race if other_parties[0].race == "Other" else other_parties[0].race}
+    - "respondent_height": ${(other_parties[0].height_feet + "'" + other_parties[0].height_inches  + "''") if other_parties[0].height_feet != "" else ""}
+    - "respondent_weight": ${other_parties[0].weight}
+    - "respondent_characteristics": ${other_parties[0].features}
+    - "employer_name": ${ other_parties[0].employer_name if other_parties[0].has_job else ""}
+    - "employer_address_line_one": ${ other_parties[0].employer_address.line_one(bare=True) if other_parties[0].has_job else ""}
+    - "employer_city": ${ other_parties[0].employer_address.city if other_parties[0].has_job else ""}
+    - "employer_state": ${ other_parties[0].employer_address.state if other_parties[0].has_job else ""}
+    - "employer_zip": ${ other_parties[0].employer_address.zip if other_parties[0].has_job else ""}
+    - "protect_others_check": ${ True if others_protected.there_are_any else False}
+    - "others_protected_list": ${comma_and_list(others_with_minor_initials) if others_protected.there_are_any else ""}
+    - "incidents_check": ${True}
+    - "date_incident_1": ${stalking_events[0].name.text}
+    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm')}
+    - "am_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='AM' else False }
+    - "pm_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='PM' else False }
+    - "location_incident_1": ${stalking_events[0].place}
+    - "description_incident_1": ${stalking_events[0].description}
+    - "date_incident_2": ${stalking_events[1].name.text}
+    - "time_incident_2": ${format_time(stalking_events[1].time, format='h:mm')}
+    - "am_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='AM' else False }
+    - "pm_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='PM' else False }
+    - "location_incident_2": ${stalking_events[1].place}
+    - "description_incident_2": ${stalking_events[1].description}
+    - "description_incident_2_continued": ${""}
+    - "date_incident_3": ${stalking_events[2].name.text}
+    - "time_incident_3": ${format_time(stalking_events[2].time, format='h:mm')}
+    - "am_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='AM' else False }
+    - "pm_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='PM' else False }
+    - "location_incident_3": ${stalking_events[2].place}
+    - "description_incident_1": ${stalking_events[2].description}
+    - "no_police_report": ${ False if any_police_reports else True}
+    - "yes_police_report": ${any_police_reports}
+    - "report_number": ${comma_and_list(report_numbers) if any_police_reports else ""}
+    - "others_protected": ${comma_and_list(others_protected) if others_protected.there_are_any else ""}
+    - "no_stalking": ${protection_requested['stalking']}
+    - "no_contact": ${protection_requested['contacting']}
+    - "no_contact_list": ${comma_and_list(others_with_minor_initials)}
+    - "no_coming": ${protection_requested['away']}
+    - "feet_away": ${distance_away}
+    - "no_home": ${protected_place_types['Home']}
+    - "no_school": ${protected_place_types['School']}
+    - "no_day_care": ${protected_place_types['day_care']}
+    - "no_workplace": ${protected_place_types['Workplace']}
+    - "no_other_place": ${protected_place_types['Other']}
+    - "other_place_line_1": ${""}
+    - "other_place_line_2": ${other_places}
+    - "away_address_list": ${comma_and_list(away_address_list)}
+    - "no_remaining": ${True if live_with_stalker or school_with_stalker or work_with_stalker else False}
+    - "no_remain_residence": ${live_with_stalker}
+    - "no_remain_school": ${school_with_stalker}
+    - "no_remain_work": ${work_with_stalker}
+    - "no_remain_address_list": ${comma_and_list(no_remain_address_list)}
+    - "no_firearms": ${other_parties[0].prohibit_firearms}
+    - "other_relief_check": ${other_parties[0].anything_else}
+    - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
+    - "pay_costs_check": ${other_parties[0].pay_costs}
+    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
+    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_address_line_one": ${ users[0].address.line_one(bare=True)}
+    - "user_city": ${ users[0].address.city}
+    - "user_state": ${ users[0].address.state}
+    - "user_zip": ${ users[0].address.zip}
+    - "signature_date": ${today() if e_signature else ""}
+    - "user_phone": ${ phone_number_formatted(users[0].phone_number)}
+    - "user_email": ${ users[0].email if users[0].has_email_address else ""}
+---
+attachment:
+  variable name: snco_petition[i]
+  name: snco_petition
+  filename: snco_petition
+  skip undefined: True
+  editable: False
+  pdf template file: Stalking_NCO_Petition.pdf
+  fields:
+    - "circuit_court": ${""}
+    - "filing_county": ${trial_court.address.county}
+    - "user_name": ${users[0].name.full(middle='full')}
+    - "others_protected": ${comma_and_list(others_protected)}
+    - "protect_a_minor": ${any_minors}
+    - "protect_an_adult": ${any_adults}
+    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "case_number": ${""}
+    - "user_address": ${users[0].address.on_one_line(bare=True)}
+    - "use_safe_address": ${hide_address}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
+    - "other_protected_address_1": ${others_protected[0].address.on_one_line(bare=True)}
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
+    - "other_protected_address_2": ${others_protected[1].address.on_one_line(bare=True)}
+    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_home_check": ${other_parties[0].address_known}
+    - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
+    - "stalker_birth": ${other_parties[0].birthdate}
+    - "respondent_is_male": ${True if other_parties[0].gender == "Male" else False}
+    - "respondent_is_female": ${True if other_parties[0].gender == "Female" else False}
+    - "respondent_other_gender": ${other_parties[0].other_gender if other_parties[0].gender == "Other" else ""}
+    - "respondent_race": ${other_parties[0].other_race if other_parties[0].race == "Other" else other_parties[0].race}
+    - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "" else ""}
+    - "respondent_weight": ${other_parties[0].weight}
+    - "respondent_features": ${other_parties[0].features}
+    - "respondent_employer_name": ${ other_parties[0].employer_name if other_parties[0].has_job else ""}
+    - "respondent_work_check": ${True if other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != "" else False}
+    - "respondent_work_address": ${ other_parties[0].employer_address.on_one_line(bare=True) if other_parties[0].has_job else ""}
+    - "respondent_work_hours": ${other_parties[0].work_hours if other_parties[0].has_job else ""}
+    - "respondent_hair": ${ other_parties[0].hair_color}
+    - "respondent_eyes": ${ other_parties[0].eye_color if other_parties[0].eye_color != "" else '' }
+    - "respondent_ssn": ${other_parties[0].ssn}
+    - "respondent_dl": ${other_parties[0].drivers_license}
+    - "respondent_plate": ${other_parties[0].license_plate if other_parties[0].has_vehicle else ""}
+    - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
+    - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
+    - "just_armed": ${True if other_parties[0].armed and not other_parties[0].suicide_risk else False}
+    - "just_suicidal": ${True if other_parties[0].suicide_risk and not other_parties[0].armed else False}
+    - "armed_and_suicidal": ${True if other_parties[0].suicide_risk and other_parties[0].armed else False}  
+    - "date_incident_1": ${stalking_events[0].name.text}
+    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm a')}
+    - "location_incident_1": ${stalking_events[0].place}
+    - "description_incident_1": ${stalking_events[0].description}
+    - "description_incident_2": |
+        % if format_time(stalking_events[1].time, format='h:mm a') != "":
+        On or about ${stalking_events[1].name.text} at ${format_time(stalking_events[1].time, format='h:mm a')} at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
+        % else:
+        On or about ${stalking_events[1].name.text} at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
+        % endif
+    - "petitioner_in_county": ${ jurisdiction_type['I live here']}
+    - "respondent_in_county": ${ jurisdiction_type['Respondent lives here']}
+    - "acts_in_county":  ${ jurisdiction_type['Abuse was here']}
+    - "no_stalking": ${protection_requested['stalking']}
+    - "no_contact": ${protection_requested['contacting']}
+    - "no_coming": ${protection_requested['away']}
+    - "feet_away": ${distance_away}
+    - "no_home": ${protected_place_types['Home'] if protection_requested['away'] else False}
+    - "no_school_or_daycare": ${True if protection_requested['away'] and (protected_place_types['School'] or protected_place_types['day_care']) else False}
+    - "no_workplace": ${protected_place_types['Workplace'] if protection_requested['away'] else False}
+    - "no_other_place": ${protected_place_types['Other'] if protection_requested['away'] else False}
+    - "other_places_list": ${other_places}
+    - "no_firearms": ${other_parties[0].prohibit_firearms}
+    - "other_relief_check": ${other_parties[0].anything_else}
+    - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
+    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True)}
+    - "petitioner_address_line_2": ${ users[0].address.line_two()}
+    - "petitioner_phone": ${ phone_number_formatted(users[0].phone_number)}
+    - "petitioner_email": ${ "Email:" + " " + users[0].email if users[0].has_email_address else ""}
+    - "protected_home_address": ${home.on_one_line(bare=True) if protection_requested['away'] and protected_place_types['Home'] else ""}
+    - "protected_work_addresses": ${comma_and_list(away_work_address_list)}
+    - "school_daycare_addresses": ${comma_and_list(away_school_daycare_list)}
+---
+attachment:
+  variable name: snco_order[i]
+  name: snco_order
+  filename: snco_order
+  skip undefined: True
+  editable: False
+  pdf template file: Stalking_NCO_Order.pdf
+  fields:
+    - "circuit_court": ${""}
+    - "filing_county": ${trial_court.address.county}
+    - "user_name": ${users[0].name.full(middle='full')}
+    - "others_protected": ${comma_and_list(others_protected)}
+    - "protect_a_minor": ${any_minors}
+    - "protect_an_adult": ${any_adults}
+    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "case_number": ${""}
+    - "user_address": ${users[0].address.on_one_line(bare=True)}
+    - "use_safe_address": ${hide_address}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
+    - "other_protected_address_1": ${others_protected[0].address.on_one_line(bare=True)}
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
+    - "other_protected_address_2": ${others_protected[1].address.on_one_line(bare=True)}
+    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_home_check": ${other_parties[0].address_known}
+    - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
+    - "stalker_birth": ${other_parties[0].birthdate}
+    - "respondent_is_male": ${True if other_parties[0].gender == "Male" else False}
+    - "respondent_is_female": ${True if other_parties[0].gender == "Female" else False}
+    - "respondent_race": ${other_parties[0].other_race if other_parties[0].race == "Other" else other_parties[0].race}
+    - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "" else ""}
+    - "respondent_weight": ${other_parties[0].weight}
+    - "respondent_features": ${other_parties[0].features}
+    - "respondent_employer_name": ${ other_parties[0].employer_name if other_parties[0].has_job else ""}
+    - "respondent_work_check": ${True if other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != "" else False}
+    - "respondent_work_address": ${ other_parties[0].employer_address.on_one_line(bare=True) if other_parties[0].has_job else ""}
+    - "respondent_work_hours": ${other_parties[0].work_hours if other_parties[0].has_job else ""}
+    - "respondent_hair": ${ other_parties[0].hair_color}
+    - "respondent_eyes": ${ other_parties[0].eye_color if other_parties[0].eye_color != "" else '' }
+    - "respondent_ssn": ${other_parties[0].ssn}
+    - "respondent_dl": ${other_parties[0].drivers_license}
+    - "respondent_plate": ${other_parties[0].license_plate if other_parties[0].has_vehicle else ""}
+    - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
+    - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
+    #Add questions about an incarcerated respondent?
+    - "respondent_jail_check": ${False}
+    - "respondent_jail_name": ${""}
+    - "respondent_address_unknown": ${False if other_parties[0].address_known else True}
+    - "armed": ${other_parties[0].armed}
+    - "suicidal": ${other_parties[0].suicide_risk}
+    #What does the Y checkbox on the form mean?
+    - "y_check": ${False}
+---
+ attachment:
+  variable name: snco_summons[i]
+  name: snco_summons
+  filename: snco_summons
+  skip undefined: True
+  editable: False
+  pdf template file: Stalking_NCO_Summons.pdf
+  fields:
+    - "circuit_court": ${""}
+    - "filing_county": ${trial_court.address.county}
+    - "user_name": ${users[0].name.full(middle='full')}
+    - "protect_a_minor": ${any_minors}
+    - "protect_an_adult": ${any_adults}
+    - "others_protected": ${ comma_and_list(others_protected)}
+    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "main_service_address": ${other_parties[0].service_address.on_one_line(bare=True)}
+    - "independent": ${False}
+    - "criminal": ${False}
+    - "juvenile": ${False}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_phone": ${ phone_number_formatted(users[0].phone_number) }
+    - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True) }
+    - "petitioner_address_line_2": ${ users[0].address.line_two() }
