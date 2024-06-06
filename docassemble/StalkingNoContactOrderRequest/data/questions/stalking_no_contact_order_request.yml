@@ -67,6 +67,7 @@ mandatory: True
 code: |
   nav.set_section('section_intro')
   sees_nav_bar
+  snapshot_start
   instructions
   whats_next
   accept_terms
@@ -129,7 +130,7 @@ code: |
     other_parties[0].drugs
     other_parties[0].carrying_weapon
     other_parties[0].home_weapon
-    if other_parties[0].carrying_weapon or other_parties.home_weapon:
+    if other_parties[0].carrying_weapon or other_parties[0].home_weapon:
       other_parties[0].weapons_info
     if other_parties[0].order_of_protection == True:
       other_parties[0].op_state
@@ -163,16 +164,15 @@ code: |
         if work_list.number_gathered() > 1:
           which_stalker_work
   other_parties[0].prohibit_firearms
-   
+  if trial_court.address.county == "Cook":
+    other_parties[0].pay_costs 
   other_parties[0].anything_else
   if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
     other_parties[0].no_protection_chosen
-  if trial_court.address.county == "Cook":
-    other_parties[0].pay_costs 
+  
   
   nav.set_section('section_filing_info')
-  if other_parties[0].address_known == True:
-    other_parties[0].which_address
+  other_parties[0].which_address
   if other_parties[0].bonus_service_check == True:
     other_parties[0].which_bonus_address
   if trial_court.address.county == "Cook":  
@@ -186,13 +186,42 @@ code: |
   
   if trial_court.address.county == "Cook":
     make_report_list
-    with_initials
+    #with_initials
     cook_stay_away_addresses
     cook_no_remain_addresses
   else:
     state_stay_away_addresses
-       
+    
+  addendum_check
+  #debug_page
+  forms_assembling
+  snapshot_forms
   get_docs_screen
+---
+code: |
+  stuff_to_snapshot = {
+  	'start_time': str(current_datetime().format_datetime()),
+  	'started_interview': True, 
+  	}
+    
+  stuff_to_snapshot['user_zip'] = showifdef('users[0].address.zip')
+
+  stuff_to_snapshot['downloaded_forms'] = showifdef('forms_assembling')
+  
+  stuff_to_snapshot['filing_county'] = showifdef('trial_court.address.county')  
+  
+  store_variables_snapshot(
+  	data=stuff_to_snapshot, persistent=True
+  	)
+  snapshot_interview_state = True
+---
+code: |
+  snapshot_interview_state
+  snapshot_start = True  
+---
+code: |
+  reconsider('snapshot_interview_state')
+  snapshot_forms = True
 ---
 #others protected gather code block
 code: |
@@ -238,6 +267,7 @@ code: |
       if date_difference(starting=others_protected[index].birth, ending=today()).years < 18:
         others_with_minor_initials[index].name.first = other.name.first[:1]
         others_with_minor_initials[index].name.last = other.name.last[:1]
+    others_with_minor_initials.there_is_another = False
   with_initials = True
 ---
 # employers schools gather code block
@@ -258,6 +288,31 @@ code: |
         away_address_list.append(place.address.on_one_line(bare=True))
     away_address_list.there_is_another = False
   cook_stay_away_addresses = True
+---
+#This code block sets a flag for each item in others_protected and stalking_events. This flag tracks whether the item needs to be included in an addendum form rather than the main petition.
+reconsider: True
+code: |
+  if others_protected.there_are_any and others_protected.number_gathered() > 0:
+    for index, other in enumerate(others_protected):
+      if trial_court.address.county == "Cook":
+        other.include_in_addendum = True
+      else:
+        if index > 1:
+          other.include_in_addendum = True
+        else:
+          other.include_in_addendum = False
+  for index, event in enumerate(stalking_events):
+    if trial_court.address.county == "Cook":
+      if index > 2:
+        event.include_in_addendum = True
+      else:
+        event.include_in_addendum = False
+    else:
+      if index > 1:
+        event.include_in_addendum = True
+      else:
+        event.include_in_addendum = False
+  addendum_check = True
 ---
 #list of "stay away" addresses for non-cook petition
 reconsider: True
@@ -1154,15 +1209,19 @@ fields:
     maxlength: 4
   - Make: other_parties[0].vehicle_make
     required: False
+    maxlength: 30
     help: |
       This is the brand that made the vehicle. For example, Ford, Chevy, and Toyota are all makes.
   - Model: other_parties[0].vehicle_model
     required: False
+    maxlength: 30
     help: |
       This is the vehicle's type. For example, Explorer, Suburban, and Camry are all models.
   - Color: other_parties[0].vehicle_color
+    maxlength: 30
     required: False
   - License plate number: other_parties[0].license_plate
+    maxlength: 10
     required: False
   - State: other_parties[0].vehicle_state
     required: False
@@ -1217,7 +1276,7 @@ fields:
 id: unknown address note
 continue button field: unknown_address_note
 question: |
-  Note about the unkown address
+  Note about the unknown address
 subquestion: |
   If you do not know ${other_parties[0].name.full(middle='full')}'s address, you may still file. However, you may need to show the court that you made a good effort to find their address. You can do this by filing written statement called an “affidavit” telling how you tried to find Nerd Nerd's address. If you need to file one of these, the judge or court clerk will provide it.
 ---
@@ -1252,6 +1311,7 @@ subquestion: |
 fields:
   - Employer name: other_parties[0].employer_name
     required: False
+    maxlength: 30
   - Occupation or type of work: respondent_work_type
     required: false
     help: |
@@ -1259,6 +1319,7 @@ fields:
     maxlength: 30
   - Standard work hours: other_parties[0].work_hours
     required: False
+    maxlength: 30
     help: |
       For example, 9:00 a.m. to 5:00 p.m.
   - Street address: other_parties[0].employer_address.address
@@ -1403,19 +1464,36 @@ fields:
       is: "IL"
     required: False
 ---
+#This code block generates options for the dropdown menu in the question asking which address the sheriff should serve the stalker at.
+reconsider: True
+code: |
+  if other_parties[0].address_known:
+    list_home_address = True
+    home_address_text = other_parties[0].address.on_one_line(bare=True)
+  else:
+    list_home_address = False
+    home_address_text = ""
+  if other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != "":
+    list_employer_address = True
+    employer_address_text = other_parties[0].employer_address.on_one_line(bare=True)
+  else:
+    list_employer_address = False
+    employer_address_text = ""
+---
 id: stalker which address
 question: |
   Where should the sheriff go to deliver court papers to ${other_parties[0].name.full(middle='full')}?
 fields: 
   - no label: other_parties[0].which_address
     choices:
-      - ${other_parties[0].address.on_one_line(bare=True)}: home_address
-        show if: other_parties[0].address_known
-      - ${other_parties[0].employer_address.on_one_line(bare=True)}: employer_address
-        show if: other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != ""
+      - ${home_address_text}: home_address
+        show if: list_home_address
+      - ${employer_address_text}: employer_address
+        show if: list_employer_address
       - An address I will enter: add_service_address
   - Street address: other_parties[0].service_address.address
     address autocomplete: True
+    required: False
     show if:
       variable: other_parties[0].which_address
       is: "add_service_address" 
@@ -1425,16 +1503,19 @@ fields:
       variable: other_parties[0].which_address
       is: "add_service_address" 
   - City: other_parties[0].service_address.city
+    required: False
     show if:
       variable: other_parties[0].which_address
       is: "add_service_address" 
   - State: other_parties[0].service_address.state
+    required: False
     show if:
       variable: other_parties[0].which_address
       is: "add_service_address" 
     code: |
       states_list()  
   - ZIP code: other_parties[0].service_address.zip
+    required: False
     show if:
       variable: other_parties[0].which_address
       is: "add_service_address" 
@@ -1840,7 +1921,7 @@ subquestion: |
   
   <div class="alert alert-info ilao-info" role="alert">
     <h6 class="alert-heading">What it means to sign your forms</h6>
-    <p>By signing your <i>Motion to Remove Eviction Court File from Public Record</i>, you are certifying that:
+    <p>By signing your <i>Petition for Stalking No Contact Order</i>, you are certifying that:
   <p>
   <p><ul>
   <li>You read the document,</li>
@@ -1856,6 +1937,24 @@ choices:
 terms:
   - "e-signature": |
       An e-signature is an electronic signature. It is a digital version of a signature that has the same effect as a hand-written signature.
+---
+id: debug
+continue button field: debug_page
+question: |
+  Debug
+subquestion: |
+  Others protected number gathered: ${others_protected.number_gathered()}
+---
+id: forms assembling
+continue button field: forms_assembling
+question: |
+  Almost done
+subquestion: |
+  After you click **Next**, it may take a few moments to finish making your forms.
+  
+  ###### You do not need to refresh your screen. Hang in there!
+  
+  [NEWLINE]
 ---
 id: get docs screen
 question: |
@@ -1915,16 +2014,23 @@ objects:
   - cook_findings: ALDocument.using(title="Findings", filename="cook_findings.pdf", has_addendum=False)
   - cook_disposition_order: ALDocument.using(title="Disposition order", filename="cook_disposition.pdf", has_addendum=False)
   - others_protected_addendum: ALDocument.using(title="Others protected addendum", filename="others_protected_addendum.pdf", has_addendum=False)
+  - snco_events_addendum: ALDocument.using(title="Stalking incidents addendum", filename="snco_events_addendum.pdf", has_addendum=False)
+---
+objects:
+  - petition_bundle: ALDocumentBundle.using(elements=[snco_petition, cook_petition, others_protected_addendum, snco_events_addendum], filename="petition.pdf", title="Petition")
 ---
 objects: 
-  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, snco_petition, others_protected_addendum, cook_petition, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
-  - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, snco_petition, others_protected_addendum, cook_petition, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
+  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, petition_bundle, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
+  - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, petition_bundle, cook_dv_cover_sheet, snco_order, cook_findings, cook_disposition_order, snco_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
 ---
 code: |
   snco_instructions.enabled = True
   #op_schools.enabled = False
   snco_summons.enabled = True
   efiling_exemption.enabled = False
+  others_protected_addendum.enabled = False
+  petition_bundle.enabled = True
+  snco_events_addendum.enabled = False
   others_protected_addendum.enabled = False
   
   if trial_court_index == -1:
@@ -1935,6 +2041,10 @@ code: |
     cook_disposition_order.enabled = True
     snco_petition.enabled = False
     snco_order.enabled = False
+    if others_protected.number_gathered() > 0:
+      others_protected_addendum.enabled = True
+    if stalking_events.number_gathered() > 3:
+      snco_events_addendum.enabled = True
   else:
     cook_dv_cover_sheet.enabled = False
     cook_sheriff_info_sheet.enabled = False
@@ -1945,6 +2055,8 @@ code: |
     snco_order.enabled = True
     if others_protected.number_gathered() > 2:
       others_protected_addendum.enabled = True
+    if stalking_events.number_gathered() > 2:
+      snco_events_addendum.enabled = True
       
 ---
 attachment:
@@ -1952,6 +2064,12 @@ attachment:
   name: instructions
   filename: snco_instructions
   docx template file: snco_instructions.docx
+---
+attachment:
+  variable name: snco_events_addendum[i]
+  name: snco_events_addendum
+  filename: snco_events_addendum
+  docx template file: snco_events_addendum.docx
 ---
 attachment:
   variable name: others_protected_addendum[i]
@@ -2226,7 +2344,7 @@ attachment:
     - "am_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='AM' else False }
     - "pm_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='PM' else False }
     - "location_incident_3": ${stalking_events[2].place}
-    - "description_incident_1": ${stalking_events[2].description}
+    - "description_incident_3": ${stalking_events[2].description}
     - "no_police_report": ${ False if any_police_reports else True}
     - "yes_police_report": ${any_police_reports}
     - "report_number": ${comma_and_list(report_numbers) if any_police_reports else ""}
@@ -2312,7 +2430,7 @@ attachment:
     - "just_suicidal": ${True if other_parties[0].suicide_risk and not other_parties[0].armed else False}
     - "armed_and_suicidal": ${True if other_parties[0].suicide_risk and other_parties[0].armed else False}  
     - "date_incident_1": ${stalking_events[0].name.text}
-    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm a')}
+    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm a') if showifdef('stalking_events[0].time') else ""}
     - "location_incident_1": ${stalking_events[0].place}
     - "description_incident_1": ${stalking_events[0].description}
     - "description_incident_2": |
@@ -3132,7 +3250,7 @@ review:
   - Edit: other_parties[0].pay_costs
     button: |
       **Do you want ${other_parties[0].name.full(middle='full')} to pay any costs?**
-      ${word(yesno(other_parites[0].pay_costs))}
+      ${word(yesno(other_parties[0].pay_costs))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
@@ -3802,7 +3920,7 @@ review:
   - Edit: other_parties[0].pay_costs
     button: |
       **Do you want ${other_parties[0].name.full(middle='full')} to pay any costs?**
-      ${word(yesno(other_parites[0].pay_costs))}
+      ${word(yesno(other_parties[0].pay_costs))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
