@@ -1,6 +1,6 @@
 metadata:
-  title: SNCO - Stalking No Contact Order request
-  short title: SNCO request
+  title: Stalking No Contact Order
+  short title: SNCO
   comment: This program helps you ask the court to order someone making you fearful for your safety or causing you emotional distress to stop stalking you.
   authors:
     - Vivian McNaughton
@@ -12,9 +12,10 @@ include:
   - docassemble.ILAO:ilao-interview-framework.yml
   - docassemble.ILAO:shared-basic-questions.yml
 ---
+#This text was removed from the under. Check whether the hotline can be used for stalkers or if a comparable resource exists. "**Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate."
+---
 default screen parts:
   under: |
-    **Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate.
     % if not user_logged_in():
     
     [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} **Sign in**](${url_of('login', next=interview_url())}) or [**create**](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
@@ -56,9 +57,9 @@ code: |
 sections:
   - section_intro: Start
   - section_petitioner: People you want to protect
-  - section_respondent: About the person who caused abuse
   - section_incidents: What happened
   - section_protections: Protections
+  - section_respondent: Person you want protection from
   - section_filing_info: Filing and service details
   - section_download: Download
 ---
@@ -82,21 +83,56 @@ code: |
     
   
   users[0].name.first
+  other_parties[0].name.first
   hide_address
   users[0].address.address
   if user_relationship != "unrelated":
     related_note
-  if date_difference(starting=users[0].birthdate, ending=today()).years < 18:
+  if users[0].age_in_years() < 18:
     too_young_kickout
   if others_protected.there_are_any:
     others_protected.gather()
   
+  nav.set_section('section_incidents')
+  
+  stalking_event_intro
+  stalking_events.gather()
+  if stalking_events.number_gathered() < 2:
+    two_times_kickout
+    
+  nav.set_section('section_protections')
+  if order_type['emergency'] and trial_court.address.county == "Cook":
+    emergency_reason
+  if protection_requested['away']:
+    distance_away
+    if protected_place_types['Home']:
+      run_home_address_block
+    if protected_place_types['School'] or protected_place_types['Workplace']: 
+      employers_schools.gather()  
+    if protected_place_types['Other']:
+      other_places
+    if trial_court.address.county == "Cook":
+      if live_with_stalker:
+        home.address
+      if school_with_stalker: 
+        if school_list.number_gathered() > 1:
+          which_stalker_school
+      if work_with_stalker:    
+        if work_list.number_gathered() > 1:
+          which_stalker_work
+  other_parties[0].prohibit_firearms
+  if trial_court.address.county == "Cook":
+    other_parties[0].pay_costs 
+  other_parties[0].anything_else
+  if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
+    other_parties[0].no_protection_chosen
+  
   nav.set_section('section_respondent')
-  other_parties[0].name.first
+  
   other_parties[0].gender
   other_parties[0].race
   if trial_court.address.county == "Cook":
-    other_parties[0].skin_tone
+    #other_parties[0].skin_tone
     if other_parties[0].other_names.there_are_any:
       other_parties[0].other_names.gather()
   other_parties[0].ssn
@@ -136,41 +172,6 @@ code: |
       other_parties[0].op_state
     respondent_on_probation
   
-    
-  nav.set_section('section_incidents')
-  stalking_event_intro
-  stalking_events.gather()
-  if stalking_events.number_gathered() < 2:
-    two_times_kickout
-    
-  nav.set_section('section_protections')
-  if order_type['emergency'] and trial_court.address.county == "Cook":
-    emergency_reason
-  if protection_requested['away']:
-    distance_away
-    if protected_place_types['Home']:
-      run_home_address_block
-    if protected_place_types['School'] or protected_place_types['Workplace']: 
-      employers_schools.gather()  
-    if protected_place_types['Other']:
-      other_places
-    if trial_court.address.county == "Cook":
-      if live_with_stalker:
-        home.address
-      if school_with_stalker: 
-        if school_list.number_gathered() > 1:
-          which_stalker_school
-      if work_with_stalker:    
-        if work_list.number_gathered() > 1:
-          which_stalker_work
-  other_parties[0].prohibit_firearms
-  if trial_court.address.county == "Cook":
-    other_parties[0].pay_costs 
-  other_parties[0].anything_else
-  if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
-    other_parties[0].no_protection_chosen
-  
-  
   nav.set_section('section_filing_info')
   other_parties[0].which_address
   if other_parties[0].bonus_service_check == True:
@@ -203,7 +204,12 @@ code: |
   	'start_time': str(current_datetime().format_datetime()),
   	'started_interview': True, 
   	}
-    
+  
+  try:
+    stuff_to_snapshot['ip_address'] = device(ip=True)
+  except:
+    pass
+  
   stuff_to_snapshot['user_zip'] = showifdef('users[0].address.zip')
 
   stuff_to_snapshot['downloaded_forms'] = showifdef('forms_assembling')
@@ -226,7 +232,7 @@ code: |
 #others protected gather code block
 code: |
   others_protected[i].name.first
-  others_protected[i].birth
+  others_protected[i].birthdate
   if others_protected[i].is_survivor == False and trial_court.address.county == "Cook":
     others_protected[i].relation_to_user
     others_protected[i].protection_reason
@@ -264,7 +270,7 @@ code: |
     for index, other in enumerate(others_protected):
       others_with_minor_initials.append(other)
   
-      if date_difference(starting=others_protected[index].birth, ending=today()).years < 18:
+      if others_protected[index].age_in_years() < 18:
         others_with_minor_initials[index].name.first = other.name.first[:1]
         others_with_minor_initials[index].name.last = other.name.last[:1]
     others_with_minor_initials.there_is_another = False
@@ -364,7 +370,7 @@ code: |
   any_adults = False
   if others_protected.number_gathered() > 0:
     for other in others_protected:
-      if date_difference(starting=other.birth, ending=today()).years < 18:
+      if other.age_in_years() < 18:
         any_minors = True
       else:
         any_adults = True
@@ -433,7 +439,9 @@ id: two times check
 question: |
   Has the stalker done things which made you fearful or caused you emotional distress at least two separate times?
 subquestion: |
-  ${collapse_template(distress_explainer)}
+  **Emotional distress** means feeling a lot of mental pain, worry, or fear.
+
+  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset. Stalking does not include an exercise of the right to free speech or assembly. It does not include lawful picketing at the workplace. 
 fields:
   - no label: two_times_check
     datatype: yesnoradio
@@ -829,7 +837,7 @@ id: others protected birthday
 question: |
   What was ${others_protected[i].name.full(middle='full')} born? 
 fields:
-  - Their date of birth: others_protected[i].birth
+  - Their date of birth: others_protected[i].birthdate
     datatype: BirthDate
     alMax: today()
 ---
@@ -939,6 +947,8 @@ id: stalker gender
 question: |
   What gender is ${other_parties[0].name.full(middle='full')}?
 subquestion: |
+  This information is used to help enforce the Stalking No Contact Order.
+  
   If you do not know, you can leave this blank.
 fields:
   - Gender: other_parties[0].gender
@@ -955,13 +965,13 @@ fields:
       variable: other_parties[0].gender
       is: "Other"  
 ---
-
----
-id: stalker race
+id: stalker race stalker skin tone
 question: |
   What race is ${other_parties[0].name.full(middle='full')}?
 subquestion: |
-    If you do not know, you can leave this blank.
+  This information is used to help enforce the Stalking No Contact Order.
+  
+  If you do not know, you can leave this blank.
 fields:
   - Race: other_parties[0].race
     input type: radio
@@ -983,28 +993,25 @@ fields:
     show if: 
       variable: other_parties[0].race
       is: "Other"  
----
-id: stalker skin tone
-question: |
-  What is ${other_parties[0].name.full(middle='full')}'s skin tone?
-subquestion: |
-    If you do not know, you can leave this blank.
-fields:
-  - Skin tone: other_parties[0].skin_tone
-    input type: radio
-    choices:
-      - Very light: Very light
-      - Light: Light
-      - Light brown: Light brown
-      - Olive: Olive
-      - Brown: Brown
-      - Dark brown: Dark brown
-      - Other: Other
-  - Other: other_parties[0].other_skin_tone
-    maxlength: 20
-    show if: 
-      variable: other_parties[0].skin_tone
-      is: "Other"  
+  #- Skin tone: other_parties[0].skin_tone
+  #  input type: radio
+  #  required: False
+  #  show if:
+  #    variable: trial_court.address.county
+  #    is: "Cook"
+  #  choices:
+  #    - Very light: Very light
+  #    - Light: Light
+  #    - Light brown: Light brown
+  #    - Olive: Olive
+  #    - Brown: Brown
+  #    - Dark brown: Dark brown
+  #    - Other: Other
+  #- Other: other_parties[0].other_skin_tone
+  #  maxlength: 20
+  #  show if: 
+  #    variable: other_parties[0].skin_tone
+  #    is: "Other"  
 ---
 id: stalker any other names
 question: |
@@ -1090,65 +1097,124 @@ fields:
       variable: knows_respondent_dob
       is: some
 ---
-id: stalker height stalker weight
+id: cook county physical characteristics
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s height and weight?
+  Tell us about ${other_parties[0].name.full(middle="full")}'s appearance
 subquestion: |
-  If you do not know, you can leave this blank. 
+  This information is used to help enforce the Stalking No Contact Order.
+  
+  Enter what information you know.
 fields:
-  - Feet: other_parties[0].height_feet
+  - Height (feet): other_parties[0].height_feet
     datatype: integer
     required: False
-    min: 1
-    max: 9
+    min: 2
+    max: 8
+    grid: 6
     help: |
       Example: 5
-  - Inches: other_parties[0].height_inches
+  - Height (inches): other_parties[0].height_inches
     datatype: integer
     required: False
     min: 0
     max: 11
+    grid: 6
     help: |
       Example: 8
-  - Weight (in pounds): other_parties[0].weight
+  - Weight (pounds): other_parties[0].weight
     datatype: integer
     required: False
     min: 1
     max: 1500
     help: |
       Example: 170
----
-id: stalker eyes
-question: |
-  What color are ${other_parties[0].name.full(middle='full')}'s eyes?
-subquestion: |
-  If you do not know, you can leave this blank. 
-fields:
-  - Eye color: other_parties[0].eye_color
-    maxlength: 30
+  - Skin color: other_parties[0].skin_tone
     required: False
-    help: |
-      Examples: brown, blue, hazel, green
-  - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].wear_glasses
     datatype: radio
-    required: False
-    choices:
-      - Yes: True
-      - No: False
-      - Sometimes: sometimes
-      - I do not know: dont_know
----
-id: stalker hair color
-question: |
-  What color is ${other_parties[0].name.full(middle='full')}'s hair?
-subquestion: |
-  If you do not know, you can leave this blank. 
-fields:
+    choices: 
+      - Very light: Very light
+      - Light: Light
+      - Light brown: Light brown
+      - Olive: Olive
+      - Brown: Brown
+      - Dark brown: Dark brown
+      - Other: other
+  - ${other_parties[0].name.full(middle="full")}'s skin color: respondent_skin_other
+    maxlength: 30
+    show if:
+      variable: other_parties[0].skin_tone
+      is: 'other'
   - Hair color: other_parties[0].hair_color
     maxlength: 30
     required: False
     help: |
       Examples: brown, black, blond, gray, bald or shaved
+  - Eye color: other_parties[0].eye_color
+    maxlength: 30
+    required: False
+    help: |
+      Examples: brown, blue, hazel, green
+  - Does ${other_parties[0].name.full(middle="full")} wear glasses?: other_parties[0].wear_glasses
+    datatype: radio
+    choices: 
+      - Yes: Yes
+      - Sometimes: Sometimes
+      - No: No
+---
+#id: stalker height stalker weight
+#question: |
+#  What is ${other_parties[0].name.full(middle='full')}'s height and weight?
+#subquestion: |
+#  If you do not know, you can leave this blank. 
+#fields:
+#  - Feet: other_parties[0].height_feet
+#    datatype: integer
+#    required: False
+#    grid: 6
+#    min: 1
+#    max: 9
+#    help: |
+#      Example: 5
+#  - Inches: other_parties[0].height_inches
+#    datatype: integer
+#    required: False
+#    min: 0
+#    max: 11
+#    grid: 6
+#    help: |
+#      Example: 8
+#  - Weight (in pounds): other_parties[0].weight
+#    datatype: integer
+#    required: False
+#    min: 1
+#    max: 1500
+#    help: |
+#      Example: 170
+#---
+#id: stalker eyes
+#question: |
+#  What color are ${other_parties[0].name.full(middle='full')}'s hair and eyes?
+#subquestion: |
+#  If you do not know, you can leave this blank. 
+#fields:
+#  - Hair color: other_parties[0].hair_color
+#    maxlength: 30
+#    required: False
+#    help: |
+#      Examples: brown, black, blond, gray, bald or shaved
+#  - Eye color: other_parties[0].eye_color
+#    maxlength: 30
+#    required: False
+#    help: |
+#      Examples: brown, blue, hazel, green
+#  - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].wear_glasses
+#    datatype: radio
+#    required: False
+#    choices:
+#      - Yes: True
+#      - No: False
+#      - Sometimes: sometimes
+#      - I do not know: dont_know
 ---
 #check how much space is available
 id: stalker distinguishing features
@@ -1184,7 +1250,7 @@ id: stalker drivers license
 question: |
   What is ${other_parties[0].name.full(middle='full')}'s driver's license number?
 subquestion: |
-  If you do not know, you can leave this blank.
+  If you do not know or they do not have a driver's license, you can leave this blank.
 fields:
   - License number: other_parties[0].drivers_license
     required: False
@@ -1246,22 +1312,15 @@ fields:
     help: |
       For example, this could be "military ID number" or "passport number."
 ---
-id: stalker phone number
+id: stalker phone number stalker email address
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s phone number?
+  What is ${other_parties[0].name.full(middle='full')}'s contact information?
 subquestion: |
   If you do not know, you can leave this blank.
 fields:
   - Phone number: other_parties[0].phone_number
     datatype: al_international_phone
     required: False
----
-id: stalker email address
-question: |
-  What is ${other_parties[0].name.full(middle='full')}'s email address?
-subquestion: |
-  If you do not know, you can leave this blank.
-fields:
   - Email address: other_parties[0].email_address
     datatype: email
     required: False
@@ -1594,33 +1653,71 @@ subquestion: |
   
   The judge will expect more details about recent events than past events. Enter exact dates if you can. For repeated events, you may tell how often the behavior took place.
 ---
-id: stalking event date time
+id: stalking event info
 question: |
-  When did the ${ordinal(i)} stalking event take place?
+  % if i == 0:
+  Tell us about the most recent incident of stalking
+  % else:
+  Tell us about the ${ordinal(i)} most recent incident of stalking
+  % endif
 subquestion: |
-  If you not remember the exact date, enter the month and year.
+  Try to be specific about:
+
+  * What ${other_parties[0].name.full(middle='full')} did,
+  * What ${other_parties[0].name.full(middle='full')} said,
+  * Where the stalking happened,
+  * How the stalking happened, such as in person, by phone or text, etc.,
+  * Who was there when the stalking happened, and
+  * The effects the stalking had on you, other survivors, and anyone else who was there. It is important to mention any children that were present or were affected by the stalking.
+  
+  Include any threats or use of a weapon.
+  
+  For repeated stalking, you can say things like “weekly” for the date or “anytime I work late” for the time.
 fields:
   - Date: stalking_events[i].name.text
-  - Time: stalking_events[i].time
-    datatype: time
-    required: False
+    maxlength: 25
     help: |
-      If you do not remember this and do not have a good estimate, you can leave this blank.
----
-id: stalking event place
-question: |
-  Where did the ${ordinal(i)} stalking event take place?
-fields:
+      If you don't remember the exact date, enter the month and year. Use abbreviations if needed.
+  - Time: stalking_events[i].time
+    required: False
+    maxlength: 15
+    help: |
+      If you don't remember the exact time, enter "morning" or "afternoon" or "night." Use abbreviations if needed.
   - Place: stalking_events[i].place
----
-id: stalking event description
-question: |
-  Describe the ${ordinal(i)} stalking event.
-subquestion: |
-  Be as specific as possible
-fields:
   - Description: stalking_events[i].description
     input type: area
+    rows: 12
+    maxlength: 800
+    help: |
+      The petition has space for about 800 characters for each incident.
+---
+#id: stalking event date time
+#question: |
+#  When did the ${ordinal(i)} stalking event take place?
+#subquestion: |
+#  If you not remember the exact date, enter the month and year.
+#fields:
+#  - Date: stalking_events[i].name.text
+#  - Time: stalking_events[i].time
+#    datatype: time
+#    required: False
+#    help: |
+#      If you do not remember this and do not have a good estimate, you can leave this blank.
+#---
+#id: stalking event place
+#question: |
+#  Where did the ${ordinal(i)} stalking event take place?
+#fields:
+#  - Place: stalking_events[i].place
+#---
+#id: stalking event description
+#question: |
+#  Describe the ${ordinal(i)} stalking event.
+#subquestion: |
+#  Be as specific as possible
+#fields:
+#  - Description: stalking_events[i].description
+#    input type: area
 ---
 id: stalking event police report
 question: |
@@ -1636,7 +1733,13 @@ fields:
 ---
 id: stalking event is there another
 question: |
-  Do you want to include another stalking event?
+  Do you want to add another stalking event?
+subquestion: |
+  % if len(stalking_events.elements) == 1:  
+  So far you told us about 1 incident. 
+  % else:
+  So far you told us about ${ str(len(stalking_events.elements)) } incidents. 
+  % endif
 fields:
   - no label: stalking_events.there_is_another
     datatype: yesnoradio
@@ -2327,22 +2430,22 @@ attachment:
     - "others_protected_list": ${comma_and_list(others_with_minor_initials) if others_protected.there_are_any else ""}
     - "incidents_check": ${True}
     - "date_incident_1": ${stalking_events[0].name.text}
-    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm')}
-    - "am_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='AM' else False }
-    - "pm_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='PM' else False }
+    - "time_incident_1": ${stalking_events[0].time}
+    #- "am_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='AM' else False }
+    #- "pm_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='PM' else False }
     - "location_incident_1": ${stalking_events[0].place}
     - "description_incident_1": ${stalking_events[0].description}
     - "date_incident_2": ${stalking_events[1].name.text}
-    - "time_incident_2": ${format_time(stalking_events[1].time, format='h:mm')}
-    - "am_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='AM' else False }
-    - "pm_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='PM' else False }
+    - "time_incident_2": ${stalking_events[1].time}
+    #- "am_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='AM' else False }
+    #- "pm_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='PM' else False }
     - "location_incident_2": ${stalking_events[1].place}
     - "description_incident_2": ${stalking_events[1].description}
     - "description_incident_2_continued": ${""}
     - "date_incident_3": ${stalking_events[2].name.text}
-    - "time_incident_3": ${format_time(stalking_events[2].time, format='h:mm')}
-    - "am_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='AM' else False }
-    - "pm_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='PM' else False }
+    - "time_incident_3": ${stalking_events[2].time}
+    #- "am_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='AM' else False }
+    #- "pm_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='PM' else False }
     - "location_incident_3": ${stalking_events[2].place}
     - "description_incident_3": ${stalking_events[2].description}
     - "no_police_report": ${ False if any_police_reports else True}
@@ -2430,12 +2533,12 @@ attachment:
     - "just_suicidal": ${True if other_parties[0].suicide_risk and not other_parties[0].armed else False}
     - "armed_and_suicidal": ${True if other_parties[0].suicide_risk and other_parties[0].armed else False}  
     - "date_incident_1": ${stalking_events[0].name.text}
-    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm a') if showifdef('stalking_events[0].time') else ""}
+    - "time_incident_1": ${stalking_events[0].time}
     - "location_incident_1": ${stalking_events[0].place}
     - "description_incident_1": ${stalking_events[0].description}
     - "description_incident_2": |
-        % if format_time(stalking_events[1].time, format='h:mm a') != "":
-        On or about ${stalking_events[1].name.text} at ${format_time(stalking_events[1].time, format='h:mm a')} at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
+        % if stalking_events[1].time != "":
+        On or about ${stalking_events[1].name.text}, ${stalking_events[1].time}, at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
         % else:
         On or about ${stalking_events[1].name.text} at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
         % endif
@@ -2588,6 +2691,10 @@ review:
     button: |
       **Your name:**
       ${users[0].name.full(middle='full')}
+  - Edit: other_parties[0].name.first
+    button: |  
+      **Stalker's name:**
+      ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
       **Do you want to keep your home address hidden?**
@@ -2665,6 +2772,7 @@ review:
       % endfor
     show if: others_protected.there_are_any
 ---
+id: others protected review screen
 continue button field: others_protected.revisit
 question: |
     Edit the others you want the SNCO to protect
@@ -2683,6 +2791,7 @@ columns:
 delete buttons: True
 confirm: True
 ---
+id: other protected info review screen
 continue button field: x.others_protected_info
 generic object: ALIndividual
 question: |
@@ -2721,7 +2830,7 @@ review:
       ${x.address.on_one_line(bare=True)}
     show if: not hide_address or not x.use_safe_address
 ---
-section: About the person who caused the abuse
+section: Person you want protection from
 id: respondent review screen
 event: section_respondent
 question: |
@@ -3029,6 +3138,7 @@ review:
       No
       % endif  
 ---
+id: stalker other names review screen
 continue button field: other_parties[0].other_names.revisit
 question: |
     Edit ${other_parties[0].name.full(middle='full')}'s other names
@@ -3047,6 +3157,7 @@ columns:
 delete buttons: True
 confirm: True
 ---
+id: stalker other name info review screen
 continue button field: x.review_other_names
 generic object: ALIndividual
 question: |
@@ -3092,6 +3203,7 @@ columns:
 delete buttons: True
 confirm: True
 ---
+id: incident review screen
 continue button field: x.review_events
 generic object: Thing
 question: |
@@ -3258,6 +3370,7 @@ review:
       ${other_parties[0].describe_costs}
     show if: trial_court.address.county.lower() == "cook" and other_parties[0].pay_costs
 ---
+id: employers schools review screen
 continue button field: employers_schools.revisit
 question: |
     Edit the workplace, school, and day care addresses
@@ -3276,6 +3389,7 @@ columns:
 delete buttons: True
 confirm: True
 ---
+id: employer or school review screen
 continue button field: x.employers_schools_info
 generic object: ALIndividual
 question: |
