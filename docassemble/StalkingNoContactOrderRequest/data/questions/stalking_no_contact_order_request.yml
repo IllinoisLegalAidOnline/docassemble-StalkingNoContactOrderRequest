@@ -77,7 +77,7 @@ code: |
   if two_times_check == False:
     two_times_kickout
   nav.set_section('section_petitioner')
-  trial_court
+  trial_court_index
   if jurisdiction_type.all_false():
     other_jurisdiction_location
     
@@ -101,7 +101,7 @@ code: |
     two_times_kickout
     
   nav.set_section('section_protections')
-  if order_type['emergency'] and trial_court.address.county == "Cook":
+  if order_type['emergency'] and trial_court_index == -1:
     emergency_reason
   if protection_requested['away']:
     distance_away
@@ -111,7 +111,7 @@ code: |
       employers_schools.gather()  
     if protected_place_types['Other']:
       other_places
-    if trial_court.address.county == "Cook":
+    if trial_court_index == -1:
       if live_with_stalker:
         home.address
       if school_with_stalker: 
@@ -121,7 +121,7 @@ code: |
         if work_list.number_gathered() > 1:
           which_stalker_work
   other_parties[0].prohibit_firearms
-  if trial_court.address.county == "Cook":
+  if trial_court_index == -1:
     other_parties[0].pay_costs 
   other_parties[0].anything_else
   if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
@@ -131,7 +131,7 @@ code: |
   
   other_parties[0].gender
   other_parties[0].race
-  if trial_court.address.county == "Cook":
+  if trial_court_index == -1:
     #other_parties[0].skin_tone
     if other_parties[0].other_names.there_are_any:
       other_parties[0].other_names.gather()
@@ -156,7 +156,7 @@ code: |
     other_parties[0].employer_name
   other_parties[0].suicide_risk
   other_parties[0].armed
-  if trial_court.address.county == "Cook":
+  if trial_court_index == -1:
     if other_parties[0].divorced_user:
       other_parties[0].divorce_date
     elif other_parties[0].parentage_action:
@@ -176,8 +176,9 @@ code: |
   other_parties[0].which_address
   if other_parties[0].bonus_service_check == True:
     other_parties[0].which_bonus_address
-  if trial_court.address.county == "Cook":  
+  if trial_court_index == -1:  
     service_information
+    #cook_district
   case_number
   users[0].has_email_address
   e_signature
@@ -233,7 +234,7 @@ code: |
 code: |
   others_protected[i].name.first
   others_protected[i].birthdate
-  if others_protected[i].is_survivor == False and trial_court.address.county == "Cook":
+  if others_protected[i].is_survivor == False and trial_court_index == -1:
     others_protected[i].relation_to_user
     others_protected[i].protection_reason
   if hide_address == False or others_protected[i].use_safe_address == False:
@@ -300,7 +301,7 @@ reconsider: True
 code: |
   if others_protected.there_are_any and others_protected.number_gathered() > 0:
     for index, other in enumerate(others_protected):
-      if trial_court.address.county == "Cook":
+      if trial_court_index == -1:
         other.include_in_addendum = True
       else:
         if index > 1:
@@ -308,7 +309,7 @@ code: |
         else:
           other.include_in_addendum = False
   for index, event in enumerate(stalking_events):
-    if trial_court.address.county == "Cook":
+    if trial_court_index == -1:
       if index > 2:
         event.include_in_addendum = True
       else:
@@ -532,21 +533,20 @@ code: |
         filtered_courts.append((court[0],court_name))
     return sorted( filtered_courts, key=lambda y: y[1])
 ---
-depends on:
-  - trial_court_index
-code: |
-  if trial_court_index == -1:
-    trial_court = court_list.as_court('trial_court', 15)
-    trial_court.address.county = "Cook"
-  else:
-    trial_court = court_list.as_court('trial_court', trial_court_index)
+#depends on:
+#  - trial_court_index
+#code: |
+#  if trial_court_index == -1:
+#    trial_court = court_list.as_court('trial_court', 15)
+#    trial_court.address.county = "Cook"
+#  else:
+#    trial_court = court_list.as_court('trial_court', trial_court_index)
 ---
 depends on:
   - trial_court_index
-  - cook_district
 code: |
   if trial_court_index == -1:
-    trial_court = court_list.as_court('trial_court', cook_district)
+    trial_court = court_list.as_court('trial_court', 21)
   else:
     trial_court = court_list.as_court('trial_court', trial_court_index)
     
@@ -559,6 +559,7 @@ code: |
   filing_county = str(trial_court.address.county)
   courthouse_info = court_name + ", " + court_street_address + ", " + court_city + ", " + court_state + " " + court_zip
 ---
+#If this question gets reimplemented, add court 21 to the options.
 id: Cook County district
 question: |
   Which Cook County courthouse will you file in?
@@ -582,7 +583,7 @@ content: |
 id: jurisdiction
 #continue button field: jurisdiction
 question: |
-  Why do you want to file in ${ trial_court.address.county } County?
+  Why do you want to file in ${ end_in_county(trial_court.address.county)}?
 subquestion: |
   Check all that apply.
 fields:
