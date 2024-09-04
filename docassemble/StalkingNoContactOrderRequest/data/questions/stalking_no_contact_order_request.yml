@@ -14,14 +14,6 @@ include:
 ---
 #This text was removed from the under. Check whether the hotline can be used for stalkers or if a comparable resource exists. "**Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate."
 ---
-default screen parts:
-  under: |
-    % if not user_logged_in():
-    
-    [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} **Sign in**](${url_of('login', next=interview_url())}) or [**create**](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
-    % endif
-    
-    Feedback, suggestions, or comments? [**Let us know**](${ interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url , easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1) } ){:target="_blank"}.
 ---
 objects:
   - users: ALPeopleList.using(there_are_any=True)
@@ -50,9 +42,9 @@ objects:
   - other_ops: DAList.using(object_type=Thing, complete_attribute='complete', there_are_any=True)
 ---
 code: |
-  ilao_easy_form_title = "SNCO - Stalking No Contact Order request"
+  ilao_easy_form_title = "Stalking No Contact Order"
   ilao_easy_form_url = "https://www.illinoislegalaid.org/legal-information/stalking-no-contact-order-request"
-  form_name = "Stalking No Contact Order request"
+  form_name = "Stalking No Contact Order"
   al_form_type = 'new_case'
   user_ask_role = 'plaintiff'
   github_user = 'IllinoisLegalAidOnline'
@@ -463,15 +455,15 @@ code: |
 ---
 id: welcome
 question: |
-  SNCO - Stalking No Contact Order Request
+  Stalking No Contact Order Request
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **SNCO - Stalking No Contact Order Request** Easy Form.
+  Welcome to Illinois Legal Aid Online's **Stalking No Contact Order Request** Easy Form.
 
   This program will help you make forms to get a Stalking No Contact Order against someone who has done things that made you fearful for your safety or caused you emotional distress. The forms you make with this program can only be used in Illinois.
 
   If the victim of stalking is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the victim.
 
-  To learn more, read ILAO's article about [**Getting a no contact order for stalking**](https://www.illinoislegalaid.org/legal-information/getting-no-contact-order-stalking).
+  To learn more, read ILAO's article about [**Getting a Stalking No Contact Order**](https://www.illinoislegalaid.org/legal-information/getting-no-contact-order-stalking).
   
   #### Your safety is important
   
@@ -568,9 +560,9 @@ event: two_times_kickout
 question: |
   Sorry
 subquestion: |
-  To qualify for a ${form_name}, a stalker must have done things which made you fearful or caused you emotional distress at least two separate times.
+  To qualify for a ${form_name}, a stalker must have done things which made you fearful or caused you emotional distress **at least two separate times**.
   
-  A different protective order may work for your situation. Read ILAO's article [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) to learn more.
+  A different protective order may work for your situation. Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 buttons:
   - Exit: exit
   - Restart: restart
@@ -582,9 +574,8 @@ subquestion: |
   You can file in Illinois if:
 
   * You live in Illinois,
-  * The person you are filing against lives in Illinois,
-  * The abuse took place in Illinois, or
-  * You are in Illinois to avoid abuse elsewhere.
+  * The person you are filing against lives in Illinois, or
+  * The stalking took place in Illinois.
 fields:
   - no label: in_illinois
     datatype: yesnoradio
@@ -604,14 +595,13 @@ buttons:
 id: county
 continue button field: case_county
 question: |
-  In which county will you file your ${ form_name }?
+  In which county will you file your ${ form_name } request?
 subquestion: |
   You can file your case in the county:
   
   * Where you live,
-  * Where the person who caused the abuse lives,
-  * Where the abuse occurred, or
-  * Where you are staying to avoid abuse.
+  * Where the person who stalked you lives, or
+  * Where the stalking occurred.
 fields:
   - no label: trial_court_index
     datatype: integer
@@ -700,7 +690,7 @@ fields:
     choices:
       - I or the person I want to protect lives in ${ trial_court.address.county } County.: I live here
       - The person I am filing against lives in ${ trial_court.address.county } County.: Respondent lives here
-      - The abuse took place in ${ trial_court.address.county } County.: Abuse was here
+      - The stalking took place in ${ trial_court.address.county } County.: Abuse was here
 ---
 id: not proper location
 event: other_jurisdiction_location
@@ -710,8 +700,8 @@ subquestion: |
   You can file your case in the Illinois county:
   
   * Where you live,
-  * Where the person who caused the abuse lives, or
-  * Where the abuse occurred.
+  * Where the person who stalked you lives, or
+  * Where the stalking occurred.
 
   If Illinois is not the right place to ask for a Stalking No Contact Order, you can use the [**Legal Services Corporation website**](https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help) to find a legal aid organization near you.
 buttons:
@@ -839,14 +829,18 @@ fields:
     none of the above: False
     choices:
       - We are not related.: unrelated
-      - We currently or previously dated.: dated
-      - We have children together.: children
-      - We are related through blood. For example, I am their parent, child, sibling, grandchild, grantparent, or other blood relative.: blood
+      - We dated.: dated
       - We are related through current or past marriage. For example, I am their spouse, ex-spouse, in-law, step-child, or other relative.: marriage
-      - We have a blood relationship through a child: blood_child
+      - We have children together.: children
+      - We are related through blood. For example, I am their parent, child, sibling, grandchild, grantparent, or other blood relative.: blood   
+      - We have a blood relationship through a child. For example, I am their grandchild's grandparent on the other side of the family.: blood_child
       - We share or have shared a home.: home
       - We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.: adopt_child
       - They are my personal caregiver.: caregiver
+validation code: |
+    if user_relationship['unrelated']:
+      if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['home'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
+        validation_error("You cannot be both related and unrelated to the person you are filing the Stalking No Contact Order against.")
 #field: user_relationship
 #choices:
 #  - We are not related.: unrelated
@@ -1299,7 +1293,7 @@ question: |
 subquestion: |
   This can be an old legal name, nickname, or alias.
   
-  So far you have told us about ${comma_and_list(other_parties[0].other_names.complete_elements().full_names())}.
+  You can list up to 4 names. So far you have told us about ${comma_and_list(other_parties[0].other_names.complete_elements().full_names())}.
 fields:
   - no label: other_parties[0].other_names.there_is_another
     datatype: yesnoradio
@@ -1397,12 +1391,12 @@ fields:
       variable: other_parties[0].skin
       is: 'other'
   - Hair color: other_parties[0].hair
-    maxlength: 30
+    maxlength: 25
     required: False
     help: |
       Examples: brown, black, blond, gray, bald or shaved
   - Eye color: other_parties[0].eyes
-    maxlength: 30
+    maxlength: 25
     required: False
     help: |
       Examples: brown, blue, hazel, green
@@ -1508,6 +1502,7 @@ subquestion: |
 fields:
   - Driver's license number: other_parties[0].drivers_license
     required: False
+    maxlength: 20
 ---
 id: stalker access to vehicle
 question: |
@@ -1725,11 +1720,18 @@ fields:
     required: False
     choices:
       - Has a history of mental illness.: illness
+        show if: trial_court_index == -1
       - Is a suicide risk.: suicide
       - Is likely to be under the influence of alcohol.: alcohol
+        show if: trial_court_index == -1
       - Is likely to be under the influence of drugs.: drugs
+        show if: trial_court_index == -1
       - Is likely to carry a weapon.: armed
+        show if: trial_court_index == -1
+      - Is likely armed or dangerous.: armed
+        show if: trial_court_index != -1
       - Has weapons in the home.: home
+        show if: trial_court_index == -1
   - Type and location of weapons: other_parties[0].weapons_info
     required: False
     maxlength: 40
@@ -1934,9 +1936,17 @@ id: out of state county
 question: |
   In which county can the sheriff find ${other_parties[0].name.full(middle="full")}?
 subquestion: |
+  % if other_parties[0].which_address != "add_service_address" or other_parties[0].service_address.address != "":
   You said the sheriff can serve court papers on ${other_parties[0].name.full(middle="full")} at:
   
+  % if other_parties[0].which_address == "add_service_address":
   * ${ other_parties[0].service_address.on_one_line(bare=True) }
+  % elif other_parties[0].which_address == "home_address":
+  * ${other_parties[0].address.on_one_line(bare=True)}
+  % elif other_parties[0].which_address == "employer_address":
+  * ${other_parties[0].employer_address.on_one_line(bare=True)}
+  % endif
+  % endif
   
   Enter the county below so the sheriff can find ${other_parties[0].name.full(middle="full")}.
   
@@ -1944,6 +1954,7 @@ subquestion: |
 fields:
   - County where ${other_parties[0].name.full(middle="full")} can be served: service_county
     maxlength: 40
+    required: False
 ---
 template: county_lookup_help
 subject: |
@@ -2012,7 +2023,12 @@ fields:
   #- Email address: other_parties[0].service_email
   #  required: False
 validation code: |
-  service_state = other_parties[0].service_address.state
+  if other_parties[0].which_address == "add_service_address":
+    service_state = other_parties[0].service_address.state
+  elif other_parties[0].which_address == "home_address":
+    service_state = other_parties[0].address.state
+  elif other_parties[0].which_address == "employer_address":
+    service_state = other_parties[0].employer_address.state
 ---
 id: list bonus service check
 question: |
@@ -2099,7 +2115,7 @@ subquestion: |
   
   Include any threats or use of a weapon.
   
-  For repeated stalking, you can say things like “weekly” for the date or “anytime I work late” for the time.
+  If the stalking was repeated, you can note that in your description.
 fields:
   - Date: stalking_events[i].name.text
     maxlength: 25
@@ -2183,12 +2199,9 @@ question: |
 subquestion: |
   There are two kinds of SNCO: an Emergency Order and a Plenary Order. You can ask the court for both if you want.
   
-  For an Emergency Order, the court will issue an order which takes effect immediately. The order can be issued even before your abuser knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the abuser can present a case to the court also. 
+  For an Emergency Order, the court will issue an order which takes effect immediately. The order can be issued even before your stalker knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the stalker can present a case to the court also. 
   
-  For a Plenary Order, the court will issue an order after a hearing at which the abuser can also present a case. This order can last a long time, usually two years. It can even be made permanent in some cases.
-  
-  To learn more about emergency protective orders and plenary protective orders, read ILAO's article on [**How do you get an emergency order of protection?**](https://www.illinoislegalaid.org/legal-information/how-do-you-get-emergency-order-protection).
-  
+  For a Plenary Order, the court will issue an order after a hearing at which the stalker can also present a case. This order can last a long time, usually two years. It can even be made permanent in some cases.
 fields:
   - no label: order_type
     datatype: checkboxes
@@ -2256,7 +2269,7 @@ fields:
       - Home
       - Workplace
       - School
-      - Day Care: day_care
+      - Daycare: day_care
       - Other
 ---
 #depends on:
@@ -2295,14 +2308,17 @@ subquestion: |
   For example, you could name a store you go to regularly.
   
   Include any addresses if you know them.
+  
+  If you list multiple places, give each place its own line in the text field.
 fields:
-  - Name or type of place: other_places
+  - Name or type of place, and address (if known): other_places
     maxlength: 300
+    rows: 10
     input type: area
 ---
 #id: employers schools name
 #question: |
-#  What is the name and type of the ${ordinal(i)} workplace, school, or day care you want ${other_parties[0].name.full(middle='full')} to stay away from?
+#  What is the name and type of the ${ordinal(i)} workplace, school, or daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
 #fields:
 #  - Type: employers_schools[i].type
 #    input type: radio
@@ -2311,7 +2327,7 @@ fields:
 #        show if: protected_place_types['Workplace']
 #      - School: school
 #        show if: protected_place_types['School']
-#      - Day care: day_care
+#      - Daycare: day_care
 #        show if: protected_place_types['day_care']
 #  - Name: employers_schools[i].name.first
 ---
@@ -2319,7 +2335,7 @@ id: workplace name workplace address
 question: |
   What is the name and address of the workplace you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
-  - Name: protected_workplace.name.first
+  - Workplace name: protected_workplace.name.first
   - Street address: protected_workplace.address.address
     address autocomplete: True
   - Address line 2: protected_workplace.address.unit
@@ -2335,7 +2351,7 @@ id: school name school address
 question: |
   What is the name and address of the school you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
-  - Name: protected_school.name.first
+  - School name: protected_school.name.first
   - Street address: protected_school.address.address
     address autocomplete: True
   - Address line 2: protected_school.address.unit
@@ -2349,9 +2365,9 @@ fields:
 ---
 id: day care name day care address
 question: |
-  What is the name and address of the day care you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
-  - Name: protected_day_care.name.first
+  - Daycare name: protected_day_care.name.first
   - Street address: protected_day_care.address.address
     address autocomplete: True
   - Address line 2: protected_day_care.address.unit
@@ -2382,7 +2398,7 @@ fields:
 #question: |
 #  Do you want to add another place that ${other_parties[0].name.full(middle='full')} should stay away from?
 #subquestion: |
-#  You can list workplaces, schools, or day cares. If you only want to add a different type of place, click **No**.
+#  You can list workplaces, schools, or daycares. If you only want to add a different type of place, click **No**.
 #
 #  So far you have told us about ${comma_and_list(employers_schools.complete_elements().full_names())}.
 #fields:
@@ -2474,6 +2490,7 @@ fields:
   - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: 500
+    rows: 12
     show if: other_parties[0].anything_else
 ---
 id: no protection chosen
@@ -2595,7 +2612,7 @@ under: |
   % endif 
 
   &nbsp;
-  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
+  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=current_context().question_id, easy_form_variable=current_context().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
 ---
 generic object: ALDocumentBundle
 template: x.send_email_template
@@ -2623,7 +2640,8 @@ objects:
   - cook_dv_cover_sheet: ALDocument.using(title="Domestic Violence Cover Sheet", filename="cook_dv_cover_sheet.pdf", has_addendum=False)
   - cook_sheriff_info_sheet: ALDocument.using(title="Confidential Sheriff Information Sheet", filename="cook_sheriff_info_sheet.pdf", has_addendum=False)
   - cook_petition: ALDocument.using(title="Verified Petition", filename="cook_petition.pdf", has_addendum=False)
-  - cook_order: ALDocument.using(title="Stalking No Contact Order (draft)", filename="cook_snco_order.pdf", has_addendum=False)
+  - cook_e_order: ALDocument.using(title="Emergency Stalking No Contact Order (draft)", filename="cook_snco_order.pdf", has_addendum=False)
+  - cook_p_order: ALDocument.using(title="Plenary Stalking No Contact Order (draft)", filename="cook_snco_order.pdf", has_addendum=False)
   #- cook_findings: ALDocument.using(title="Findings", filename="cook_findings.pdf", has_addendum=False)
   #- cook_disposition_order: ALDocument.using(title="Disposition order", filename="cook_disposition.pdf", has_addendum=False)
   - others_protected_addendum: ALDocument.using(title="Others protected addendum", filename="others_protected_addendum.pdf", has_addendum=False)
@@ -2633,8 +2651,8 @@ objects:
   - petition_bundle: ALDocumentBundle.using(elements=[snco_petition, cook_petition, others_protected_addendum, snco_events_addendum], filename="petition.pdf", title="Verified Petition")
 ---
 objects: 
-  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_sheriff_info_sheet, petition_bundle, cook_dv_cover_sheet, emergency_order, plenary_order, cook_order, op_summons, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
-  - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_sheriff_info_sheet petition_bundle, cook_dv_cover_sheet, emergency_order, plenary_order, cook_order, op_summons, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
+  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
+  - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
 ---
 code: |
   snco_instructions.enabled = True
@@ -2651,7 +2669,14 @@ code: |
     cook_dv_cover_sheet.enabled = True
     cook_sheriff_info_sheet.enabled = True
     cook_petition.enabled = True
-    cook_order.enabled = True
+    if order_type['plenary']:
+      cook_p_order.enabled = True
+    else:
+      plenary_order.enabled = False
+    if order_type['emergency']:
+      cook_e_order.enabled = True
+    else:
+      emergency_order.enabled = False
     #cook_findings.enabled = True
     #cook_disposition_order.enabled = True
     snco_petition.enabled = False
@@ -2665,7 +2690,8 @@ code: |
     cook_dv_cover_sheet.enabled = False
     cook_sheriff_info_sheet.enabled = False
     cook_petition.enabled = False
-    cook_order.enabled = False
+    cook_e_order.enabled = False
+    cook_p_order.enabled = False
     #cook_findings.enabled = False
     #cook_disposition_order.enabled = False
     snco_petition.enabled = True
@@ -2764,7 +2790,7 @@ attachment:
     - "respondent": ${other_parties[0].name.full(middle="full")}
     #- "case_number__1": ${ "" }
     - "alias_names": ${ comma_and_list(other_parties[0].other_names)}
-    - "respondent_race": ${ other_parties[0].other_gender if other_parties[0].gender == 'other' else other_parties[0].gender }
+    - "respondent_race": ${ respondent_race_other if other_parties[0].race == 'Other' else other_parties[0].race }
     - "respondent_dob": |
         % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
         ${ other_parties[0].birthdate }
@@ -2810,7 +2836,7 @@ attachment:
     - "respondent_drugs": ${ True if caution_reasons['drugs'] == True else "" }
     - "respondent_firearms_on_person": ${ True if caution_reasons['armed'] == True else "" }
     - "respondent_weapons_in_home": ${ True if caution_reasons['home'] == True else "" }
-    - "respondent_weapons_description": ${ other_parties[0].weapons_info if other_parties[0].carrying_weapon or other_parties[0].home_weapon == True else "" }       
+    - "respondent_weapons_description": ${ other_parties[0].weapons_info if caution_reasons['armed'] or caution_reasons['home'] else "" }       
     - "respondent_suicidal": ${ True if caution_reasons['suicide'] == True else ''  }    
     - "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
     - "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  } 
@@ -3052,9 +3078,9 @@ attachment:
 #    - "plenary_check": ${order_type['plenary']}
 ---
 attachment:
-  variable name: cook_order[i]
-  name: cook_order
-  filename: cook_order
+  variable name: cook_e_order[i]
+  name: cook_e_order
+  filename: cook_e_order
   skip undefined: True
   editable: False
   pdf template file: cook_snco_order.pdf
@@ -3067,8 +3093,49 @@ attachment:
     - "independent": ${False}
     - "criminal": ${False}
     - "juvenile": ${False}
-    - "emergency": ${order_type['emergency']}
-    - "plenary": ${order_type['plenary']}
+    - "emergency": ${True}
+    - "plenary": ${False}
+    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "safe_address": ${hide_address}
+    - "petitioner_address_line_one": ${users[0].address.line_one(bare=True)}
+    - "petitioner_address_line_two": ${users[0].address.line_two()}
+    - "respondent_address_line_one": ${other_parties[0].address.line_one(bare=True)}
+    - "respondent_address_line_two": ${other_parties[0].address.line_two()}
+    - "respondent_birth_date": ${other_parties[0].birthdate}
+    - "respondent_sex": ${other_parties[0].cook_sex_other if other_parties[0].cook_sex == "other" else other_parties[0].cook_sex}
+    - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
+    - "respondent_height": |
+        % if other_parties[0].height_feet > 1:
+        ${ str(other_parties[0].height_feet) + "\'" }
+        % if other_parties[0].height_inches > 0:
+        ${ str(other_parties[0].height_inches) + "\""}
+        % endif
+        % else:
+        ${""}
+        % endif
+    - "respondent_weight": ${other_parties[0].weight if other_parties[0].weight > 0 else ""}
+    - "respondent_hair": ${ other_parties[0].hair}
+    - "respondent_eye": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
+    - "emergency_reason": ${emergency_reason if order_type['emergency'] else ""}
+---
+attachment:
+  variable name: cook_p_order[i]
+  name: cook_p_order
+  filename: cook_p_order
+  skip undefined: True
+  editable: False
+  pdf template file: cook_snco_order.pdf
+  fields:
+    - "user_name": ${users[0].name.full(middle='full')}
+    - "additional_protected": ${comma_and_list(others_protected)}
+    - "respondent": ${other_parties[0].name.full(middle='full')}
+    - "case_number": ${""}
+    - "respondent_birth": ${other_parties[0].birthdate}
+    - "independent": ${False}
+    - "criminal": ${False}
+    - "juvenile": ${False}
+    - "emergency": ${False}
+    - "plenary": ${True}
     - "petitioner_name": ${users[0].name.full(middle='full')}
     - "safe_address": ${hide_address}
     - "petitioner_address_line_one": ${users[0].address.line_one(bare=True)}
@@ -3103,7 +3170,10 @@ attachment:
     #What are these "on behalf of" fields in the template for?
     - "people_ex_rel": ${users[0].name.full(middle='full')}
     - "on_behalf_of": ${""}
-    - "self_name": ${""}
+    - "self_name": |
+        % if protect_whom['me']:
+        ${users[0].name.full(middle='full')}
+        % endif
     - "behalf_petitioner": |
         % if others_protected.there_are_any:
         % if len(comma_and_list(others_protected)) < 70:
@@ -3111,8 +3181,6 @@ attachment:
         % else:
         See attached list of protected persons.
         % endif
-        % else:
-        ""
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
     #Can the case number be known?
@@ -3139,10 +3207,10 @@ attachment:
     - "respondent_state": ${ other_parties[0].address.state}
     - "respondent_zip": ${other_parties[0].address.zip}
     - "respondent_birth_date": ${other_parties[0].birthdate}
-    - "respondent_is_male": ${True if other_parties[0].state_gender == "Male" else False}
-    - "respondent_is_female": ${True if other_parties[0].state_gender == "Female" else False}
+    - "respondent_is_male": ${True if other_parties[0].cook_sex == "Male" else False}
+    - "respondent_is_female": ${True if other_parties[0].cook_sex == "Female" else False}
     - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
-    - "respondent_height": ${(other_parties[0].height_feet + "'" + other_parties[0].height_inches  + "''") if other_parties[0].height_feet != 0 else ""}
+    - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "0" else ""}
     - "respondent_weight": ${other_parties[0].weight if other_parties[0].weight > 0 else ""}
     - "respondent_characteristics": ${other_parties[0].features}
     - "employer_name": ${ other_parties[0].employer_name if other_parties[0].has_job else ""}
@@ -3175,28 +3243,51 @@ attachment:
     - "no_police_report": ${ False if any_police_reports else True}
     - "yes_police_report": ${any_police_reports}
     - "report_number": ${comma_and_list(report_numbers) if any_police_reports else ""}
-    - "others_protected_list": |
-        % if others_protected.there_are_any:
+    - "additional_events_check": ${True if stalking_events.number_gathered() > 3 else False}
+    - "additional_events_text": |
+        % if stalking_events.number_gathered() > 3:
+        Additional incidents are attached.
+        % endif
+    - "others_protected_list": |     
+        % if others_protected.there_are_any and not protect_whom['me']:
         % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
         % else:
         See attached list of protected persons.
         % endif
+        % elif protect_whom['me'] and not others_protected.there_are_any:
+        ${users[0].name.full(middle='full')}
+        % elif others_protected.there_are_any and protect_whom['me']:
+        % if len(comma_and_list(others_protected)) > 50:
+        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
+        % elif others_protected.number_gathered() == 1:
+        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
-        ""
+        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        % endif
         % endif
     - "no_stalking": ${protection_requested['stalking']}
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
-        % if others_protected.there_are_any and protection_requested['contacting']:
+        % if protection_requested['contacting']:
+        % if others_protected.there_are_any and not protect_whom['me']:
         % if len(comma_and_list(others_with_minor_initials)) < 70:
         ${comma_and_list(others_with_minor_initials)}
         % else:
         See attached list of protected persons.
         % endif
+        % elif protect_whom['me'] and not others_protected.there_are_any:
+        ${users[0].name.full(middle='full')}
+        % elif others_protected.there_are_any and protect_whom['me']:
+        % if len(comma_and_list(others_with_minor_initials)) > 50:
+        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
+        % elif others_with_minor_initials.number_gathered() == 1:
+        ${users[0].name.full(middle='full')} and ${comma_and_list(others_with_minor_initials)}
         % else:
-        ""
+        ${users[0].name.full(middle='full')}, ${comma_and_list(others_with_minor_initials)}
+        % endif
         % endif 
+        % endif
     - "no_coming": ${protection_requested['away']}
     - "feet_away": ${distance_away}
     - "no_home": ${protected_place_types['Home']}
@@ -3241,7 +3332,18 @@ attachment:
     - "others_protected": ${comma_and_list(others_protected)}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
-    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "behalf_of_names": |
+        % if protect_whom['me'] and others_protected.there_are_any:
+        % if others_protected.number_gathered() == 1:
+        ${users[0].name.full(middle='full')} and ${ comma_and_list(others_protected)}
+        % else:
+        ${users[0].name.full(middle='full')}, ${ comma_and_list(others_protected)}
+        % endif
+        % elif others_protected.there_are_any and not protect_whom['me']:
+        ${comma_and_list(others_protected)}
+        % elif protect_whom['me'] and not others_protected.there_are_any:
+        ${users[0].name.full(middle='full')}
+        % endif
     - "stalker_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
@@ -3281,9 +3383,9 @@ attachment:
     - "description_incident_1": ${stalking_events[0].description}
     - "description_incident_2": |
         % if stalking_events[1].time != "":
-        On or about ${stalking_events[1].name.text}, ${format_time(stalking_events[1].time, format='h:mm a')}, at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
+        On or about ${stalking_events[1].name.text}, ${format_time(stalking_events[1].time, format='h:mm a')}, at ${stalking_events[1].place} the following occurred: ${stalking_events[1].description}
         % else:
-        On or about ${stalking_events[1].name.text} at ${stalking_events[1].place} the following occurred(:) ${stalking_events[1].description}
+        On or about ${stalking_events[1].name.text} at ${stalking_events[1].place} the following occurred: ${stalking_events[1].description}
         % endif
     - "petitioner_in_county": ${ jurisdiction_type['I live here']}
     - "respondent_in_county": ${ jurisdiction_type['Respondent lives here']}
@@ -3305,7 +3407,8 @@ attachment:
     - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True)}
     - "petitioner_address_line_2": ${ users[0].address.line_two()}
     - "petitioner_phone": ${ phone_number_formatted(users[0].phone_number)}
-    - "petitioner_email": ${ "Email:" + " " + users[0].email if users[0].has_email_address else ""}
+    - "petitioner_email": ${users[0].email if users[0].has_email_address else ""}
+    - "just_email": ${"Email"}
     - "protected_home_address": ${home.on_one_line(bare=True) if protection_requested['away'] and protected_place_types['Home'] else ""}
     - "protected_work_addresses": ${protected_workplace.name.first + ", " + protected_workplace.address.on_one_line()}
     - "school_daycare_addresses": ${comma_and_list(away_school_daycare_list)}
@@ -3320,6 +3423,8 @@ attachment:
   fields:
     - "circuit_court": ${court_circuit}
     - "filing_county": ${trial_court.address.county}
+    - "emergency_type": ${order_type['emergency']}
+    - "plenary_type": ${False}
     - "user_name": ${users[0].name.full(middle='full')}
     - "others_protected": ${comma_and_list(others_protected)}
     - "protect_a_minor": ${any_minors}
@@ -3374,6 +3479,8 @@ attachment:
   fields:
     - "circuit_court": ${court_circuit}
     - "filing_county": ${trial_court.address.county}
+    - "emergency_type": ${False}
+    - "plenary_type": ${order_type['emergency']}
     - "user_name": ${users[0].name.full(middle='full')}
     - "others_protected": ${comma_and_list(others_protected)}
     - "protect_a_minor": ${any_minors}
@@ -3497,7 +3604,7 @@ attachment:
         % endif
     - "service_method_sps": ${ True if service_method == "sps" else "" }
     - "service_method_detective": ${ True if service_method == "detective" else "" }
-    - "protective_order_type_op": ${ True }
+    - "protective_order_type_snco": ${ True }
     - "court_date_on_attached": ${ True }
     - "show_address": ${ not hide_address }
     - "hide_address": ${ hide_address }
@@ -3559,7 +3666,7 @@ review:
       * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
       % endif
       % if jurisdiction_type['Abuse was here']:
-      * The abuse took place in ${end_in_county(trial_court.address.county)}.
+      * The stalking took place in ${end_in_county(trial_court.address.county)}.
       % endif
   - Edit: users[0].name.first
     button: |
@@ -3596,51 +3703,34 @@ review:
       ${users[0].address.on_one_line(bare=True)}
   - Edit: user_relationship
     button: |
-      **How are you related to the person you are filing the Stalking No Contact Order against?**      
+      **How are you related to the person you are filing the Stalking No Contact Order against?**
+      
       % if user_relationship['unrelated']:
-      We are not related.
-      % elif user_relationship['se']:
-      I am their spouse.
-      % elif user_relationship['xs']:
-      I am their ex-spouse.
-      % elif user_relationship['bg']:
-      I am their boyfriend, girlfriend, or romantic partner (including ex-).
-      % elif user_relationship['cc']:
-      We have a child in common (never married).
-      % elif user_relationship['cs']:
-      We share or shared a living space.
-      % elif user_relationship['ch']:
-      I am their child.
-      % elif user_relationship['pa']:
-      I am their parent.
-      % elif user_relationship['sb']:
-      I am their brother, sister, or sibling.
-      % elif user_relationship['of']:
-      They are another family member.
-      % elif user_relationship['sc']:
-      I am their step child.
-      % elif user_relationship['ss']:
-      I am their step brother, step sister, or step sibling.
-      % elif user_relationship['sp']:
-      I am their step parent.
-      % elif user_relationship['gc']:
-      I am their grandchild.
-      % elif user_relationship['gp']:
-      I am their grandparent.
-      % elif user_relationship['il']:      
-      I am their in-law.
-      % elif user_relationship['pd']:
-      I have a disability and receive care from the abuser.
-      % elif user_relationship['pc']:
-      I am a high-risk adult with disabilities and the abuser is my personal caregiver.
-      % elif user_relationship['pr']:
-      I have a disability and the abuser is my personal assistant or caregiver.
-      % elif user_relationship['f']:
-      The abuser is a family or household member of my foster child.
-      % elif user_relationship['a']:
-      The abuser is a family or household member of my adopted child, or of my prospective adopted child.
-      % elif user_relationship['l']:
-      The abuser is a family or household member of a child that I am the legally-appointed custodian of.
+      * We are not related.
+      % endif
+      % if user_relationship['dated']:
+      * We dated.
+      % endif
+      % if user_relationship['marriage']:
+      * We are related through current or past marriage.
+      % endif
+      % if user_relationship['children']:
+      * We have children together.
+      % endif
+      % if user_relationship['blood']:
+      * We are related through blood.
+      % endif
+      % if user_relationship['blood_child']:
+      * We have a blood relationship through a child.
+      % endif
+      % if user_relationship['home']:
+      We share or have shared a home.
+      % endif
+      % if user_relationship['adopt_child']:
+      * We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.
+      % endif
+      % if user_relationship['caregiver']:
+      * They are my personal caregiver.
       % endif
   - Edit: users[0].birthdate
     button: |
@@ -3694,7 +3784,7 @@ review:
       ${x.birth}
   - Edit: x.is_survivor
     button: |
-      **Is ${x.name.full(middle='full')} a survivor of rape, sexual assault, or sexual abuse?**
+      **Was ${x.name.full(middle='full')} stalked?**
       ${word(yesno(x.is_survivor))}
   - Edit: x.protection_reason
     button: |
@@ -4247,7 +4337,7 @@ review:
       * School
       % endif
       % if protected_place_types['day_care']:
-      * Day care
+      * Daycare
       % endif
       % if protected_place_types['Other']:
       * Other
@@ -4265,7 +4355,7 @@ review:
     show if: protection_requested['away'] and protected_place_types['Home'] and not hide_address
   #- Edit: employers_schools.revisit
   #  button: |
-  #    **Workplaces, schools, and day cares:**
+  #    **Workplaces, schools, and daycares:**
   #    
   #    % for my_var in employers_schools:
   #      * ${ my_var.name.first }
@@ -4283,7 +4373,7 @@ review:
     show if: protection_requested['away'] and protected_place_types['School']
   - Edit: protected_day_care.name.first
     button: |
-      **The day care ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The daycare ${other_parties[0].name.full(middle='full')} should stay away from:**
       ${protected_day_care.name.first}, ${protected_day_care.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['day_care']
   - Edit: other_places
@@ -4522,7 +4612,7 @@ review:
       * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
       % endif
       % if jurisdiction_type['Abuse was here']:
-      * The abuse took place in ${end_in_county(trial_court.address.county)}.
+      * The stalking took place in ${end_in_county(trial_court.address.county)}.
       % endif
   - Edit: users[0].name.first
     button: |
@@ -4542,51 +4632,34 @@ review:
       ${users[0].address.on_one_line(bare=True)}
   - Edit: user_relationship
     button: |
-      **How are you related to the person you are filing the Stalking No Contact Order against?**      
+      **How are you related to the person you are filing the Stalking No Contact Order against?**
+      
       % if user_relationship['unrelated']:
-      We are not related.
-      % elif user_relationship['se']:
-      I am their spouse.
-      % elif user_relationship['xs']:
-      I am their ex-spouse.
-      % elif user_relationship['bg']:
-      I am their boyfriend, girlfriend, or romantic partner (including ex-).
-      % elif user_relationship['cc']:
-      We have a child in common (never married).
-      % elif user_relationship['cs']:
-      We share or shared a living space.
-      % elif user_relationship['ch']:
-      I am their child.
-      % elif user_relationship['pa']:
-      I am their parent.
-      % elif user_relationship['sb']:
-      I am their brother, sister, or sibling.
-      % elif user_relationship['of']:
-      They are another family member.
-      % elif user_relationship['sc']:
-      I am their step child.
-      % elif user_relationship['ss']:
-      I am their step brother, step sister, or step sibling.
-      % elif user_relationship['sp']:
-      I am their step parent.
-      % elif user_relationship['gc']:
-      I am their grandchild.
-      % elif user_relationship['gp']:
-      I am their grandparent.
-      % elif user_relationship['il']:      
-      I am their in-law.
-      % elif user_relationship['pd']:
-      I have a disability and receive care from the abuser.
-      % elif user_relationship['pc']:
-      I am a high-risk adult with disabilities and the abuser is my personal caregiver.
-      % elif user_relationship['pr']:
-      I have a disability and the abuser is my personal assistant or caregiver.
-      % elif user_relationship['f']:
-      The abuser is a family or household member of my foster child.
-      % elif user_relationship['a']:
-      The abuser is a family or household member of my adopted child, or of my prospective adopted child.
-      % elif user_relationship['l']:
-      The abuser is a family or household member of a child that I am the legally-appointed custodian of.
+      * We are not related.
+      % endif
+      % if user_relationship['dated']:
+      * We dated.
+      % endif
+      % if user_relationship['marriage']:
+      * We are related through current or past marriage.
+      % endif
+      % if user_relationship['children']:
+      * We have children together.
+      % endif
+      % if user_relationship['blood']:
+      * We are related through blood.
+      % endif
+      % if user_relationship['blood_child']:
+      * We have a blood relationship through a child.
+      % endif
+      % if user_relationship['home']:
+      We share or have shared a home.
+      % endif
+      % if user_relationship['adopt_child']:
+      * We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.
+      % endif
+      % if user_relationship['caregiver']:
+      * They are my personal caregiver.
       % endif
   - Edit: users[0].birthdate
     button: |
@@ -5029,7 +5102,7 @@ review:
       * School
       % endif
       % if protected_place_types['day_care']:
-      * Day care
+      * Daycare
       % endif
       % if protected_place_types['Other']:
       * Other
@@ -5057,7 +5130,7 @@ review:
     show if: protection_requested['away'] and protected_place_types['School']
   - Edit: protected_day_care.name.first
     button: |
-      **The day care ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The daycare ${other_parties[0].name.full(middle='full')} should stay away from:**
       ${protected_day_care.name.first}, ${protected_day_care.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['day_care']
   - Edit: other_places
