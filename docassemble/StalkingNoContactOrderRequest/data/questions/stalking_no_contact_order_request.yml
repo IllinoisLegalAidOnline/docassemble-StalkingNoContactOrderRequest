@@ -187,7 +187,7 @@ code: |
     #  other_parties[0].weapons_info
     #if other_parties[0].order_of_protection == True:
     #  other_ops.gather()
-    respondent_on_probation
+    #respondent_on_probation
   
   nav.set_section('section_filing_info')
   if service_method == "sheriff" and service_state != "IL":
@@ -1477,22 +1477,22 @@ fields:
     maxlength: 150
     required: False
 ---
-id: stalker probation
-question: |
-  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
-fields:
-  - no label: respondent_on_probation
-    datatype: radio
-    choices:
-      - Yes: Yes
-      - No: No
-      - I don't know.: idk
-  - Probation in which county?: respondent_probation_county
-    required: False
-    maxlength: 25
-    show if: 
-      variable: respondent_on_probation
-      is: "Yes"
+#id: stalker probation
+#question: |
+#  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
+#fields:
+#  - no label: respondent_on_probation
+#    datatype: radio
+#    choices:
+#      - Yes: Yes
+#      - No: No
+#      - I don't know.: idk
+#  - Probation in which county?: respondent_probation_county
+#    required: False
+#    maxlength: 25
+#    show if: 
+#      variable: respondent_on_probation
+#      is: "Yes"
 ---
 id: stalker drivers license
 question: |
@@ -1585,8 +1585,8 @@ fields:
       - I don't know.: I don't know.
   - List their accounts: respondent_social_media_accounts
     input type: area
-    rows: 3
-    maxlength: 100
+    rows: 5
+    maxlength: 180
     help: |
       Enter as much information as you can including app, website, and username if you know it.
     show if:
@@ -1605,6 +1605,9 @@ fields:
   - Cell phone: other_parties[0].mobile_number
     datatype: al_international_phone
     required: False
+    show if:
+      code: |
+        trial_court_index == -1
   - Email address: other_parties[0].email_address
     datatype: email
     required: False
@@ -1689,11 +1692,11 @@ fields:
     help: |
       Describe their position, job title, or role where they work. Examples: Manager, cook, cashier
     maxlength: 30
-  - Standard work hours: other_parties[0].work_hours
+  - Work days and hours: other_parties[0].work_hours
     required: False
     maxlength: 30
     help: |
-      For example, 9:00 a.m. to 5:00 p.m.
+      If you don't know the exact days and hours, you can say something like "weekdays" or "nights."
   - Street address: other_parties[0].employer_address.address
     address autocomplete: True
     required: False
@@ -1721,7 +1724,7 @@ fields:
     choices:
       - Has a history of mental illness.: illness
         show if: trial_court_index == -1
-      - Is a suicide risk.: suicide
+      - Is now or has been suicidal.: suicide
       - Is likely to be under the influence of alcohol.: alcohol
         show if: trial_court_index == -1
       - Is likely to be under the influence of drugs.: drugs
@@ -1734,7 +1737,9 @@ fields:
         show if: trial_court_index == -1
   - Type and location of weapons: other_parties[0].weapons_info
     required: False
-    maxlength: 40
+    input type: area
+    rows: 5
+    maxlength: 180
     js show if: |
       val("caution_reasons['armed']") == true || val("caution_reasons['home']") == true
 ---
@@ -2519,8 +2524,8 @@ subquestion: |
 fields:
   - no label: service_information
     input type: area
-    rows: 2
-    maxlength: 150
+    rows: 10
+    maxlength: 400
     required: False
 ---
 id: signature
@@ -2646,12 +2651,14 @@ objects:
   #- cook_disposition_order: ALDocument.using(title="Disposition order", filename="cook_disposition.pdf", has_addendum=False)
   - others_protected_addendum: ALDocument.using(title="Others protected addendum", filename="others_protected_addendum.pdf", has_addendum=False)
   - snco_events_addendum: ALDocument.using(title="Stalking incidents addendum", filename="snco_events_addendum.pdf", has_addendum=False)
+  - sheriff_cover_sheet: ALDocument.using(title="Sheriff Information Cover Sheet", filename="sheriff_info_cover_sheet.pdf", has_addendum=False)
 ---
 objects:
   - petition_bundle: ALDocumentBundle.using(elements=[snco_petition, cook_petition, others_protected_addendum, snco_events_addendum], filename="petition.pdf", title="Verified Petition")
+  - sheriff_info_bundle: ALDocumentBundle.using(elements=[sheriff_cover_sheet, cook_sheriff_info_sheet], filename="cook_sheriff_info_sheet.pdf", title="Confidential Sheriff Information Sheet")
 ---
 objects: 
-  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
+  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, sheriff_info_bundle, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
   - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
 ---
 code: |
@@ -2663,20 +2670,24 @@ code: |
   petition_bundle.enabled = True
   snco_events_addendum.enabled = False
   others_protected_addendum.enabled = False
+  sheriff_cover_sheet.enabled = False
+  sheriff_info_bundle.enabled = False
 
   
   if trial_court_index == -1:
     cook_dv_cover_sheet.enabled = True
+    sheriff_cover_sheet.enabled = True
+    sheriff_info_bundle.enabled = True
     cook_sheriff_info_sheet.enabled = True
     cook_petition.enabled = True
     if order_type['plenary']:
       cook_p_order.enabled = True
     else:
-      plenary_order.enabled = False
+      cook_p_order.enabled = False
     if order_type['emergency']:
       cook_e_order.enabled = True
     else:
-      emergency_order.enabled = False
+      cook_e_order.enabled = False
     #cook_findings.enabled = True
     #cook_disposition_order.enabled = True
     snco_petition.enabled = False
@@ -2726,6 +2737,16 @@ attachment:
   name: others_protected_addendum
   filename: others_protected_addendum
   docx template file: others_protected_addendum.docx
+---
+attachment:
+  variable name: sheriff_cover_sheet[i]
+  name: sheriff_cover_sheet
+  filename: sheriff_cover_sheet
+  skip undefined: True
+  editable: False
+  pdf template file: sheriff_cover_sheet.pdf
+  fields:
+    - "fake": ${ "" }
 ---
 attachment:
   variable name: cook_dv_cover_sheet[i]
@@ -2838,9 +2859,8 @@ attachment:
     - "respondent_weapons_in_home": ${ True if caution_reasons['home'] == True else "" }
     - "respondent_weapons_description": ${ other_parties[0].weapons_info if caution_reasons['armed'] or caution_reasons['home'] else "" }       
     - "respondent_suicidal": ${ True if caution_reasons['suicide'] == True else ''  }    
-    - "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
-    - "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  } 
-    
+    #- "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
+    #- "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  }   
     - "respondent_employer": |
         % if other_parties[0].has_job:
         ${ other_parties[0].employer_name }
@@ -3571,7 +3591,7 @@ attachment:
     - "respondent__2": ${other_parties[0].name.full(middle="full")}
     - "service_address_line_1": ${other_parties[0].service_address.line_one(bare=True)}
     - "service_address_csz": ${other_parties[0].service_address.line_two()}
-    - "respondent_phone": ${ phone_number_formatted(other_parties[0].phone_number) if other_parties[0].phone_number != "" else phone_number_formatted(other_parties[0].mobile_number) }
+    - "respondent_phone": ${phone_number_formatted(other_parties[0].mobile_number) if trial_court_index == -1 and other_parties[0].phone_number == "" else phone_number_formatted(other_parties[0].phone_number)}
     - "respondent_email": ${ other_parties[0].email_address }
     - "respondent__3": ${other_parties[0].name.full(middle="full") if other_parties[0].bonus_service_check == True else ""}
     - "service_alt_address_line_1": |
@@ -4005,18 +4025,20 @@ review:
     show if: other_parties[0].another_number_check
   - Edit: other_parties[0].phone_number
     button: |
-      **${other_parties[0].name.full(middle='full')}'s phone number:**
-      % if other_parties[0].phone_number != "" and other_parties[0].mobile_number != "":
-      
-      * Home number: ${phone_number_formatted(other_parties[0].phone_number)}
-      * Mobile number: ${phone_number_formatted(other_parties[0].mobile_number)}
-      % elif other_parties[0].mobile_number != "":
-      ${phone_number_formatted(other_parties[0].mobile_number)}
-      % elif other_parties[0].phone_number != "":
-      ${phone_number_formatted(other_parties[0].phone_number)}
+      **${other_parties[0].name.full(middle="full")}'s home phone number:**
+      % if other_parties[0].phone_number != "":
+      ${ phone_number_formatted(other_parties[0].phone_number) }      
       % else:
-      I don't know
+      ${ "do not know" }
       % endif
+  - Edit: other_parties[0].mobile_number
+    button: |
+      **${other_parties[0].name.full(middle="full")}'s cell number:**
+      % if other_parties[0].mobile_number != "":
+      ${ phone_number_formatted(other_parties[0].mobile_number) }      
+      % else:
+      ${ "do not know" }
+      % endif    
   - Edit: other_parties[0].email_address
     button: |
       **${other_parties[0].name.full(middle='full')}'s email address:**
@@ -4041,6 +4063,16 @@ review:
       * Phone: ${phone_number_formatted(other_parties[0].alt_phone)}
       % endif
     show if: (other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != "") and other_parties[0].bonus_contact_info
+  - Edit: respondent_on_social_media
+    button: |
+      **Is ${other_parties[0].name.full(middle="full")} active on social media?**
+      ${ respondent_on_social_media }      
+  - Edit: respondent_social_media_accounts
+    button: |
+      **${other_parties[0].name.full(middle="full")}'s social media accounts:**
+      ${ respondent_social_media_accounts }
+    show if: respondent_on_social_media == 'Yes'
+
   - Edit: other_parties[0].address_known
     button: | 
       **Do you know ${other_parties[0].name.full(middle='full')}'s current home address?**
@@ -4168,16 +4200,16 @@ review:
       % endif
       % endif
     show if: other_parties[0].order_of_protection
-  - Edit: respondent_on_probation
-    button: |
-      **Is ${other_parties[0].name.full(middle="full")} on probation?**
-      % if respondent_on_probation == "idk":
-      I don't know
-      % elif respondent_on_probation == "Yes":
-      Yes, in ${end_in_county(respondent_probation_county)}
-      % else:
-      No
-      % endif  
+  #- Edit: respondent_on_probation
+  #  button: |
+  #    **Is ${other_parties[0].name.full(middle="full")} on probation?**
+  #    % if respondent_on_probation == "idk":
+  #    I don't know
+  #    % elif respondent_on_probation == "Yes":
+  #    Yes, in ${end_in_county(respondent_probation_county)}
+  #    % else:
+  #    No
+  #    % endif  
 ---
 id: stalker other names review screen
 continue button field: other_parties[0].other_names.revisit
@@ -4872,18 +4904,20 @@ review:
     show if: other_parties[0].another_number_check
   - Edit: other_parties[0].phone_number
     button: |
-      **${other_parties[0].name.full(middle='full')}'s phone number:**
-      % if other_parties[0].phone_number != "" and other_parties[0].mobile_number != "":
-      
-      * Home number: ${phone_number_formatted(other_parties[0].phone_number)}
-      * Mobile number: ${phone_number_formatted(other_parties[0].mobile_number)}
-      % elif other_parties[0].mobile_number != "":
-      ${phone_number_formatted(other_parties[0].mobile_number)}
-      % elif other_parties[0].phone_number != "":
-      ${phone_number_formatted(other_parties[0].phone_number)}
+      **${other_parties[0].name.full(middle="full")}'s home phone number:**
+      % if other_parties[0].phone_number != "":
+      ${ phone_number_formatted(other_parties[0].phone_number) }      
       % else:
-      I don't know
+      ${ "do not know" }
       % endif
+  - Edit: other_parties[0].mobile_number
+    button: |
+      **${other_parties[0].name.full(middle="full")}'s cell number:**
+      % if other_parties[0].mobile_number != "":
+      ${ phone_number_formatted(other_parties[0].mobile_number) }      
+      % else:
+      ${ "do not know" }
+      % endif      
   - Edit: other_parties[0].email_address
     button: |
       **${other_parties[0].name.full(middle='full')}'s email address:**
@@ -4909,6 +4943,16 @@ review:
       * Phone: ${phone_number_formatted(other_parties[0].alt_phone)}
       % endif
     show if: (other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != "") and other_parties[0].bonus_contact_info
+  - Edit: respondent_on_social_media
+    button: |
+      **Is ${other_parties[0].name.full(middle="full")} active on social media?**
+      ${ respondent_on_social_media }      
+  - Edit: respondent_social_media_accounts
+    button: |
+      **${other_parties[0].name.full(middle="full")}'s social media accounts:**
+      ${ respondent_social_media_accounts }
+    show if: respondent_on_social_media == 'Yes'
+
   - Edit: other_parties[0].address_known
     button: | 
       **Do you know ${other_parties[0].name.full(middle='full')}'s current home address?**
@@ -5036,16 +5080,16 @@ review:
       % endif
       % endif
     show if: other_parties[0].order_of_protection
-  - Edit: respondent_on_probation
-    button: |
-      **Is ${other_parties[0].name.full(middle="full")} on probation?**
-      % if respondent_on_probation == "idk":
-      I don't know
-      % elif respondent_on_probation == "Yes":
-      Yes, in ${end_in_county(respondent_probation_county)}
-      % else:
-      No
-      % endif
+  #- Edit: respondent_on_probation
+  #  button: |
+  #    **Is ${other_parties[0].name.full(middle="full")} on probation?**
+  #    % if respondent_on_probation == "idk":
+  #    I don't know
+  #    % elif respondent_on_probation == "Yes":
+  #    Yes, in ${end_in_county(respondent_probation_county)}
+  #    % else:
+  #    No
+  #    % endif
   - Edit: stalking_events.revisit
     button: |
       **Stalking incidents:**
