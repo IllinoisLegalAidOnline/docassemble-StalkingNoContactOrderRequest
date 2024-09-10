@@ -161,7 +161,7 @@ code: |
     other_parties[0].license_plate
   if other_parties[0].another_number_check:
     other_parties[0].another_number_description
-  if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or other_parties[0].mobile_number != "":
+  if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (trial_court_index == -1 and other_parties[0].mobile_number != ""):
     if other_parties[0].bonus_contact_info:
       other_parties[0].alt_email
   if other_parties[0].address_known or other_parties[0].last_address_known:
@@ -187,7 +187,7 @@ code: |
     #  other_parties[0].weapons_info
     #if other_parties[0].order_of_protection == True:
     #  other_ops.gather()
-    #respondent_on_probation
+    respondent_on_probation
   
   nav.set_section('section_filing_info')
   if service_method == "sheriff" and service_state != "IL":
@@ -457,9 +457,9 @@ id: welcome
 question: |
   Stalking No Contact Order Request
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **Stalking No Contact Order Request** Easy Form.
+  Welcome to Illinois Legal Aid Online's **Stalking No Contact Order** Easy Form.
 
-  This program will help you make forms to get a Stalking No Contact Order against someone who has done things that made you fearful for your safety or caused you emotional distress. The forms you make with this program can only be used in Illinois.
+  This program will help you make forms to get a Stalking No Contact Order (SNCO) against someone who has done things that made you fearful for your safety or caused you emotional distress. The forms you make with this program can only be used in Illinois.
 
   If the victim of stalking is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the victim.
 
@@ -786,6 +786,27 @@ fields:
     default: IL      
   - ZIP code: users[0].address.zip
 ---
+id: others protected address
+question: |
+  What is ${other_parties[0].name.full(middle='full')}'s address?
+subquestion: |
+  **This address will appear on your court papers.** If you do not want to list ${other_parties[0].name.full(middle='full')}'s address, you can leave this blank.
+fields:
+  - Street address: others_protected[0].address.address
+    address autocomplete: True
+    required: False
+  - Address line 2: others_protected[0].address.unit
+    required: False
+  - City: others_protected[0].address.city
+    required: False
+  - State: others_protected[0].address.state
+    required: False
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: others_protected[0].address.zip
+    required: False
+---
 depends on:
   - hide_address
   - users[0].address.address
@@ -833,7 +854,7 @@ fields:
       - We are related through current or past marriage. For example, I am their spouse, ex-spouse, in-law, step-child, or other relative.: marriage
       - We have children together.: children
       - We are related through blood. For example, I am their parent, child, sibling, grandchild, grantparent, or other blood relative.: blood   
-      - We have a blood relationship through a child. For example, I am their grandchild's grandparent on the other side of the family.: blood_child
+      - We have a blood relationship through a child. For example, I am their niece's parent.: blood_child
       - We share or have shared a home.: home
       - We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.: adopt_child
       - They are my personal caregiver.: caregiver
@@ -1043,7 +1064,7 @@ question: |
 subquestion: |
   ${others_protected[i].name.full(middle='full')} cannot be included in the SNCO unless they have been stalked.
 
-  If you have another person you would like to include, click **Next**.
+  Click **Next** to continue making your forms without including ${others_protected[i].name.full(middle='full')}.
 ---
 #id: others protected relation to user cook county
 #question: |
@@ -1386,17 +1407,17 @@ fields:
       - Dark brown: Dark brown
       - Other: other
   - ${other_parties[0].name.full(middle="full")}'s skin color: respondent_skin_other
-    maxlength: 30
+    maxlength: 20
     show if:
       variable: other_parties[0].skin
       is: 'other'
   - Hair color: other_parties[0].hair
-    maxlength: 25
+    maxlength: 20
     required: False
     help: |
       Examples: brown, black, blond, gray, bald or shaved
   - Eye color: other_parties[0].eyes
-    maxlength: 25
+    maxlength: 20
     required: False
     help: |
       Examples: brown, blue, hazel, green
@@ -1474,25 +1495,27 @@ subquestion: |
 fields:
   - Features: other_parties[0].features
     input type: area
-    maxlength: 150
+    maxlength: 100
     required: False
 ---
-#id: stalker probation
-#question: |
-#  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
-#fields:
-#  - no label: respondent_on_probation
-#    datatype: radio
-#    choices:
-#      - Yes: Yes
-#      - No: No
-#      - I don't know.: idk
-#  - Probation in which county?: respondent_probation_county
-#    required: False
-#    maxlength: 25
-#    show if: 
-#      variable: respondent_on_probation
-#      is: "Yes"
+id: stalker probation
+question: |
+  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
+fields:
+  - no label: respondent_on_probation
+    datatype: radio
+    choices:
+      - Yes: Yes
+      - No: No
+      - I don't know.: idk
+  - Probation in which county?: respondent_probation_county
+    required: False
+    maxlength: 40
+    help: |
+      Enter the state if outside Illinois.
+    show if: 
+      variable: respondent_on_probation
+      is: "Yes"
 ---
 id: stalker drivers license
 question: |
@@ -2052,7 +2075,7 @@ fields:
     - ${home_address_text}: home_address
       show if: other_parties[0].address_known and other_parties[0].which_address != "home_address"
     - ${employer_address_text}: employer_address
-      show if: other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != ""
+      show if: other_parties[0].has_job and other_parties[0].employer_address.on_one_line(bare=True) != "" and other_parties[0].which_address != "employer_address"
     - An address I will enter: service_address
   - Street address: other_parties[0].bonus_service_address.address
     address autocomplete: True
@@ -2138,10 +2161,19 @@ fields:
       If you don't remember the exact address, you can describe the location. For example, you could enter "the parking lot at my workplace."
   - What happened: stalking_events[i].description
     input type: area
-    rows: 12
-    maxlength: 800
+    rows: 14
+    maxlength: |
+      % if trial_court_index == -1:
+      500
+      % else:
+      800
+      % endif
     help: |
-      The petition has space for about 800 characters for each incident.
+      % if trial_court_index == -1:
+      The petition has space for about 500 characters including spaces for each incident.
+      % else:
+      The petition has space for about 800 characters including spaces for each incident.
+      % endif
 ---
 #id: stalking event date time
 #question: |
@@ -2219,7 +2251,7 @@ fields:
 #Check space limits on template
 id: emergency reason
 question: |
-  Why should the court grant an *Emergency Order* without telling ${other_parties[0].name.full(middle='full')} first?
+  Why should the court grant an *Emergency Order* right away?
 subquestion: |
   Use complete sentences and proper punctuation. Your response will appear in your forms exactly as you type it. 
 fields:
@@ -2313,8 +2345,10 @@ subquestion: |
   For example, you could name a store you go to regularly.
   
   Include any addresses if you know them.
+  % if trial_court_index != -1:
   
-  If you list multiple places, give each place its own line in the text field.
+  If you list multiple places, they should be separated by hitting the Enter key.
+  % endif
 fields:
   - Name or type of place, and address (if known): other_places
     maxlength: 300
@@ -2494,7 +2528,14 @@ fields:
     datatype: yesnoradio
   - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
-    maxlength: 500
+    #maxlength: 500
+    #maxlength: 140
+    maxlength: |
+      % if trial_court_index == -1:
+      140
+      % else:
+      280
+      % endif
     rows: 12
     show if: other_parties[0].anything_else
 ---
@@ -2859,8 +2900,9 @@ attachment:
     - "respondent_weapons_in_home": ${ True if caution_reasons['home'] == True else "" }
     - "respondent_weapons_description": ${ other_parties[0].weapons_info if caution_reasons['armed'] or caution_reasons['home'] else "" }       
     - "respondent_suicidal": ${ True if caution_reasons['suicide'] == True else ''  }    
-    #- "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
-    #- "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  }   
+    - "respondent_probation_yes":  ${ True if respondent_on_probation == "Yes" else ''  } 
+    - "respondent_probation_no":  ${ True if respondent_on_probation == "No" else ''  }
+    - "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  }   
     - "respondent_employer": |
         % if other_parties[0].has_job:
         ${ other_parties[0].employer_name }
@@ -2884,11 +2926,11 @@ attachment:
         % endif
     - "service_city": |
         % if other_parties[0].which_address == "add_service_address":
-        ${other_parties[0].service_address.city }
+        ${other_parties[0].service_address.city}, ${other_parties[0].service_address.state}
         % elif other_parties[0].which_address == "home_address":
-        ${ other_parties[0].address.city }        
+        ${ other_parties[0].address.city }, ${other_parties[0].address.state}        
         % else:
-        ${ other_parties[0].employer_address.city }        
+        ${ other_parties[0].employer_address.city }, ${other_parties[0].employer_address.state}       
         % endif
         
     - "last_known_address": |
@@ -2898,7 +2940,7 @@ attachment:
 
     - "last_known_city": |
         % if other_parties[0].address_known or other_parties[0].last_address_known:
-        ${ other_parties[0].address.city }
+        ${ other_parties[0].address.city }, ${other_parties[0].address.state}    
         % endif
 
     - "respondent_work_address": |
@@ -2909,7 +2951,7 @@ attachment:
         % endif
     - "respondent_work_city": |
         % if other_parties[0].has_job:
-        ${ other_parties[0].employer_address.city }
+        ${ other_parties[0].employer_address.city }, ${other_parties[0].employer_address.state}    
         % else:
         ${ "do not know" }
         % endif
@@ -2927,11 +2969,11 @@ attachment:
     - "service_alt_city": |
         % if other_parties[0].bonus_service_check:
         % if other_parties[0].which_bonus_address == "service_address":
-        ${other_parties[0].bonus_service_address.city}
+        ${other_parties[0].bonus_service_address.city}, ${other_parties[0].bonus_service_address.state}   
         % elif other_parties[0].which_bonus_address == "home_address":
-        ${other_parties[0].address.city}
+        ${other_parties[0].address.city}, ${other_parties[0].address.state}   
         % else:
-        ${other_parties[0].employer_address.city}
+        ${other_parties[0].employer_address.city}, ${other_parties[0].employer_address.state}   
         % endif
         % endif
     - "respondent_phone": ${ phone_number_formatted(other_parties[0].phone_number)}
@@ -3654,10 +3696,13 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
-  - Edit: trial_court_index
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
     button: |
       **You are filing in:**
-      ${end_in_county(trial_court.address.county)}
+      ${end_in_county(filing_county)}
   - Edit: cook_district
     button: |
       **Which courthouse will you file in?**
@@ -4100,26 +4145,11 @@ review:
   - Edit: other_parties[0].employer_name
     button: |
       **${other_parties[0].name.full(middle='full')}'s job information:**
-      % if other_parties[0].employer_name == "":
-      * Employer name: I don't know
-      % else:
-      * Employer name: ${other_parties[0].employer_name}
-      % endif
-      % if respondent_work_type == "":
-      * Occupation: I don't know
-      % else:
-      * Occupation: ${respondent_work_type}
-      % endif
-      % if other_parties[0].work_hours == "":
-      * Work hours: I don't know
-      % else:
-      * Standard work hours: ${other_parties[0].work_hours}
-      % endif
-      % if other_parties[0].employer_address.on_one_line(bare=True) == "":
-      * Address: I don't know
-      % else:
-      * Address: ${other_parties.employer_address.on_one_line(bare=True)}
-      % endif
+      
+      * Employer name: ${showifdef('other_parties[0].employer_name')}
+      * Occupation: ${showifdef('respondent_work_type')}
+      * Standard work hours: ${showifdef('other_parties[0].work_hours')}
+      * Address: ${other_parties[0].employer_address.on_one_line(bare=True)}
     show if: other_parties[0].has_job
   - Edit: caution_reasons
     button: |
@@ -4200,16 +4230,16 @@ review:
       % endif
       % endif
     show if: other_parties[0].order_of_protection
-  #- Edit: respondent_on_probation
-  #  button: |
-  #    **Is ${other_parties[0].name.full(middle="full")} on probation?**
-  #    % if respondent_on_probation == "idk":
-  #    I don't know
-  #    % elif respondent_on_probation == "Yes":
-  #    Yes, in ${end_in_county(respondent_probation_county)}
-  #    % else:
-  #    No
-  #    % endif  
+  - Edit: respondent_on_probation
+    button: |
+      **Is ${other_parties[0].name.full(middle="full")} on probation?**
+      % if respondent_on_probation == "idk":
+      I don't know
+      % elif respondent_on_probation == "Yes":
+      Yes, in ${end_in_county(respondent_probation_county)}
+      % else:
+      No
+      % endif  
 ---
 id: stalker other names review screen
 continue button field: other_parties[0].other_names.revisit
@@ -4516,10 +4546,13 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
-  - Edit: trial_court_index
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
     button: |
       **You are filing in:**
-      ${end_in_county(trial_court.address.county)}
+      ${end_in_county(filing_county)}
   - Edit: cook_district
     button: |
       **Which courthouse will you file in?**
@@ -4612,10 +4645,13 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
-  - Edit: trial_court_index
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
     button: |
       **You are filing in:**
-      ${end_in_county(trial_court.address.county)}
+      ${end_in_county(filing_county)}
   - Edit: cook_district
     button: |
       **Which courthouse will you file in?**
@@ -4926,7 +4962,6 @@ review:
       % else:
       ${other_parties[0].email_address}
       % endif
-   #JUMP
   - Edit: other_parties[0].bonus_contact_info
     button: |
       **Do you want to include additional contact information  for ${other_parties[0].name.full(middle='full')}?**
@@ -4980,26 +5015,11 @@ review:
   - Edit: other_parties[0].employer_name
     button: |
       **${other_parties[0].name.full(middle='full')}'s job information:**
-      % if other_parties[0].employer_name == "":
-      * Employer name: I don't know
-      % else:
-      * Employer name: ${other_parties[0].employer_name}
-      % endif
-      % if respondent_work_type == "":
-      * Occupation: I don't know
-      % else:
-      * Occupation: ${respondent_work_type}
-      % endif
-      % if other_parties[0].work_hours == "":
-      * Work hours: I don't know
-      % else:
-      * Standard work hours: ${other_parties[0].work_hours}
-      % endif
-      % if other_parties[0].employer_address.on_one_line(bare=True) == "":
-      * Address: I don't know
-      % else:
-      * Address: ${other_parties.employer_address.on_one_line(bare=True)}
-      % endif
+      
+      * Employer name: ${showifdef('other_parties[0].employer_name')}
+      * Occupation: ${showifdef('respondent_work_type')}
+      * Standard work hours: ${showifdef('other_parties[0].work_hours')}
+      * Address: ${other_parties[0].employer_address.on_one_line(bare=True)}
     show if: other_parties[0].has_job
   - Edit: caution_reasons
     button: |
@@ -5080,16 +5100,16 @@ review:
       % endif
       % endif
     show if: other_parties[0].order_of_protection
-  #- Edit: respondent_on_probation
-  #  button: |
-  #    **Is ${other_parties[0].name.full(middle="full")} on probation?**
-  #    % if respondent_on_probation == "idk":
-  #    I don't know
-  #    % elif respondent_on_probation == "Yes":
-  #    Yes, in ${end_in_county(respondent_probation_county)}
-  #    % else:
-  #    No
-  #    % endif
+  - Edit: respondent_on_probation
+    button: |
+      **Is ${other_parties[0].name.full(middle="full")} on probation?**
+      % if respondent_on_probation == "idk":
+      I don't know
+      % elif respondent_on_probation == "Yes":
+      Yes, in ${end_in_county(respondent_probation_county)}
+      % else:
+      No
+      % endif
   - Edit: stalking_events.revisit
     button: |
       **Stalking incidents:**
