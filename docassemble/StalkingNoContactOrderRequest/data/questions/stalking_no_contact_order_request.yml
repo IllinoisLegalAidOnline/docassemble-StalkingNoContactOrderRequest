@@ -219,6 +219,7 @@ code: |
   addendum_check
   #debug_page
   forms_assembling
+  pop_protected_code
   adult_minor_sorting
   snapshot_forms
   get_docs_screen
@@ -450,8 +451,6 @@ code: |
       else:
         any_adults = True
   check_ages = True
----
-
 ---
 id: welcome
 question: |
@@ -2348,10 +2347,18 @@ subquestion: |
   % if trial_court_index != -1:
   
   If you list multiple places, they should be separated by hitting the Enter key.
+  % else:
+  
+  If you list multiple places, they should be separated by commas.
   % endif
 fields:
   - Name or type of place, and address (if known): other_places
-    maxlength: 300
+    maxlength: |
+      % if trial_court_index == -1:
+      150
+      % else:
+      300
+      % endif
     rows: 10
     input type: area
 ---
@@ -2375,6 +2382,7 @@ question: |
   What is the name and address of the workplace you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - Workplace name: protected_workplace.name.first
+    maxlength: 50
   - Street address: protected_workplace.address.address
     address autocomplete: True
   - Address line 2: protected_workplace.address.unit
@@ -2391,6 +2399,7 @@ question: |
   What is the name and address of the school you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - School name: protected_school.name.first
+    maxlength: 50
   - Street address: protected_school.address.address
     address autocomplete: True
   - Address line 2: protected_school.address.unit
@@ -2407,6 +2416,7 @@ question: |
   What is the name and address of the daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - Daycare name: protected_day_care.name.first
+    maxlength: 50
   - Street address: protected_day_care.address.address
     address autocomplete: True
   - Address line 2: protected_day_care.address.unit
@@ -3631,8 +3641,22 @@ attachment:
     - "case_number__2": ${ case_number }
     - "case_number__3": ${ case_number }
     - "respondent__2": ${other_parties[0].name.full(middle="full")}
-    - "service_address_line_1": ${other_parties[0].service_address.line_one(bare=True)}
-    - "service_address_csz": ${other_parties[0].service_address.line_two()}
+    - "service_address_line_1": |
+        % if other_parties[0].which_address == "add_service_address":
+        ${other_parties[0].service_address.line_one(bare=True)}
+        % elif other_parties[0].which_address == "home_address":
+        ${other_parties[0].address.line_one(bare=True)}
+        % elif other_parties[0].which_address == "employer_address":
+        ${other_parties[0].employer_address.line_one(bare=True)}
+        % endif
+    - "service_address_csz": |
+        % if other_parties[0].which_address == "add_service_address":
+        ${other_parties[0].service_address.line_two()}
+        % elif other_parties[0].which_address == "home_address":
+        ${other_parties[0].address.line_two()}
+        % elif other_parties[0].which_address == "employer_address":
+        ${other_parties[0].employer_address.line_two()}
+        % endif
     - "respondent_phone": ${phone_number_formatted(other_parties[0].mobile_number) if trial_court_index == -1 and other_parties[0].phone_number == "" else phone_number_formatted(other_parties[0].phone_number)}
     - "respondent_email": ${ other_parties[0].email_address }
     - "respondent__3": ${other_parties[0].name.full(middle="full") if other_parties[0].bonus_service_check == True else ""}
