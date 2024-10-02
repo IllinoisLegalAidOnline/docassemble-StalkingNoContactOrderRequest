@@ -2073,7 +2073,7 @@ validation code: |
 ---
 id: list bonus service check
 question: |
-  Do you want to list another place where the sheriff could give court papers to ${other_parties[0].name.full(middle='full')}?
+  Do you want to list another place where court papers could be delivered to ${other_parties[0].name.full(middle='full')}?
 fields:
   - no label: other_parties[0].bonus_service_check
     datatype: yesnoradio
@@ -2372,11 +2372,10 @@ subquestion: |
   For example, you could name a store you go to regularly.
   
   Include any addresses if you know them.
-  % if trial_court_index == -1:
   
+  % if trial_court_index == -1:
   If you list multiple places, they should be separated by commas. 
   % else:
-  
   If you list multiple places, they should be separated by hitting the Enter key.
   % endif
 fields:
@@ -2427,7 +2426,7 @@ question: |
   What is the name and address of the school you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - School name: protected_school.name.first
-    maxlength: 50
+    maxlength: 30
   - Street address: protected_school.address.address
     address autocomplete: True
   - Address line 2: protected_school.address.unit
@@ -2444,7 +2443,7 @@ question: |
   What is the name and address of the daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
 fields:
   - Daycare name: protected_day_care.name.first
-    maxlength: 50
+    maxlength: 30
   - Street address: protected_day_care.address.address
     address autocomplete: True
   - Address line 2: protected_day_care.address.unit
