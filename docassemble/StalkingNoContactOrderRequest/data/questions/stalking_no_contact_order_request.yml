@@ -1146,6 +1146,8 @@ question: |
   What is the stalker's name?
 subquestion: |
   This is the person you will file the Stalking No Contact Order against.
+
+  
 fields:
   - First name: other_parties[0].name.first
   - Middle name: other_parties[0].name.middle
@@ -1153,7 +1155,6 @@ fields:
   - Last name: other_parties[0].name.last
     required: False
   - Suffix: other_parties[0].name.suffix
-    required: False
     code: |
       name_suffix()
 ---
@@ -1825,6 +1826,7 @@ fields:
 #    input type: area
 #    required: False
 ---
+#The divorce and parentage action questions are for the general DV cover sheet, not SNCO. These can be removed.
 id: stalker user divorce
 question: |
   Have you and ${other_parties[0].name.full(middle='full')} previously filed a divorce in Cook County?
@@ -2296,9 +2298,9 @@ fields:
     datatype: checkboxes
     none of the above: True
     choices:
-      - "Stop stalking and threatening the survivor, survivor's family and household members, and stop enlisting other people to stalk or threaten.": stalking
-      - "Stop contacting the survivor, survivor's family and household members whether in person, by phone, by e-mail, by note or by sending messages through other people.": contacting
-      - "Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare.": away
+      - "Stop stalking and threatening the victim, victim's family and household members, and stop enlisting other people to stalk or threaten.": stalking
+      - "Stop contacting the victim, victim's family, and household members whether in person, by phone, by e-mail, by note or by sending messages through other people.": contacting
+      - "Stay away from the locations of the victim, victim's family, and household members' home, work, school, or daycare.": away
 ---
 template: stay_away_contact
 subject: |
