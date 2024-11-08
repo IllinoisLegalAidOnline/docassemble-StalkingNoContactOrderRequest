@@ -555,19 +555,19 @@ question: |
   % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
   Has the stalker stalked you and the people you want to protect at least two times?
   % elif protect_whom['me']:
-  Has the stalker stalked you at least two separate times?
+  Has the stalker stalked you at least two times?
   % else:
   Has the stalker stalked the people you want to protect at least two times?
   % endif
 subquestion: |
-  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset. Stalking does not include an exercise of the right to free speech or assembly. It does not include lawful picketing at the workplace. 
+  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset.
 
   % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  If the stalker has made you and the people you want to protect afraid or caused you emotional distress at least two times, click **Yes**.
+  If the stalker has made you and the people you want to protect afraid or caused you emotional distress **at least two times**, click **Yes**.
   % elif protect_whom['me']:
-  If the stalker has made you afraid or caused you emotional distress at least two times, click **Yes**.
+  If the stalker has made you afraid or caused you emotional distress **at least two times**, click **Yes**.
   % else:
-  If the stalker has made the people you want to protect afraid or caused them emotional distress at least two times, click **Yes**.
+  If the stalker has made the people you want to protect afraid or caused them emotional distress **at least two times**, click **Yes**.
   % endif
 
   **Emotional distress** means feeling a lot of mental pain, worry, or fear.
@@ -816,23 +816,23 @@ fields:
 ---
 id: others protected address
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s address?
+  What is ${others_protected[i].name.full(middle='full')}'s address?
 subquestion: |
-  **This address will appear on your court papers.** If you do not want to list ${other_parties[0].name.full(middle='full')}'s address, you can leave this blank.
+  **This address will appear on your court papers.** If you do not want to list ${others_protected[0].name.full(middle='full')}'s address, you can leave this blank.
 fields:
-  - Street address: others_protected[0].address.address
+  - Street address: others_protected[i].address.address
     address autocomplete: True
     required: False
-  - Address line 2: others_protected[0].address.unit
+  - Address line 2: others_protected[i].address.unit
     required: False
-  - City: others_protected[0].address.city
+  - City: others_protected[i].address.city
     required: False
-  - State: others_protected[0].address.state
+  - State: others_protected[i].address.state
     required: False
     code: |
       states_list()
     default: IL      
-  - ZIP code: others_protected[0].address.zip
+  - ZIP code: others_protected[i].address.zip
     required: False
 ---
 depends on:
@@ -1138,22 +1138,22 @@ fields:
   - no label: others_protected[i].use_safe_address
     datatype: yesnoradio
 ---
-id: others protected address
-question: |
-  What is ${others_protected[i].name.full(middle='full')}'s address?
-subquestion: |
-  This address will appear on court papers.
-fields:
-  - Street address: others_protected[0].address.address
-    address autocomplete: True
-  - Address line 2: others_protected[0].address.unit
-    required: False
-  - City: others_protected[0].address.city
-  - State: others_protected[0].address.state
-    code: |
-      states_list()
-    default: IL      
-  - ZIP code: others_protected[0].address.zip
+#id: others protected address
+#question: |
+#  What is ${others_protected[i].name.full(middle='full')}'s address?
+#subquestion: |
+#  This address will appear on court papers.
+#fields:
+#  - Street address: others_protected[0].address.address
+#    address autocomplete: True
+#  - Address line 2: others_protected[0].address.unit
+#    required: False
+#  - City: others_protected[0].address.city
+#  - State: others_protected[0].address.state
+#    code: |
+#      states_list()
+#    default: IL      
+#  - ZIP code: others_protected[0].address.zip
 ---
 id: any others protected
 question: |
@@ -1169,6 +1169,8 @@ fields:
   - no label: others_protected.there_is_another
     datatype: yesnoradio
 ---
+sets:
+  - other_parties[0].name.first
 id: other parties name stalker name
 question: |
   What is the stalker's name?
@@ -1177,20 +1179,14 @@ subquestion: |
 
   You will need to enter their full name. If you do not know their full name, you may want to talk with a lawyer to discuss your options. Use **[Get Legal Help](https://www.illinoislegalaid.org/get-legal-help)** to find free or low-cost legal services in your area.
 fields:
-  - First name: other_parties[0].name.first
-  - Middle name: other_parties[0].name.middle
-    required: False
-  - Last name: other_parties[0].name.last
-  - Suffix: other_parties[0].name.suffix
-    required: False
-    code: |
-      name_suffix()
+  - code: |
+      other_parties[0].name_fields()
 ---
 id: stalker gender cook
 question: |
   What is ${other_parties[0].name.full(middle="full")}'s sex and gender identity?
 subquestion: |
-  This information is used to help law enforcement identify ${other_parties[0].name.full(middle="full")} and enforce the Order of Protection. If you do not know this information, you can leave it blank.
+  This information is used to help law enforcement identify ${other_parties[0].name.full(middle="full")} and enforce the Stalking No Contact Order. If you do not know this information, you can leave it blank.
 fields:
   - Sex (will be public, used by any law enforement): other_parties[0].cook_sex
     datatype: radio
@@ -2054,9 +2050,7 @@ id: stalker which address
 question: |
   Where should court papers be delivered to ${other_parties[0].name.full(middle='full')}?
 subquestion: |
-  % if len(service_list) == 1:
-  You can ask for an SNCO without knowing an address where ${other_parties[0].name.full(middle='full')} can be found, but the court may make you try to find their address.
-  % endif
+  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for an SNCO without knowing their address, but that may make it harder to get the SNCO.
 fields: 
   - no label: other_parties[0].which_address
     input type: radio
@@ -3326,6 +3320,7 @@ attachment:
     - "user_zip": ${users[0].address.zip}
     - "user_phone": ${ phone_number_formatted(users[0].phone_number)}
     - "user_email": ${ users[0].email if users[0].has_email_address else ""}
+    - "pro_se": ${True}
 ---
 attachment:
   variable name: cook_p_order[i]
@@ -3422,6 +3417,7 @@ attachment:
     - "user_zip": ${users[0].address.zip}
     - "user_phone": ${ phone_number_formatted(users[0].phone_number)}
     - "user_email": ${ users[0].email if users[0].has_email_address else ""}
+    - "pro_se": ${True}
 ---
 attachment:
   variable name: cook_petition[i]
@@ -3433,12 +3429,9 @@ attachment:
   fields:
     #What are these "on behalf of" fields in the template for?
     - "people_ex_rel": ${users[0].name.full(middle='full')}
-    - "on_behalf_of": |
-        % if not protect_whom['me']:
-        ${users[0].name.full(middle='full')}
-        % endif
+    - "on_behalf_of": ${""}
     - "self_name": |
-        % if protect_whom['me'] and others_protected.there_are_any:
+        % if protect_whom['me']:
         ${users[0].name.full(middle='full')}
         % endif
     - "behalf_petitioner": |
@@ -3448,8 +3441,6 @@ attachment:
         % else:
         See attached list of protected persons.
         % endif
-        % else:
-        ${users[0].name.full(middle='full')}
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
     #Can the case number be known?
@@ -3491,20 +3482,20 @@ attachment:
     #- "others_protected_list": ${comma_and_list(others_protected) if others_protected.there_are_any else ""}
     - "incidents_check": ${True}
     - "date_incident_1": ${stalking_events[0].name.text}
-    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm') if stalking_events[0].time != "" else ""}
+    - "time_incident_1": ${stalking_events[0].time}
     - "am_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='AM' else False }
     - "pm_incident_1": ${ True if format_time(stalking_events[0].time, format='a')=='PM' else False }
     - "location_incident_1": ${stalking_events[0].place}
     - "description_incident_1": ${stalking_events[0].description}
     - "date_incident_2": ${stalking_events[1].name.text}
-    - "time_incident_2": ${format_time(stalking_events[1].time, format='h:mm') if stalking_events[1].time != "" else ""}
+    - "time_incident_2": ${stalking_events[1].time}
     - "am_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='AM' else False }
     - "pm_incident_2": ${ True if format_time(stalking_events[1].time, format='a')=='PM' else False }
     - "location_incident_2": ${stalking_events[1].place}
     - "description_incident_2": ${stalking_events[1].description}
     - "description_incident_2_continued": ${""}
     - "date_incident_3": ${stalking_events[2].name.text}
-    - "time_incident_3": ${format_time(stalking_events[2].time, 'h:mm') if stalking_events[2].time != "" else ""}
+    - "time_incident_3": ${stalking_events[2].time}
     - "am_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='AM' else False }
     - "pm_incident_3": ${ True if format_time(stalking_events[2].time, format='a')=='PM' else False }
     - "location_incident_3": ${stalking_events[2].place}
@@ -3648,12 +3639,12 @@ attachment:
     - "just_suicidal": ${True if caution_reasons['suicide'] and not caution_reasons['armed'] else False}
     - "armed_and_suicidal": ${True if caution_reasons['suicide'] and caution_reasons['armed'] else False}  
     - "date_incident_1": ${stalking_events[0].name.text}
-    - "time_incident_1": ${format_time(stalking_events[0].time, format='h:mm a') if stalking_events[0].time != "" else ""}
+    - "time_incident_1": ${stalking_events[0].time}
     - "location_incident_1": ${stalking_events[0].place}
     - "description_incident_1": ${stalking_events[0].description}
     - "description_incident_2": |
         % if stalking_events[1].time != "":
-        On or about ${stalking_events[1].name.text}, ${format_time(stalking_events[1].time, format='h:mm a')}, at ${stalking_events[1].place} the following occurred: ${stalking_events[1].description}
+        On or about ${stalking_events[1].name.text}, ${stalking_events[1].time}, at ${stalking_events[1].place} the following occurred: ${stalking_events[1].description}
         % else:
         On or about ${stalking_events[1].name.text} at ${stalking_events[1].place} the following occurred: ${stalking_events[1].description}
         % endif
@@ -4600,7 +4591,9 @@ review:
     button: |
       **When did the stalking event take place?**
       % if x.time != "":
-      ${x.name.text} at ${format_time(x.time, format='h:mm a')}
+      
+      * Date: ${x.name.text}
+      * Time: ${x.time}
       % else:
       ${x.name.text}
       % endif
