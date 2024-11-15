@@ -740,6 +740,8 @@ id: protect whom
 question: |
   Who do you want this Stalking No Contact Order to protect?
 subquestion: |
+  You can include minor children or high-risk adults who can't file for themselves. You do not need to be related to them.
+  
   Check all that apply.
 fields:
   - no label: protect_whom
@@ -816,7 +818,7 @@ fields:
 ---
 id: others protected address
 question: |
-  What is ${others_protected[i].name.full(middle='full')}'s address?
+  What is ${others_protected[i].name.full(middle='full')}'s mailing address?
 subquestion: |
   **This address will appear on your court papers.** If you do not want to list ${others_protected[0].name.full(middle='full')}'s address, you can leave this blank.
 fields:
@@ -3428,14 +3430,16 @@ attachment:
   pdf template file: cook_petition.pdf
   fields:
     #What are these "on behalf of" fields in the template for?
-    - "people_ex_rel": ${users[0].name.full(middle='full')}
+    - "people_ex_rel": ${""}
     - "on_behalf_of": ${""}
     - "self_name": |
-        % if protect_whom['me']:
+        % if not protect_whom['me']:
         ${users[0].name.full(middle='full')}
         % endif
     - "behalf_petitioner": |
-        % if others_protected.there_are_any:
+        % if protect_whom['me']:
+        ${users[0].name.full(middle='full')}
+        % else:
         % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
         % else:
