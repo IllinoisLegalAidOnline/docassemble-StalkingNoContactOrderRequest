@@ -571,11 +571,11 @@ subquestion: |
   **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel emotional distress. Someone being rude or mean may not count as stalking. The judge will decide what counts as stalking. 
 
   % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  If the stalker has caused you and the people you want to protect emotional distress or made you and them afraid **at least two times**, click **Yes**.
+  If the stalker has caused **{emotional distress}** to you and the people you want to protect or made you and them afraid **at least two times**, click **Yes**.
   % elif protect_whom['me']:
-  If the stalker has caused you **{emotional distress}** or made you afraid **at least two times**, click **Yes**.
+   If the stalker has caused **{emotional distress}** to you or made you afraid **at least two times**, click **Yes**.
   % else:
-  If the stalker has caused the people you want to protect them emotional distress or made them afraid **at least two times**, click **Yes**.
+  If the stalker has caused **{emotional distress}** to the people you want to protect or made them afraid **at least two times**, click **Yes**.
   % endif
 fields:
   - no label: two_times_check
@@ -785,7 +785,7 @@ sets:
 question:  |
   What is your name?
 subquestion: |
-  Enter your name, even if you are filing the Stalking No Contact Order on behalf of a child or a high-risk adult. In court and on the forms, you will be listed as the **Petitioner**.
+  Enter your name, even if you are filing the Stalking No Contact Order on behalf of a minor child or a high-risk adult. In court and on the forms, you will be listed as the **Petitioner**.
 fields:
   - code: |
       users[0].name_fields()
@@ -3245,7 +3245,7 @@ attachment:
   editable: False
   pdf template file: efiling_exemption.pdf
   fields:
-    - "county": ${trial_court.address.county.upper()}
+    - "county": ${trial_court.address.county}
     - "petitioner__1": ${ users[0].name.full(middle="full") }
     - "respondent": ${other_parties[0].name.full(middle="full")}
     - "case_number__1": ${ case_number }
@@ -3264,16 +3264,10 @@ attachment:
   editable: False
   pdf template file: cook_snco_order.pdf
   fields:
-    - "user_name": ${""}
+    - "user_name": ${users[0].name.full(middle='full')}
     - "additional_protected": |
         % if protect_whom["minor"] or protect_whom["adult"]:
-        % if others_protected.number_gathered() < 2:
-        ${users[0].name.full(middle='full')} and ${others_protected[0].name.full(middle='full')}
-        % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
-        % endif
-        % else:
-        ${users[0].name.full(middle='full')}
+        ${comma_and_list(others_protected)}
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
@@ -3369,16 +3363,10 @@ attachment:
   editable: False
   pdf template file: cook_snco_order.pdf
   fields:
-    - "user_name": ${""}
+    - "user_name": ${users[0].name.full(middle='full')}
     - "additional_protected": |
         % if protect_whom["minor"] or protect_whom["adult"]:
-        % if others_protected.number_gathered() < 2:
-        ${users[0].name.full(middle='full')} and ${others_protected[0].name.full(middle='full')}
-        % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
-        % endif
-        % else:
-        ${users[0].name.full(middle='full')}
+        ${comma_and_list(others_protected)}
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
@@ -3727,6 +3715,10 @@ attachment:
     - "protected_home_address": ${home.on_one_line(bare=True) if protection_requested['away'] and protected_place_types['Home'] else ""}
     - "protected_work_addresses": ${protected_workplace.name.first + ", " + protected_workplace.address.on_one_line()}
     - "school_daycare_addresses": ${comma_and_list(away_school_daycare_list)}
+    - "others_addendum": |
+        % if others_protected.number_gathered() > 2:
+        A list of additional protected persons is attached.
+        % endif
 ---
 attachment:
   variable name: emergency_order[i]
