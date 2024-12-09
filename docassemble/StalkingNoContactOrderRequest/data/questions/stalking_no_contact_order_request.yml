@@ -14,7 +14,6 @@ include:
 ---
 #This text was removed from the under. Check whether the hotline can be used for stalkers or if a comparable resource exists. "**Worried about doing this on your own?** Call the [**Illinois Domestic Violence Hotline**](https://the-network.org/get-help/) at 877-863-6338 (877-TO END DV) to talk with an advocate."
 ---
----
 objects:
   - users: ALPeopleList.using(there_are_any=True)
   - other_parties: ALPeopleList.using(there_are_any=True)
@@ -4042,43 +4041,6 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - filing_county
-    button: |
-      **You are filing in:**
-      ${end_in_county(filing_county)}
-  - Edit: cook_district
-    button: |
-      **Which courthouse will you file in?**
-      % if cook_district == '15':
-      First Municipal District, Daley Center, 50 W. Washington Street, Chicago
-      % elif cook_district == '16':
-      Second Municipal District, 5600 Old Orchard Road, Skokie
-      % elif cook_district == '17':
-      Third Municipal District, 2121 Euclid Avenue, Rolling Meadows
-      % elif cook_district == '18':
-      Fourth Municipal District, 1500 Maybrook Drive, Maywood
-      % elif cook_district == '19':
-      Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview
-      % elif cook_district == '20':
-      Sixth Municipal District, 16501 South Kedzie Parkway, Markham
-      % endif
-    show if: trial_court.address.county.lower() == "cook"
-  - Edit: jurisdiction_type
-    button: |
-      **You are filing in ${end_in_county(trial_court.address.county)} because:**
-      
-      % if jurisdiction_type['I live here']:
-      * I live in ${end_in_county(trial_court.address.county)}.
-      % endif
-      % if jurisdiction_type['Respondent lives here']:
-      * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
-      % endif
-      % if jurisdiction_type['Abuse was here']:
-      * The stalking took place in ${end_in_county(trial_court.address.county)}.
-      % endif
   - Edit: users[0].name.first
     button: |
       **Your name:**
@@ -4918,6 +4880,19 @@ review:
       Sixth Municipal District, 16501 South Kedzie Parkway, Markham
       % endif
     show if: trial_court.address.county.lower() == "cook"
+  - Edit: jurisdiction_type
+    button: |
+      **You are filing in ${end_in_county(trial_court.address.county)} because:**
+      
+      % if jurisdiction_type['I live here']:
+      * I live in ${end_in_county(trial_court.address.county)}.
+      % endif
+      % if jurisdiction_type['Respondent lives here']:
+      * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
+      % endif
+      % if jurisdiction_type['Abuse was here']:
+      * The stalking took place in ${end_in_county(trial_court.address.county)}.
+      % endif
   - Edit: service_method
     button: |
       **How do you want ${other_parties[0].name.full(middle="full")} to be served?**
