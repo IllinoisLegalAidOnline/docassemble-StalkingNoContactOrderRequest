@@ -262,7 +262,8 @@ code: |
 code: |
   others_protected[i].name.first
   others_protected[i].birthdate
-  if others_protected[i].is_survivor or others_protected[i].age_in_years() < 18:
+  #if others_protected[i].is_survivor or others_protected[i].age_in_years() < 18:
+  if others_protected[i].is_survivor:
     #if trial_court_index == -1:
       #others_protected[i].relation_to_user
       #others_protected[i].protection_reason
@@ -279,7 +280,8 @@ reconsider: True
 code: |
   popping_index = 0
   while (popping_index < others_protected.number_gathered()) and (others_protected.number_gathered() > 0):
-    if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
+    #if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
+    if not others_protected[popping_index].is_survivor:
       others_protected.pop(popping_index)
     else:
       #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
@@ -1552,6 +1554,7 @@ subquestion: |
     If you do not know, you may leave this blank.
 fields:
   - Name of prison or jail: respondent_jail_name
+    maxlength: 50
     required: False
 ---
 id: stalker probation
@@ -1730,7 +1733,7 @@ question: |
 subquestion: |
   If you do not know ${other_parties[0].name.full(middle='full')}'s address, you may still file. However, you may need to show the court that you tried to find their address. 
   
-  You can do this by filing a written statement called an “affidavit” telling how you tried to find ${other_parties[0].name.full(middle='full')}'s address. If you need to file one of these, the judge or court clerk will provide it.
+  You can do this by filing a written statement called an “affidavit” telling how you tried to find ${other_parties[0].name.full(middle='full')}'s address. If you need to file one of these, the judge or court clerk should provide it.
 ---
 id: stalker current address
 question: |
@@ -2009,7 +2012,7 @@ question: |
 subquestion: |
   This is called service. In Illinois, **Sheriffs usually serve SNCOs.**
   
-  Note: There may be a charge for a special process server or a licensed private detective. You can use ILAO's [**Special process server request Easy Form**](https://www.illinoislegalaid.org/legal-information/special-process-server-request) to ask for a special process server.
+  Note: There may be a charge for a special process server or a licensed private detective. Read ILAO's article about [**serving a summons**](https://www.illinoislegalaid.org/legal-information/serving-summons) to learn more about your service options.
 fields:
   - no label: service_method
     datatype: radio
@@ -2230,6 +2233,8 @@ subquestion: |
   * The effects the stalking had on you and anyone else who was there. It is important to mention any children that were present or were affected by the stalking.
   
   Include any threats or use of a weapon.
+
+  If the stalking was repeated, you can note that in your description.
 fields:
   - Date: stalking_events[i].name.text
     maxlength: 20
@@ -2321,7 +2326,7 @@ id: order type
 question: |
   What kind of Stalking No Contact Order do you want?
 subquestion: |
-  There are two kinds of SNCO: an Emergency Order and a Plenary Order. You can ask the court for both if you want.
+  There are two kinds of Stalking No Contact Order: Emergency and Plenary. You can ask the court for both if you want.
   
   An Emergency Order is an order which takes effect immediately. The order can be issued even before your stalker knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the stalker can present a case to the court also. 
   
@@ -2376,7 +2381,7 @@ subquestion: |
 
   For reference, a football field is 300 feet long. A car is about 15 feet long.
 
-  You can enter any distance, but the court might not make ${other_parties[0].name.full(middle='full')} stay more than 300 feet away.
+  The court might not grant a stay away distance of more than 300 feet.
 fields:
   - Distance (in feet): distance_away
     datatype: integer
