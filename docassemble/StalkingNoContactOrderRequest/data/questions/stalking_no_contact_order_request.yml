@@ -189,6 +189,9 @@ code: |
     #if other_parties[0].order_of_protection == True:
     #  other_ops.gather()
     respondent_on_probation
+  else:
+    if respondent_jail_check:
+      respondent_jail_name
   
   nav.set_section('section_filing_info')
   if service_method == "sheriff" and service_state != "IL":
@@ -258,8 +261,8 @@ code: |
 #others protected gather code block
 code: |
   others_protected[i].name.first
-  if others_protected[i].is_survivor:
-    others_protected[i].birthdate
+  others_protected[i].birthdate
+  if others_protected[i].is_survivor or others_protected[i].age_in_years() < 18:
     #if trial_court_index == -1:
       #others_protected[i].relation_to_user
       #others_protected[i].protection_reason
@@ -276,7 +279,7 @@ reconsider: True
 code: |
   popping_index = 0
   while (popping_index < others_protected.number_gathered()) and (others_protected.number_gathered() > 0):
-    if not others_protected[popping_index].is_survivor:
+    if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
       others_protected.pop(popping_index)
     else:
       #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
@@ -1533,6 +1536,24 @@ fields:
     maxlength: 100
     required: False
 ---
+id: stalker in jail
+question: |
+    Is ${other_parties[0].name.full(middle='full')} incarcerated?
+subquestion: |
+    **Incarcerated** means "in prison" or "in jail."
+fields:
+  - no label: respondent_jail_check
+    datatype: yesnomaybe
+---
+id: stalker jail name
+question: |
+  Where is ${other_parties[0].name.full(middle='full')} incarcerated?
+subquestion: |
+    If you do not know, you may leave this blank.
+fields:
+  - Name of prison or jail: respondent_jail_name
+    required: False
+---
 id: stalker probation
 question: |
   Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
@@ -1988,7 +2009,7 @@ question: |
 subquestion: |
   This is called service. In Illinois, **Sheriffs usually serve SNCOs.**
   
-  Note: There may be a charge for a special process server or a licensed private detective.
+  Note: There may be a charge for a special process server or a licensed private detective. You can use ILAO's [**Special process server request Easy Form**](https://www.illinoislegalaid.org/legal-information/special-process-server-request) to ask for a special process server.
 fields:
   - no label: service_method
     datatype: radio
@@ -2209,8 +2230,6 @@ subquestion: |
   * The effects the stalking had on you and anyone else who was there. It is important to mention any children that were present or were affected by the stalking.
   
   Include any threats or use of a weapon.
-  
-  If the stalking was repeated, you can note that in your description.
 fields:
   - Date: stalking_events[i].name.text
     maxlength: 20
@@ -2304,9 +2323,9 @@ question: |
 subquestion: |
   There are two kinds of SNCO: an Emergency Order and a Plenary Order. You can ask the court for both if you want.
   
-  For an Emergency Order, the court will issue an order which takes effect immediately. The order can be issued even before your stalker knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the stalker can present a case to the court also. 
+  An Emergency Order is an order which takes effect immediately. The order can be issued even before your stalker knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the stalker can present a case to the court also. 
   
-  For a Plenary Order, the court will issue an order after a hearing at which the stalker can also present a case. This order can last a long time, usually two years.
+  A Plenary Order, is an order issued after a hearing at which the stalker can also present a case. This order can last a long time, usually two years.
 fields:
   - no label: order_type
     datatype: checkboxes
@@ -2356,6 +2375,8 @@ subquestion: |
   You should enter a distance in feet.
 
   For reference, a football field is 300 feet long. A car is about 15 feet long.
+
+  You can enter any distance, but the court might not make ${other_parties[0].name.full(middle='full')} stay more than 300 feet away.
 fields:
   - Distance (in feet): distance_away
     datatype: integer
@@ -3503,7 +3524,14 @@ attachment:
     - "respondent_city": ${other_parties[0].address.city}
     - "respondent_state": ${ other_parties[0].address.state}
     - "respondent_zip": ${other_parties[0].address.zip}
-    - "respondent_birth_date": ${other_parties[0].birthdate}
+    - "respondent_birth_date": |
+        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
+        ${ other_parties[0].birthdate }
+        % elif knows_respondent_dob == 'some':
+        ${ other_parties[0].birthdate_info }
+        % else:
+        ${ "do not know" }
+        % endif
     - "respondent_is_male": ${True if other_parties[0].cook_sex == "Male" else False}
     - "respondent_is_female": ${True if other_parties[0].cook_sex == "Female" else False}
     - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
@@ -3647,13 +3675,30 @@ attachment:
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
     - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
-    - "other_protected_address_1": ${users[0].address.on_one_line(bare=True) if hide_address and others_protected[0].use_safe_address else others_protected[0].address.on_one_line(bare=True)}
+    - "other_protected_address_1": |
+        % if hide_address and others_protected[0].use_safe_address:
+        ${users[0].address.on_one_line(bare=True)}
+        % elif others_protected[0].address.address != "":
+        ${others_protected[0].address.on_one_line(bare=True)}
+        % endif
     - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
-    - "other_protected_address_2": ${users[0].address.on_one_line(bare=True) if hide_address and others_protected[1].use_safe_address else others_protected[1].address.on_one_line(bare=True)}
+    - "other_protected_address_2": |
+        % if hide_address and others_protected[0].use_safe_address:
+        ${users[0].address.on_one_line(bare=True)}
+        % elif others_protected[1].address.address != "":
+        ${others_protected[1].address.on_one_line(bare=True)}
+        % endif
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_home_check": ${other_parties[0].last_address_known if other_parties[0].address_known == False else other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
-    - "stalker_birth": ${other_parties[0].birthdate}
+    - "stalker_birth": |
+        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
+        ${ other_parties[0].birthdate }
+        % elif knows_respondent_dob == 'some':
+        ${ other_parties[0].birthdate_info }
+        % else:
+        ${ "do not know" }
+        % endif
     - "respondent_is_male": ${True if other_parties[0].state_gender == "Male" else False}
     - "respondent_is_female": ${True if other_parties[0].state_gender == "Female" else False}
     - "respondent_other_gender": ${other_parties[0].state_other_gender if other_parties[0].state_gender == "Other" else ""}
@@ -3782,8 +3827,8 @@ attachment:
     - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
     - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
     #Add questions about an incarcerated respondent?
-    - "respondent_jail_check": ${False}
-    - "respondent_jail_name": ${""}
+    - "respondent_jail_check": ${respondent_jail_check}
+    - "respondent_jail_name": ${respondent_jail_name}
     - "respondent_address_unknown": ${False if other_parties[0].address_known else True}
     - "armed": ${caution_reasons['armed']}
     - "suicidal": ${caution_reasons['suicide']}
@@ -3814,7 +3859,7 @@ attachment:
         ${comma_and_list(away_school_daycare_list)}
         % endif
         % endif
-    - "away_other_name": ${other_places if protection_requested['away'] and protected_place_types['Other'] else ""}
+    - "other_places": ${other_places if protection_requested['away'] and protected_place_types['Other'] else ""}
     - "no_firearms": ${other_parties[0].prohibit_firearms}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
@@ -3881,8 +3926,8 @@ attachment:
     - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
     - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
     #Add questions about an incarcerated respondent?
-    - "respondent_jail_check": ${False}
-    - "respondent_jail_name": ${""}
+    - "respondent_jail_check": ${respondent_jail_check}
+    - "respondent_jail_name": ${respondent_jail_name}
     - "respondent_address_unknown": ${False if other_parties[0].address_known else True}
     - "armed": ${caution_reasons['armed']}
     - "suicidal": ${caution_reasons['suicide']}
@@ -3913,7 +3958,7 @@ attachment:
         ${comma_and_list(away_school_daycare_list)}
         % endif
         % endif
-    - "away_other_name": ${other_places if protection_requested['away'] and protected_place_types['Other'] else ""}
+    - "other_places": ${other_places if protection_requested['away'] and protected_place_types['Other'] else ""}
     - "no_firearms": ${other_parties[0].prohibit_firearms}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
