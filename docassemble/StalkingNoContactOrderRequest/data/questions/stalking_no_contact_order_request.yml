@@ -119,6 +119,7 @@ code: |
       protected_day_care.name.first
     if protected_place_types['Other']:
       other_places
+      remove_line_breaks
     if trial_court_index == -1:
       if live_with_stalker:
         home.address
@@ -173,6 +174,8 @@ code: |
     other_parties[0].employer_name
   caution_reasons
   if trial_court_index == -1:
+    if caution_reasons['armed'] or caution_reasons['home']:
+      other_parties[0].weapons_info
     #The divorce_parentage_logic call replaces the following 4 lines of code commented out.
     divorce_parentage_logic
     #if other_parties[0].divorced_user:
@@ -262,8 +265,8 @@ code: |
 code: |
   others_protected[i].name.first
   others_protected[i].birthdate
-  #if others_protected[i].is_survivor or others_protected[i].age_in_years() < 18:
-  if others_protected[i].is_survivor:
+  if others_protected[i].age_in_years() < 18 or others_protected[i].is_survivor:
+  #if others_protected[i].is_survivor:
     #if trial_court_index == -1:
       #others_protected[i].relation_to_user
       #others_protected[i].protection_reason
@@ -280,8 +283,8 @@ reconsider: True
 code: |
   popping_index = 0
   while (popping_index < others_protected.number_gathered()) and (others_protected.number_gathered() > 0):
-    #if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
-    if not others_protected[popping_index].is_survivor:
+    if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
+    #if not others_protected[popping_index].is_survivor:
       others_protected.pop(popping_index)
     else:
       #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
@@ -391,7 +394,17 @@ code: |
     away_address_list.there_is_another = False
   cook_stay_away_addresses = True
 ---
+id: stalking event debug
+question: |
+  ${ordinal(i)}'s appearance!
+subquestion: |
+    Include in addendum: ${stalking_events[i].include_in_addendum}
+continue button field: stalking_events[i].email_debug
+---
 #This code block sets a flag for each item in others_protected and stalking_events. This flag tracks whether the item needs to be included in an addendum form rather than the main petition.
+sets: 
+  - others_protected[i].include_in_addendum
+  - stalking_events[i].include_in_addendum
 reconsider: True
 code: |
   if others_protected.there_are_any and others_protected.number_gathered() > 0:
@@ -414,6 +427,7 @@ code: |
         event.include_in_addendum = True
       else:
         event.include_in_addendum = False
+    #event.email_debug
   addendum_check = True
 ---
 #list of "stay away" addresses for non-cook petition
@@ -904,7 +918,8 @@ fields:
 validation code: |
     if user_relationship['unrelated']:
       if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
-        validation_error("You cannot be both related and unrelated to the person you are filing the Stalking No Contact Order against.")
+        validation_error("If you have any of the listed relationships with the person you are filing the Stalking No Contact Order against, you should not click the 'We are not related' option.")
+      
 #field: user_relationship
 #choices:
 #  - We are not related.: unrelated
@@ -1374,6 +1389,8 @@ fields:
 id: know respondent birthdate
 question: |
   Do you know ${other_parties[0].name.full(middle="full")}'s birthdate?
+subquestion: |
+  If you do not know their birthday but can guess their age, you can select "I know some of it" and note their age there. For example, if you think they are around 30 years old, you could write "Approximately 30 years ago."
 fields:   
   - no label: knows_respondent_dob
     datatype: radio
@@ -1407,7 +1424,7 @@ question: |
 subquestion: |
   This information is used to help enforce the Stalking No Contact Order.
   
-  Enter what information you know.
+  Enter any information you know.
 fields:
   - Height (feet): other_parties[0].height_feet
     datatype: integer
@@ -1531,7 +1548,9 @@ question: |
 subquestion: |
   Scars, tattoos, or birthmarks are all notable features.
   
-  If you do not know any, you can leave this blank.
+  If you do not know any, you can leave this blank. 
+  
+  The petition has space for about 100 characters including spaces.
 fields:
   - Features: other_parties[0].features
     input type: area
@@ -1819,13 +1838,26 @@ fields:
         show if: trial_court_index != -1
       - Has weapons in the home.: home
         show if: trial_court_index == -1
+  #- Type and location of weapons: other_parties[0].weapons_info
+  #  required: False
+  #  input type: area
+  #  rows: 5
+  #  maxlength: 180
+  #  js show if: |
+  #    trial_court_index == -1 && val("caution_reasons['armed']")      
+    #trial_court_index == -1 && (val("caution_reasons['armed']") == true || val("caution_reasons['home']") == true)
+---
+id: weapons info
+question: |
+  What weapons does ${other_parties[0].name.full(middle="full")} have?
+subquestion: |
+  If you do not know, you can leave this blank.
+fields:
   - Type and location of weapons: other_parties[0].weapons_info
     required: False
     input type: area
     rows: 5
-    maxlength: 180
-    js show if: |
-      val("caution_reasons['armed']") == true || val("caution_reasons['home']") == true
+#  maxlength: 180
 ---
 #id: stalker suicide risk
 #question: |
@@ -2232,9 +2264,13 @@ subquestion: |
   * Who was there when the stalking happened, and
   * The effects the stalking had on you and anyone else who was there. It is important to mention any children that were present or were affected by the stalking.
   
-  Include any threats or use of a weapon.
+  Include any threats or use of a weapon. If the stalking was repeated, you can note that in your description.
 
-  If the stalking was repeated, you can note that in your description.
+  % if trial_court_index == -1:
+  The petition has space for about 500 characters including spaces for each incident.
+  % else:
+  The petition has space for about 800 characters including spaces for each incident.
+  % endif
 fields:
   - Date: stalking_events[i].name.text
     maxlength: 20
@@ -2258,12 +2294,12 @@ fields:
       % else:
       800
       % endif
-    help: |
-      % if trial_court_index == -1:
-      The petition has space for about 500 characters including spaces for each incident.
-      % else:
-      The petition has space for about 800 characters including spaces for each incident.
-      % endif
+    #help: |
+    #  % if trial_court_index == -1:
+    #  The petition has space for about 500 characters including spaces for each incident.
+    #  % else:
+    #  The petition has space for about 800 characters including spaces for each incident.
+    #  % endif
 ---
 #id: stalking event date time
 #question: |
@@ -2326,7 +2362,7 @@ id: order type
 question: |
   What kind of Stalking No Contact Order do you want?
 subquestion: |
-  There are two kinds of Stalking No Contact Order: Emergency and Plenary. You can ask the court for both if you want.
+  There are two kinds of Stalking No Contact Orders: Emergency and Plenary. You can ask the court for both if you want.
   
   An Emergency Order is an order which takes effect immediately. The order can be issued even before your stalker knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the stalker can present a case to the court also. 
   
@@ -2457,6 +2493,12 @@ fields:
       % endif
     rows: 10
     input type: area
+---
+depends on:
+  - other_places
+code: |
+  other_places.replace("\n", " ")
+  remove_line_breaks = True
 ---
 #id: employers schools name
 #question: |
@@ -2624,12 +2666,14 @@ fields:
     datatype: yesnoradio
 ---
 id: stalker pay costs describe costs
+#question: |
+#  Do you want the court to make ${other_parties[0].name.full(middle='full')} pay any costs that were a result of their stalking?
+#subquestion: |
+#  This could include things like court costs, missing work, property damage, or having to pay to stay somewhere else to avoid stalking.
+#  
+#  You will need to prove that the costs were a direct result of stalking.
 question: |
-  Do you want the court to make ${other_parties[0].name.full(middle='full')} pay any costs that were a result of their stalking?
-subquestion: |
-  This could include things like court costs, missing work, property damage, or having to pay to stay somewhere else to avoid stalking.
-  
-  You will need to prove that the costs were a direct result of stalking.
+    Do you want the court to make ${other_parties[0].name.full(middle='full')} to pay your court fees and other costs, if any?
 fields: 
   - no label: other_parties[0].pay_costs
     datatype: yesnoradio
@@ -3279,7 +3323,7 @@ attachment:
     - "petitioner__2": ${ users[0].name.full(middle="full") }
     - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
     - "user_phone_number": ${ phone_number_formatted(users[0].phone_number) }
-    - "user_email": ${ users[0].email if users[0].email_notice else ""}
+    - "user_email": ${ users[0].email if users[0].has_email_address else ""}
 ---
 attachment:
   variable name: cook_e_order[i]
@@ -3323,24 +3367,29 @@ attachment:
     - "respondent_hair": ${ other_parties[0].hair}
     - "respondent_eye": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
     - "emergency_reason": ${emergency_reason if order_type['emergency'] else ""}
-    - "protected_persons": ${comma_and_list(others_protected)}
+    - "protected_persons": |
+        % if others_protected.there_are_any and not protect_whom['me']:
+        ${comma_and_list(others_protected)}
+        % elif protect_whom['me'] and not others_protected.there_are_any:
+        ${users[0].name.full(middle='full')}
+        % elif others_protected.there_are_any and protect_whom['me']:
+        % if others_protected.number_gathered() == 1:
+        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        % else:
+        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        % endif
+        % endif 
     - "minor_children": ${child_list}
     - "no_stalking": ${protection_requested['stalking']}
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
         % if protection_requested['contacting']:
         % if others_protected.there_are_any and not protect_whom['me']:
-        % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
-        % else:
-        See attached list of protected persons.
-        % endif
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and protect_whom['me']:
-        % if len(comma_and_list(others_protected)) > 50:
-        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
-        % elif others_protected.number_gathered() == 1:
+        % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
@@ -3423,24 +3472,29 @@ attachment:
     - "respondent_hair": ${ other_parties[0].hair}
     - "respondent_eye": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
     - "emergency_reason": ${emergency_reason if order_type['emergency'] else ""}
-    - "protected_persons": ${comma_and_list(others_protected)}
+    - "protected_persons": |
+        % if others_protected.there_are_any and not protect_whom['me']:
+        ${comma_and_list(others_protected)}
+        % elif protect_whom['me'] and not others_protected.there_are_any:
+        ${users[0].name.full(middle='full')}
+        % elif others_protected.there_are_any and protect_whom['me']:
+        % if others_protected.number_gathered() == 1:
+        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        % else:
+        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        % endif
+        % endif 
     - "minor_children": ${child_list}
     - "no_stalking": ${protection_requested['stalking']}
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
         % if protection_requested['contacting']:
         % if others_protected.there_are_any and not protect_whom['me']:
-        % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
-        % else:
-        See attached list of protected persons.
-        % endif
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and protect_whom['me']:
-        % if len(comma_and_list(others_protected)) > 50:
-        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
-        % elif others_protected.number_gathered() == 1:
+        % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
@@ -3580,17 +3634,11 @@ attachment:
         % endif
     - "others_protected_list": |     
         % if others_protected.there_are_any and not protect_whom['me']:
-        % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
-        % else:
-        See attached list of protected persons.
-        % endif
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and protect_whom['me']:
-        % if len(comma_and_list(others_protected)) > 50:
-        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
-        % elif others_protected.number_gathered() == 1:
+        % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
@@ -3601,22 +3649,16 @@ attachment:
     - "no_contact_list": |
         % if protection_requested['contacting']:
         % if others_protected.there_are_any and not protect_whom['me']:
-        % if len(comma_and_list(others_protected)) < 70:
         ${comma_and_list(others_protected)}
-        % else:
-        See attached list of protected persons.
-        % endif
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and protect_whom['me']:
-        % if len(comma_and_list(others_protected)) > 50:
-        See attached list of persons protected in addition to ${users[0].name.full(middle='full')}.
-        % elif others_protected.number_gathered() == 1:
+        % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
         % endif
-        % endif 
+        % endif
         % endif
     - "no_coming": ${protection_requested['away']}
     - "feet_away": ${distance_away}
@@ -3779,7 +3821,7 @@ attachment:
   fields:
     - "circuit_court": ${court_circuit}
     - "filing_county": ${trial_court.address.county}
-    - "emergency_type": ${order_type['emergency']}
+    - "emergency_type": ${True}
     - "plenary_type": ${False}
     - "user_name": ${users[0].name.full(middle='full')}
     - "others_protected": ${comma_and_list(others_protected)}
@@ -3880,7 +3922,7 @@ attachment:
     - "circuit_court": ${court_circuit}
     - "filing_county": ${trial_court.address.county}
     - "emergency_type": ${False}
-    - "plenary_type": ${order_type['emergency']}
+    - "plenary_type": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
     - "others_protected": ${comma_and_list(others_protected)}
     - "protect_a_minor": ${any_minors}
@@ -4078,6 +4120,13 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
+    button: |
+      **You are filing in:**
+      ${end_in_county(filing_county)}
   - Edit: protect_whom
     button: |
       **Who do you want to protect?**
@@ -4264,22 +4313,22 @@ review:
     button: |
       **${other_parties[0].name.full(middle='full')}'s gender identity:**
       
-      % if other_parties[0].cook_gender == "male":
+      % if other_parties[0].cook_gender["male"]:
       * Male
       % endif
-      % if other_parties[0].cook_gender == "female":
+      % if other_parties[0].cook_gender["female"]:
       * Female
       % endif
-      % if other_parties[0].cook_gender == "transfem":
+      % if other_parties[0].cook_gender["transfem"]:
       * Transgender woman / Transfeminine
       % endif
-      % if other_parties[0].cook_gender == "transmasc":
+      % if other_parties[0].cook_gender["transmasc"]:
       * Transgender man / Transmasculine
       % endif
-      % if other_parties[0].cook_gender == "nonbinary":
+      % if other_parties[0].cook_gender["nonbinary"]:
       * Nonbinary / Gender non-conforming
       % endif
-      % if other_parties[0].cook_gender == "other":
+      % if other_parties[0].cook_gender["other"]:
       * ${respondent_cook_gender_other}
       % endif
     show if: trial_court_index == -1
@@ -4351,13 +4400,7 @@ review:
   - Edit: other_parties[0].glasses
     button: |
       **Does ${other_parties[0].name.full(middle='full')} wear glasses?**
-      % if other_parties[0].glasses == "sometimes":
-      Sometimes
-      % elif other_parties[0].glasses == "dont_know":
-      I don't know
-      % else:
-      ${word(yesno(other_parties[0].glasses))}
-      % endif
+      ${other_parties[0].glasses}
   - Edit: other_parties[0].hair
     button: |
       **${other_parties[0].name.full(middle='full')}'s hair color:**
@@ -4543,7 +4586,7 @@ review:
       % else:
       ${other_parties[0].weapons_info}
       % endif
-    show if: caution_reasons['armed'] or caution_reasons['home']
+    show if: trial_court_index == -1 and (caution_reasons['armed'] or caution_reasons['home'])
   - Edit: other_parties[0].divorced_user
     button: |
       **Are you and ${other_parties[0].name.full(middle='full')} divorced?**
@@ -5149,22 +5192,22 @@ review:
     button: |
       **${other_parties[0].name.full(middle='full')}'s gender identity:**
       
-      % if other_parties[0].cook_gender == "male":
+      % if other_parties[0].cook_gender["male"]:
       * Male
       % endif
-      % if other_parties[0].cook_gender == "female":
+      % if other_parties[0].cook_gender["female"]:
       * Female
       % endif
-      % if other_parties[0].cook_gender == "transfem":
+      % if other_parties[0].cook_gender["transfem"]:
       * Transgender woman / Transfeminine
       % endif
-      % if other_parties[0].cook_gender == "transmasc":
+      % if other_parties[0].cook_gender["transmasc"]:
       * Transgender man / Transmasculine
       % endif
-      % if other_parties[0].cook_gender == "nonbinary":
+      % if other_parties[0].cook_gender["nonbinary"]:
       * Nonbinary / Gender non-conforming
       % endif
-      % if other_parties[0].cook_gender == "other":
+      % if other_parties[0].cook_gender["other"]:
       * ${respondent_cook_gender_other}
       % endif
     show if: trial_court_index == -1
@@ -5233,16 +5276,10 @@ review:
     button: |
       **${other_parties[0].name.full(middle='full')}'s eye color:**
       ${other_parties[0].eyes}
-  - Edit: other_parties[0].wears_glasses
+  - Edit: other_parties[0].glasses
     button: |
       **Does ${other_parties[0].name.full(middle='full')} wear glasses?**
-      % if other_parties[0].wears_glasses == "sometimes":
-      Sometimes
-      % elif other_parties[0].wears_glasses == "dont_know":
-      I don't know
-      % else:
-      ${word(yesno(other_parties[0].wears_glasses))}
-      % endif
+      ${other_parties[0].glasses}
   - Edit: other_parties[0].hair
     button: |
       **${other_parties[0].name.full(middle='full')}'s hair color:**
