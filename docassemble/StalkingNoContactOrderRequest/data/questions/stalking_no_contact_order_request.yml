@@ -17,7 +17,6 @@ include:
 objects:
   - users: ALPeopleList.using(there_are_any=True)
   - other_parties: ALPeopleList.using(there_are_any=True)
-  - other_parties[i].other_names: ALPeopleList.using(complete_attribute='complete')
   - others_protected: ALPeopleList.using(complete_attribute='complete')
   - minors_protected: ALPeopleList.using(there_are_any=False)
   - adults_protected: ALPeopleList.using(there_are_any=False)
@@ -148,8 +147,7 @@ code: |
   other_parties[0].race
   if trial_court_index == -1:
     #other_parties[0].skin
-    if other_parties[0].other_names.there_are_any:
-      other_parties[0].other_names.gather()
+    other_parties[0].has_alias
   other_parties[0].ssn
   knows_respondent_dob
   other_parties[0].weight
@@ -480,13 +478,6 @@ code: |
       #  no_remain_address_list.append(which_stalker_work)
     no_remain_address_list.there_is_another = False
   cook_no_remain_addresses = True
----
-#gather block for stalker's other names
-code: |
-  other_parties[0].other_names[i].name.first
-  if i > 2:
-    other_parties[0].other_names.there_is_another = False
-  other_parties[0].other_names[i].complete = True
 ---
 #flag tracking whether there are protected minors or protected adults
 reconsider: True
@@ -1337,45 +1328,15 @@ question: |
 subquestion: |
   If you know of any old legal name, nickname, or alias that ${other_parties[0].name.full(middle='full')} has used, click **Yes**.
 fields:
-  - no label: other_parties[0].other_names.there_are_any
+  - no label: other_parties[0].has_alias
     datatype: yesnomaybe
----
-id: stalker other names
-question: |
-  % if i == 0:
-  What other name has ${other_parties[0].name.full(middle='full')} gone by?
-  % else:
-  What is the ${ordinal(i)} other name ${other_parties[0].name.full(middle='full')} has gone by?
-  % endif
-subquestion: |
-  This can be an old legal name, nickname, or alias.
-  
-  You can list up to 4 names.
-  
-  % if i != 0:
-  So far you have told us about ${comma_and_list(other_parties[0].other_names.complete_elements().full_names())}.
-  % endif
-fields:
-  - First: other_parties[0].other_names[i].name.first
-  - Middle: other_parties[0].other_names[i].name.middle
-    required: False
-  - Last: other_parties[0].other_names[i].name.last
-    required: False
-  - Suffix: other_parties[0].other_names[i].name.suffix
-    required: False
-    code: |
-      name_suffix()
----
-id: stalker other names there is another
-question: |
-  Has ${other_parties[0].name.full(middle='full')} gone by any other names?
-subquestion: |
-  This can be an old legal name, nickname, or alias.
-  
-  You can list up to 4 names. So far you have told us about ${comma_and_list(other_parties[0].other_names.complete_elements().full_names())}.
-fields:
-  - no label: other_parties[0].other_names.there_is_another
-    datatype: yesnoradio
+  - Other names used by ${other_parties[0].name.full(middle="full")}:: other_parties[0].alias_names
+    input type: area
+    rows: 3
+    maxlength: 120
+    show if: other_parties[0].has_alias
+    help: |
+      This could be a name from an earlier marriage or a nickname. If there is more than one, separate by commas.
 ---
 id: stalker ssn
 question: |
@@ -1559,6 +1520,8 @@ fields:
     input type: area
     maxlength: 100
     required: False
+    help: |
+      The forms have space for about 100 characters including spaces.
 ---
 id: stalker in jail
 question: |
@@ -2484,9 +2447,9 @@ subquestion: |
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
   
   % if trial_court_index == -1:
-  If you list multiple places, they should be separated by commas. 
+  If you list multiple places, separate them with a comma.
   % else:
-  If you list multiple places, they should be separated by hitting the Enter key.
+  If you list multiple places, separate them by hitting **Enter**.
   % endif
 fields:
   - Name or type of place, and address (if known): other_places
@@ -2805,7 +2768,7 @@ subquestion: |
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
 
-  **Note:** This program does not file your ${ form_name } forms with the court.
+  **Note:** This program does not file your ${ form_name } forms with the court. You will need to do this yourself.
   
   Thank you for using ILAO Easy Forms!
 event: get_docs_screen
@@ -3009,7 +2972,7 @@ attachment:
   fields:
     - "respondent": ${other_parties[0].name.full(middle="full")}
     #- "case_number__1": ${ "" }
-    - "alias_names": ${ comma_and_list(other_parties[0].other_names)}
+    - "alias_names": ${ other_parties[0].alias_names if other_parties[0].has_alias else ""}
     - "respondent_race": ${ respondent_race_other if other_parties[0].race == 'Other' else other_parties[0].race }
     - "respondent_dob": |
         % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
@@ -3156,151 +3119,6 @@ attachment:
 
     - "preparer_name": ${ users[0].name.full(middle="full") }
     - "preparer_phone": ${ phone_number_formatted(users[0].phone_number) }
----
-#attachment:
-#  variable name: cook_sheriff_info_sheet[i]
-#  name: cook_sheriff_info_sheet
-#  filename: cook_sheriff_info_sheet
-#  skip undefined: True
-#  editable: False
-#  pdf template file: cook_sheriff_info_sheet.pdf
-#  fields:
-#    - "respondent": ${other_parties[0].name.full(middle="full")}
-#    - "case_number__1": ${ case_number }
-#    - "alias_names": ${ comma_and_list(other_parties[0].other_names)}
-#    #- "respondent_gender": ${ other_parties[0].other_gender if other_parties[0].gender == 'other' else other_parties[0].gender }
-#    - "respondent_race": ${ respondent_race_other if other_parties[0].race == 'other' else other_parties[0].race }
-#    - "respondent_dob": |
-#        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
-#        ${ other_parties[0].birthdate }
-#        % elif knows_respondent_dob == 'some':
-#        ${ other_parties[0].birthdate_info }
-#        % else:
-#        ${ "do not know" }
-#        % endif
-#    - "respondent_age": |
-#        % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
-#        ${ other_parties[0].age_in_years() }
-#        % endif
-#    - "respondent_height": |
-#        % if other_parties[0].height_feet > 1:
-#        ${ str(other_parties[0].height_feet) + "\'" }
-#        % if other_parties[0].height_inches > 0:
-#        ${ str(other_parties[0].height_inches) + "\""}
-#        % endif
-#        % else:
-#        ${""}
-#        % endif
-#    - "respondent_weight": ${ str(other_parties[0].weight) + " lbs." if other_parties[0].weight > 0 else '' }
-#    - "respondent_skin": |
-#        % if other_parties[0].skin != "":
-#        ${ respondent_skin_other if other_parties[0].skin == 'other' else other_parties[0].skin }
-#        % endif
-#    - "respondent_hair": ${ other_parties[0].hair}
-#    - "respondent_eyes": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
-#    - "respondent_glasses": ${other_parties[0].glasses if other_parties[0].glasses != "" else ''}
-#    - "respondent_tattoos": ${ other_parties[0].features if other_parties[0].features != "" else '' }
-#    - "respondent_history_illness": ${ caution_reasons['illness'] }
-#    - "respondent_alcohol": ${ caution_reasons['alcohol']}
-#    - "respondent_drugs": ${ caution_reasons['drugs'] }
-#    - "respondent_firearms_on_person": ${ caution_reasons['armed'] }
-#    - "respondent_weapons_in_home": ${ caution_reasons['home'] }
-#    - "respondent_weapons_description": ${ other_parties[0].weapons_info if other_parties[0].carrying_weapon or other_parties[0].home_weapon == True else "" }        
-#    - "respondent_suicidal": ${ caution_reasons['suicide'] }    
-#    - "respondent_on_probation":  ${ True if respondent_on_probation == "Yes" else ''  } 
-#    - "respondent_probation_county":  ${ respondent_probation_county if respondent_on_probation == "Yes" else ''  } 
-#    
-#    - "respondent_employer": ${ other_parties[0].employer_name}
-#    - "respondent_work_type": ${respondent_work_type}       
-#    - "service_address_line_1": ${other_parties[0].servie_address.line_one(bare=True)}
-#    - "service_city": ${other_parties[0].service_address.city}
-#        
-#    - "last_known_address": |
-#        % if other_parties[0].address_known or other_parties[0].last_address_known:
-#        ${other_parties[0].address.line_one(bare=True)}
-#        % endif       
-#    - "last_known_city": |
-#        % if other_parties[0].address_known or other_parties[0].last_address_known:
-#        ${other_parties[0].address.city}
-#        % endif  
-#    - "respondent_work_address": |
-#        % if other_parties[0].has_job:
-#        ${ other_parties[0].employer_address.line_one(bare=True) }
-#        % else:
-#        ${ "do not know" }
-#        % endif
-#    - "respondent_work_city": |
-#        % if other_parties[0].has_job:
-#        ${ other_parties[0].employer_address.city }
-#        % else:
-#        ${ "do not know" }
-#        % endif
-#    - "respondent_employer": ${other_parties[0].employer_name if other_parties[0].has_job else ""}
-#    - "respondent_work_type": ${respondent_work_type if other_parties[0].has_job else ""}
-#    - "service_alt_address_line_1": ${other_parties[0].bonus_service_address.line_one(bare=True) if other_parties[0].bonus_service_check else ""}
-#    - "service_alt_city": ${other_parties[0].bonus_service_address.city if other_parties[0].bonus_service_check else ""}
-#    - "respondent_phone": ${ phone_number_formatted(other_parties[0].phone_number) if other_parties[0].phone_number != "" else ""}
-#    - "service_information": ${ service_information }
-#    - "cook_vehicle_make": ${ other_parties[0].vehicle_make }
-#    - "cook_vehicle_model": ${ other_parties[0].vehicle_model }
-#    - "cook_vehicle_year": ${ other_parties[0].vehicle_year }
-#    - "cook_vehicle_color": ${ other_parties[0].vehicle_color }
-#    - "cook_vehicle_plate": ${ other_parties[0].license_plate }
-#    - "cook_vehicle_state": ${ state_name(other_parties[0].vehicle_state) }
-#
-#    - "preparer_name": ${ users[0].name.full(middle="full") }
-#    - "preparer_phone": ${ phone_number_formatted(users[0].phone_number)}
----
-#attachment:
-#  variable name: cook_disposition_order[i]
-#  name: cook_disposition_order
-#  filename: cook_disposition_order
-#  skip undefined: True
-#  editable: False
-#  pdf template file: cook_disposition_order.pdf
-#  fields:
-#    #What are these "on behalf of" fields in the template for?
-#    - "on_behalf_1": ${""}
-#    - "on_behalf_2": ${""}
-#    - "petitioner_name": ${users[0].name.full(middle='full')}
-#    - "respondent_name": ${other_parties[0].name.full(middle='full')}
-#    #Can the case number be known?
-#    - "case_number": ${""}
-#    #What is the leads number?
-#    - "leads_number": ${""}
-#    - "respondent_birth": ${other_parties[0].birthdate}
-#    #What does it mean for an SNCO to be an independent proceeding, cirminal proceeding, or deliquency petition? 
-#    - "independent": ${False}
-#    - "criminal": ${False}
-#    - "delinquency": ${False}
-#    #Should these checkboxes be left blank for the court to mark?
-#    - "emergency_check": ${order_type['emergency']}
-#    - "plenary_check": ${order_type['plenary']}
----
-#attachment:
-#  variable name: cook_findings[i]
-#  name: cook_findings
-#  filename: cook_findings
-#  skip undefined: True
-#  editable: False
-#  pdf template file: cook_findings.pdf
-#  fields:
-#    #What are these "on behalf of" fields in the template for?
-#    - "people_ex_rel": ${""}
-#    - "on_behalf_of": ${""}
-#    - "petitioner_name": ${users[0].name.full(middle='full')}
-#    - "respondent_name": ${other_parties[0].name.full(middle='full')}
-#    #Can the case number be known?
-#    - "case_number": ${""}
-#    #What is the proceeding type?
-#    - "independent": ${False}
-#    - "other_proceeding_check": ${False}
-#    - "other_proceeding_text": ${""}
-#    - "criminal_proceeding": ${False}
-#    - "juvenile": ${False}
-#    #Should these checkboxes be left blank for the court to mark?
-#    - "emergency_check": ${order_type['emergency']}
-#    - "plenary_check": ${order_type['plenary']}
 ---
 attachment:
   variable name: efiling_exemption[i]
@@ -4354,24 +4172,18 @@ review:
       % else:
       ${other_parties[0].skin}
       % endif
-  - Edit: other_parties[0].other_names.there_are_any
+  - Edit: other_parties[0].has_alias
     button: |
+      % if other_parties[0].has_alias:
+      **${other_parties[0].name.full(middle='full')} other names:**
+      ${other_parties[0].alias_names}
+      % elif other_parties[0].has_alias is None:
       **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      % if other_parties[0].other_names.there_are_any is None:
       I don't know
-      % elif other_parties[0].other_names.there_are_any:
-      Yes
       % else:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
       No
       % endif
-  - Edit: other_parties[0].other_names.revisit
-    button: |
-      **${other_parties[0].name.full(middle='full')}'s other names:**
-      
-      % for my_var in other_parties[0].other_names:
-        * ${ my_var.name.full(middle="full") }
-      % endfor
-    show if: other_parties[0].other_names.there_are_any
   - Edit: other_parties[0].ssn
     button: |
       **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
@@ -4654,38 +4466,6 @@ review:
       % else:
       No
       % endif  
----
-id: stalker other names review screen
-continue button field: other_parties[0].other_names.revisit
-question: |
-    Edit ${other_parties[0].name.full(middle='full')}'s other names
-subquestion: |
-  ${ other_parties[0].other_names.table }
-  % if other_parties[0].other_names.number_gathered() < 4:
-  
-  ${ other_parties[0].other_names.add_action() }
-  % endif
----
-table: other_parties[0].other_names.table
-rows: other_parties[0].other_names
-columns:
-  - Name: |
-      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
-  - Edit: |
-      action_button_html(url_action(row_item.attr_name("review_other_names")), label="Edit", icon="pencil-alt")
-delete buttons: True
-confirm: True
----
-id: stalker other name info review screen
-continue button field: x.review_other_names
-generic object: ALIndividual
-question: |
-  Edit the name ${ x.name.full(middle="full") }
-review: 
-  - Edit: x.name.first
-    button: |
-      **${other_parties[0].name.full(middle='full')}'s other name:**
-      ${x.name.full(middle='full')}
 ---
 section: What happened
 id: incidents review screen
@@ -5240,24 +5020,18 @@ review:
       % else:
       ${other_parties[0].skin}
       % endif
-  - Edit: other_parties[0].other_names.there_are_any
+  - Edit: other_parties[0].has_alias
     button: |
+      % if other_parties[0].has_alias:
+      **${other_parties[0].name.full(middle='full')} other names:**
+      ${other_parties[0].alias_names}
+      % elif other_parties[0].has_alias is None:
       **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      % if other_parties[0].other_names.there_are_any is None:
       I don't know
-      % elif other_parties[0].other_names.there_are_any:
-      Yes
       % else:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
       No
       % endif
-  - Edit: other_parties[0].other_names.revisit
-    button: |
-      **${other_parties[0].name.full(middle='full')}'s other names:**
-      
-      % for my_var in other_parties[0].other_names:
-        * ${ my_var.name.full(middle="full") }
-      % endfor
-    show if: other_parties[0].other_names.there_are_any
   - Edit: other_parties[0].ssn
     button: |
       **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
