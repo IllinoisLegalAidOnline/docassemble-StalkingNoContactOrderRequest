@@ -82,13 +82,13 @@ code: |
     
   
   users[0].name.first
+  if users[0].age_in_years() < 18:
+    too_young_kickout
   hide_address
   users[0].address.address
   other_parties[0].name.first
   if not user_relationship['unrelated']:
     related_note
-  if users[0].age_in_years() < 18:
-    too_young_kickout
   if need_to_gather_others:
     others_protected.gather()
     pop_protected_code
@@ -1000,31 +1000,14 @@ fields:
   - no label: others_protected[i].is_survivor
     datatype: yesnoradio
 ---
-id: cannot include other
+id: C
 continue button field: others_protected[i].cannot_include
 question: |
   Sorry
 subquestion: |
   ${others_protected[i].name.full(middle='full')} cannot be included in the SNCO unless they have been stalked.
 
-  Click **Next** to continue making your forms without including ${others_protected[i].name.full(middle='full')}.
----
-#id: others protected relation to user cook county
-#question: |
-#  What is ${others_protected[i].name.full(middle='full')}'s relationship to you?
-#fields:
-#  - They are my: others_protected[i].relation_to_user
-#    input type: combobox
-#    choices:
-#    - Child
-#    - Stepchild
-#    - Grandchild
-#    - Parent
-#    - Grandparent
-#    - Aunt or uncle
-#    - Niece or nephew
-#    - Sibling
-#    - Cousin 
+   Click **< Back** if you made a mistake. Otherwise, click **Next** to continue making your forms without including ${others_protected[i].name.full(middle='full')}.
 ---
 #review amount of space available and figure out max length
 id: protection reason cook county
