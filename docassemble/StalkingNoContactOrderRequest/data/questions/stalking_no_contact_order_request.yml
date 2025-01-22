@@ -500,7 +500,7 @@ subquestion: |
   * The stalker's name, and
   * Details about the stalking and when it took place.
   
-  Set aside 10 to 20 minutes to finish this program. You can login and save your work to return to later. 
+  Set aside 10 to 20 minutes to finish this program. You can login and save your work to continue later.
  
   ${ collapse_template(help_example) }  
 
