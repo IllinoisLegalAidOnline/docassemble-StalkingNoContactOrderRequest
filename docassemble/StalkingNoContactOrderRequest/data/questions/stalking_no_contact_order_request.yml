@@ -23,7 +23,6 @@ objects:
   - other_parties[0].employer_address: ALAddress
   - other_parties[0].service_address: ALAddress
   - other_parties[0].bonus_service_address: ALAddress
-  #- employers_schools: ALPeopleList.using(complete_attribute='complete')
   - stalking_events: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete')
   - home: ALAddress
   - report_numbers: DAList.using(object_type=Thing, there_are_any=False)
@@ -108,8 +107,6 @@ code: |
     distance_away
     if protected_place_types['Home']:
       run_home_address_block
-    #if protected_place_types['School'] or protected_place_types['Workplace']: 
-    #  employers_schools.gather()  
     if protected_place_types['Workplace']: 
       protected_workplace.name.first
     if protected_place_types['School']:
@@ -118,7 +115,6 @@ code: |
       protected_day_care.name.first
     if protected_place_types['Other']:
       other_places
-      #remove_line_breaks
     if trial_court_index == -1:
       if live_with_stalker:
         home.address
@@ -126,12 +122,6 @@ code: |
         school_with_stalker
       if protected_place_types['Workplace']: 
         work_with_stalker
-      #if school_with_stalker: 
-      #  if school_list.number_gathered() > 1:
-      #    which_stalker_school
-      #if work_with_stalker:    
-      #  if work_list.number_gathered() > 1:
-      #    which_stalker_work
   other_parties[0].prohibit_firearms
   if trial_court_index == -1:
     other_parties[0].pay_costs 
@@ -146,7 +136,6 @@ code: |
     other_parties[0].state_gender
   other_parties[0].race
   if trial_court_index == -1:
-    #other_parties[0].skin
     other_parties[0].has_alias
   other_parties[0].ssn
   knows_respondent_dob
@@ -180,15 +169,6 @@ code: |
     #  other_parties[0].divorce_date
     #elif other_parties[0].parentage_action:
     #  other_parties[0].parentage_date
-    #other_parties[0].mental_illness
-    #other_parties[0].alcohol
-    #other_parties[0].drugs
-    #other_parties[0].carrying_weapon
-    #other_parties[0].home_weapon
-    #if other_parties[0].carrying_weapon or other_parties[0].home_weapon:
-    #  other_parties[0].weapons_info
-    #if other_parties[0].order_of_protection == True:
-    #  other_ops.gather()
     respondent_on_probation
   else:
     if respondent_jail_check:
@@ -203,8 +183,6 @@ code: |
       other_parties[0].which_bonus_address
   if trial_court_index == -1 and service_method == "sheriff":  
     service_information
-    #cook_district
-  #case_number
   users[0].phone_number
   if users[0].has_email_address:
     users[0].email
@@ -215,7 +193,6 @@ code: |
   
   if trial_court.address.county == "Cook":
     make_report_list
-    #with_initials
     cook_stay_away_addresses
     cook_no_remain_addresses
   else:
@@ -364,12 +341,6 @@ code: |
   else:
     other_parties.parentage_action = False
   divorce_parentage_logic = True
----
-# employers schools gather code block
-#code: |  
-#  employers_schools[i].name.first
-#  employers_schools[i].address.address
-#  employers_schools[i].complete = True
 ---
 #list of "stay away" addresses for use in the Cook petition
 reconsider: True
@@ -520,13 +491,13 @@ subquestion: |
   To use this program:
 
   * The stalker cannot be a family member, current or ex-spouse, or current or ex-boyfriend or girlfriend (use the [**Order of Protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection) instead),
-  * The stalker must have done something that made you fearful or caused emotional distress **at least two separate times**, and
-  * You must file your forms in the county were the stalking took place or in the county where you live or where the stalker lives.
+  * The stalker must have done something that made you or people you want to protect fearful or caused emotional distress **at least two separate times**, and
+  * You must file your forms in the county were the stalking took place or in the county where you, the stalker, or someone you want to protect live.
   
   To complete this program you will need to know:
   
   * An alternative address where you can receive court documents if you do not want the stalker to know the address where you are staying,
-  * The stalker's name, gender, and race, and
+  * The stalker's name, and
   * Details about the stalking and when it took place.
   
   Set aside 10 to 20 minutes to finish this program. You can login and save your work to return to later. 
@@ -572,9 +543,7 @@ subquestion: |
 ---
 id: two times check
 question: |
-  % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  Have you or the people you want to protect been stalked by the stalker at least two times?
-  % elif protect_whom['me']:
+  % if protect_whom['me'] and not protect_whom['adult'] and not protect_whom['minor']:
   Have you been stalked by the stalker at least two times?
   % else:
   Have you or the people you want to protect been stalked by the stalker at least two times?
@@ -582,10 +551,8 @@ question: |
 subquestion: |
   **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel emotional distress. Someone being rude or mean may not count as stalking. The judge will decide what counts as stalking. 
 
-  % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  If the stalker has caused **{emotional distress}** to you or the people you want to protect or made you or them afraid **at least two times**, click **Yes**.
-  % elif protect_whom['me']:
-   If the stalker has caused **{emotional distress}** to you or made you afraid **at least two times**, click **Yes**.
+  % if protect_whom['me'] and not protect_whom['adult'] and not protect_whom['minor']:
+  If the stalker has caused **{emotional distress}** to you or made you afraid **at least two times**, click **Yes**.
   % else:
   If the stalker has caused **{emotional distress}** to you or the people you want to protect or made you or them afraid **at least two times**, click **Yes**.
   % endif
@@ -623,6 +590,7 @@ subquestion: |
   You can file in Illinois if:
 
   * You live in Illinois,
+  * Someone you want to protect lives in Illinois,
   * The person you are filing against lives in Illinois, or
   * One or more acts of the stalking took place in Illinois.
 fields:
@@ -976,9 +944,7 @@ event: too_young_kickout
 question: |
   Sorry
 subquestion: |
-  You must be 18 years old or older to use this program.
-  
-  Your parent or guardian can file for a Stalking No Contact Order for you. If you need protection from your parent or guardian, you may want to ask a court for emancipation. To learn more about emancipation, read ILAO's article on [**becoming emancipated**](https://www.illinoislegalaid.org/legal-information/becoming-emancipated).
+  You must be 18 years old or older to use this program. You can ask an adult 18 years old or older to file to protect you.
   
    Click **Back** if you made a mistake. Or you can talk with a lawyer to discuss your options. Use **[Get Legal Help](https://www.illinoislegalaid.org/get-legal-help)** to find free or low-cost legal services in your area.
 buttons:
@@ -1032,49 +998,6 @@ subquestion: |
 fields:
   - Safe email address: users[0].email    
     datatype: email
----
-#id: your contact information
-#question: |
-#  What is your contact information?
-#subquestion: |
-#  ${ collapse_template(contact_info_help) }  
-#fields:  
-#  - Phone number: users[0].phone_number
-#    datatype: al_international_phone
-#    required: False
-#  - label: |
-#      I have an email address
-#    field: users[0].has_email_address      
-#    datatype: yesnoradio
-#  - note: |
-#      This email address will appear on your court forms. Be sure to check 
-#      this email daily, otherwise you may miss important information about 
-#      your case.
-#    show if: x.has_email_address      
-#  - Email address: users[0].email    
-#    datatype: email
-#    show if: 
-#      variable: users[0].has_email_address
-#      is: True
-#---
-#template: contact_info_help
-#subject: |
-#  **Why do I need to include this?**
-#content: |  
-#  The court must be able to reach you, so you need to include some contact information.
----
-id: any others protected
-question: |
-  Do you want the Stalking No Contact Order to protect anyone else?
-subquestion: |
-  This is who you can protect with this order:
-  
-  * Children who were victims of stalking, 
-  * Children who live in the same household as you, and
-  * Adults who were victims of stalking and who cannot file for themselves due to age, disability, or poor health.
-fields:
-  - no label: others_protected.there_are_any
-    datatype: yesnoradio
 ---
 sets:
     - others_protected[i].name.first
@@ -1186,10 +1109,11 @@ question: |
 subquestion: |
   So far you have told us about ${comma_and_list(others_protected)}.
 
-  This is who you can protect with this order:
+  This is who else you can protect with this order:
   
-  * Children who were victims of the stalking, and
-  * Adults who were victims of the stalking and who cannot file for themselves due to age, disability, or poor health.
+  * Children who were victims of stalking, 
+  * Children who live in the same household as you, and
+  * Adults who were victims of stalking and who cannot file for themselves due to age, disability, or poor health.
 fields:
   - no label: others_protected.there_is_another
     datatype: yesnoradio
@@ -2124,10 +2048,6 @@ fields:
     show if:
       variable: other_parties[0].which_address
       is: "add_service_address" 
-  #- Phone number: other_parties[0].service_phone
-  #  required: False
-  #- Email address: other_parties[0].service_email
-  #  required: False
 validation code: |
   if other_parties[0].which_address == "add_service_address":
     service_state = other_parties[0].service_address.state
@@ -2163,12 +2083,6 @@ fields:
   - no label: other_parties[0].which_bonus_address
     input type: radio
     code: alt_service_list
-    #choices:
-    #- ${home_address_text}: home_address
-    #  show if: list_home_address and other_parties[0].which_address != "home_address"
-    #- ${employer_address_text}: employer_address
-    #  show if: list_employer_address and other_parties[0].which_address != "employer_address"
-    #- An address I will enter: service_address
   - Street address: other_parties[0].bonus_service_address.address
     address autocomplete: True
     show if:
@@ -2193,22 +2107,13 @@ fields:
     show if:
       variable: other_parties[0].which_bonus_address
       is: "service_address" 
-  #- Phone number: other_parties[0].bonus_service_phone
-  #  required: False
-  #- Email address: other_parties[0].bonus_service_email
-  #  required: False
-#validation code: |
-#  if other_parties[0].which_bonus_address == "home_address":
-#    other_parties[0].bonus_service_address = other_parties[0].address
-#  elif other_parties[0].which_bonus_address == "employer_address":
-#    other_parties[0].bonus_service_address = other_parties[0].employer_address
 ---
 id: stalking event intro
 continue button field: stalking_event_intro
 question: |
   Reasons for the Stalking No Contact Order
 subquestion: |
-  The following questions will ask about what ${other_parties[0].name.full(middle='full')} did to make you afraid or distressed.
+  The following questions will ask about what ${other_parties[0].name.full(middle='full')} did to make you or the people you want to protect afraid or distressed.
   
   You should be specific. Tell when and where each event happened, and how it affected you.
   
@@ -2269,34 +2174,6 @@ fields:
       % else:
       The petition has space for about 800 characters including spaces for each incident.
       % endif
----
-#id: stalking event date time
-#question: |
-#  When did the ${ordinal(i)} stalking event take place?
-#subquestion: |
-#  If you not remember the exact date, enter the month and year.
-#fields:
-#  - Date: stalking_events[i].name.text
-#  - Time: stalking_events[i].time
-#    datatype: time
-#    required: False
-#    help: |
-#      If you do not remember this and do not have a good estimate, you can leave this blank.
-#---
-#id: stalking event place
-#question: |
-#  Where did the ${ordinal(i)} stalking event take place?
-#fields:
-#  - Place: stalking_events[i].place
-#---
-#id: stalking event description
-#question: |
-#  Describe the ${ordinal(i)} stalking event.
-#subquestion: |
-#  Be as specific as possible
-#fields:
-#  - Description: stalking_events[i].description
-#    input type: area
 ---
 id: stalking event police report
 question: |
@@ -2408,14 +2285,6 @@ fields:
       - Daycare: day_care
       - Other
 ---
-#depends on:
-#  - protected_place_types
-#code: |
-#  if protected_place_types['Workplace'] or protected_place_types['School'] or protected_place_types['day_care']:
-#    employers_schools.there_are_any = True
-#  else:
-#    employers_schools.there_are_any = False
----
 id: safe home address
 question: |
   What is your home address?
@@ -2446,8 +2315,6 @@ subquestion: |
   Include any addresses if you know them. If you do not want ${other_parties[0].name.full(middle='full')} to know the addresses, do not list them here.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
-  
-  If you list multiple places, separate them with a comma.
 fields:
   - Name or type of place, and address (if known): other_places
     maxlength: |
@@ -2522,32 +2389,6 @@ fields:
     default: IL      
   - ZIP code: protected_day_care.address.zip
 ---
-#id: employers schools address
-#question: |
-#  What is ${employers_schools[i].name.first}'s address?
-#fields:
-#  - Street address: employers_schools[i].address.address
-#    address autocomplete: True
-#  - Address line 2: employers_schools[i].address.unit
-#    required: False
-#  - City: employers_schools[i].address.city
-#  - State: employers_schools[i].address.state
-#    code: |
-#      states_list()
-#    default: IL      
-#  - ZIP code: employers_schools[i].address.zip
-#---
-#id: employers schools there is another
-#question: |
-#  Do you want to add another place that ${other_parties[0].name.full(middle='full')} should stay away from?
-#subquestion: |
-#  You can list workplaces, schools, or daycares. If you only want to add a different type of place, click **No**.
-#
-#  So far you have told us about ${comma_and_list(employers_schools.complete_elements().full_names())}.
-#fields:
-#  - no label: employers_schools.there_is_another
-#    datatype: yesnoradio
----
 id: live with stalker
 question: |
   Does ${other_parties[0].name.full(middle='full')} live at the same address as you?
@@ -2572,19 +2413,6 @@ datatype: checkboxes
 choices:
   - code: |
       school_list
----
-#reconsider: True
-#code: |
-#  school_list.clear()
-#  work_list.clear()
-#  for place in employers_schools:
-#    if place.type == "school":
-#      school_list.append(place)
-#    elif place.type == "work":
-#      work_list.append(place)
-#  school_list.there_is_another = False
-#  work_list.there_is_another = False
-#  make_lists = True
 ---
 id: work with stalker
 question: |
@@ -2624,8 +2452,6 @@ fields:
     datatype: yesnoradio
   - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
-    #maxlength: 500
-    #maxlength: 140
     maxlength: |
       % if trial_court_index == -1:
       140
@@ -2771,22 +2597,15 @@ content: |
 objects:
   - snco_instructions: ALDocument.using(title="Instructions", filename="instructions.pdf", has_addendum=False)
   - snco_petition: ALDocument.using(title="Verified Petition", filename="petition.pdf", has_addendum=False)
-  #- op_schools: ALDocument.using(title="Confidential School or Daycare", filename="confidential_schools.pdf", has_addendum=False)
-  #- additional_incidents: ALDocument.using(title="Additional Incidents of Abuse", filename="additional_incidents.pdf", has_addendum=False)
-  #- additional_cases: ALDocument.using(title="Additional Case Information", filename="additional_cases.pdf", has_addendum=False)
-  #- emergency_op: ALDocument.using(title="Emergency Order of Protection (draft)", filename="emergency_op.pdf", has_addendum=False)
   - emergency_order: ALDocument.using(title="Emergency Stalking No Contact Order (draft)", filename="snco_order.pdf", has_addendum=False)
   - plenary_order: ALDocument.using(title="Plenary Stalking No Contact Order (draft)", filename="snco_order.pdf", has_addendum=False)
   - op_summons: ALDocument.using(title="Summons", filename="summons.pdf", has_addendum=False)
-  #- affidavit_pt_supervisor: ALDocument.using(title="Affidavit of Parenting Time Supervisor", filename="affidavit_pt_supervisor.pdf", has_addendum=False)
   - efiling_exemption: ALDocument.using(title="E-filing exemption (optional)", filename="e-filing_exemption.pdf", has_addendum=False)
   - cook_dv_cover_sheet: ALDocument.using(title="Domestic Violence Cover Sheet", filename="cook_dv_cover_sheet.pdf", has_addendum=False)
   - cook_sheriff_info_sheet: ALDocument.using(title="Confidential Sheriff Information Sheet", filename="cook_sheriff_info_sheet.pdf", has_addendum=False)
   - cook_petition: ALDocument.using(title="Verified Petition", filename="cook_petition.pdf", has_addendum=False)
   - cook_e_order: ALDocument.using(title="Emergency Stalking No Contact Order (draft)", filename="cook_snco_order.pdf", has_addendum=False)
   - cook_p_order: ALDocument.using(title="Plenary Stalking No Contact Order (draft)", filename="cook_snco_order.pdf", has_addendum=False)
-  #- cook_findings: ALDocument.using(title="Findings", filename="cook_findings.pdf", has_addendum=False)
-  #- cook_disposition_order: ALDocument.using(title="Disposition order", filename="cook_disposition.pdf", has_addendum=False)
   - others_protected_addendum: ALDocument.using(title="Others protected addendum", filename="others_protected_addendum.pdf", has_addendum=False)
   - snco_events_addendum: ALDocument.using(title="Stalking incidents addendum", filename="snco_events_addendum.pdf", has_addendum=False)
   - sheriff_cover_sheet: ALDocument.using(title="Sheriff Information Cover Sheet", filename="sheriff_info_cover_sheet.pdf", has_addendum=False)
