@@ -573,21 +573,21 @@ subquestion: |
 id: two times check
 question: |
   % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  Have you and the people you want to protect been stalked by the stalker at least two times?
+  Have you or the people you want to protect been stalked by the stalker at least two times?
   % elif protect_whom['me']:
   Have you been stalked by the stalker at least two times?
   % else:
-  Have the people you want to protect been stalked by the stalker at least two times?
+  Have you or the people you want to protect been stalked by the stalker at least two times?
   % endif
 subquestion: |
   **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel emotional distress. Someone being rude or mean may not count as stalking. The judge will decide what counts as stalking. 
 
   % if protect_whom['me'] and (protect_whom['adult'] or protect_whom['minor']):
-  If the stalker has caused **{emotional distress}** to you and the people you want to protect or made you and them afraid **at least two times**, click **Yes**.
+  If the stalker has caused **{emotional distress}** to you or the people you want to protect or made you or them afraid **at least two times**, click **Yes**.
   % elif protect_whom['me']:
    If the stalker has caused **{emotional distress}** to you or made you afraid **at least two times**, click **Yes**.
   % else:
-  If the stalker has caused **{emotional distress}** to the people you want to protect or made them afraid **at least two times**, click **Yes**.
+  If the stalker has caused **{emotional distress}** to you or the people you want to protect or made you or them afraid **at least two times**, click **Yes**.
   % endif
 fields:
   - no label: two_times_check
@@ -609,7 +609,7 @@ event: two_times_kickout
 question: |
   Sorry
 subquestion: |
-  To qualify for a ${form_name}, a stalker must have done things which made you fearful or caused you emotional distress **at least two separate times**.
+  To qualify for a Stalking No Contact Order, a stalker must have done things which made a person fearful or caused them emotional distress **at least two separate times**.
   
   A different protective order may work for your situation. Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 buttons:
@@ -1069,8 +1069,9 @@ question: |
 subquestion: |
   This is who you can protect with this order:
   
-  * Children who were victims of the stalking, and
-  * Adults who were victims of the stalking and who cannot file for themselves due to age, disability, or poor health.
+  * Children who were victims of stalking, 
+  * Children who live in the same household as you, and
+  * Adults who were victims of stalking and who cannot file for themselves due to age, disability, or poor health.
 fields:
   - no label: others_protected.there_are_any
     datatype: yesnoradio
@@ -2446,11 +2447,7 @@ subquestion: |
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
   
-  % if trial_court_index == -1:
   If you list multiple places, separate them with a comma.
-  % else:
-  If you list multiple places, separate them by hitting **Enter**.
-  % endif
 fields:
   - Name or type of place, and address (if known): other_places
     maxlength: |
@@ -2461,27 +2458,6 @@ fields:
       % endif
     rows: 10
     input type: area
----
-#depends on:
-#  - other_places
-#code: |
-#  other_places.replace("\n", " ")
-#  remove_line_breaks = True
----
-#id: employers schools name
-#question: |
-#  What is the name and type of the ${ordinal(i)} workplace, school, or daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
-#fields:
-#  - Type: employers_schools[i].type
-#    input type: radio
-#    choices:
-#      - Work or job site: work
-#        show if: protected_place_types['Workplace']
-#      - School: school
-#        show if: protected_place_types['School']
-#      - Daycare: day_care
-#        show if: protected_place_types['day_care']
-#  - Name: employers_schools[i].name.first
 ---
 id: workplace name workplace address
 question: |
