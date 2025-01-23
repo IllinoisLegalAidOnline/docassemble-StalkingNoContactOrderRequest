@@ -2673,7 +2673,8 @@ attachment:
     - "previous_divorce_yes": ${ True if other_parties[0].divorced_user else '' }
     - "previous_divorce_no": ${ True if not other_parties[0].divorced_user else '' }
     - "previous_parentage_yes": ${ True if other_parties[0].parentage_action and not other_parties[0].divorced_user else '' }
-    - "previous_parentage_no": ${ True if other_parties[0].divorced_user or not other_parties[0].parentage_action else '' }
+    #- "previous_parentage_no": ${ True if other_parties[0].divorced_user or not other_parties[0].parentage_action else '' }
+    - "previous_parentage_no": ${ True}
     - "previous_cook_case_date": |  
         % if other_parties[0].divorced_user:
         ${ format_date(other_parties[0].divorce_date, format='MMM d, yyyy')}
