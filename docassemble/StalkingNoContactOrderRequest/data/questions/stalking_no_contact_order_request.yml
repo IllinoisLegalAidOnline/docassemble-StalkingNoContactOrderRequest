@@ -197,11 +197,11 @@ code: |
     cook_no_remain_addresses
   else:
     state_stay_away_addresses
-    
+
+  pop_protected_code
   addendum_check
   #debug_page
   forms_assembling
-  pop_protected_code
   adult_minor_sorting
   snapshot_forms
   get_docs_screen
@@ -376,17 +376,19 @@ sets:
   - others_protected[i].include_in_addendum
   - stalking_events[i].include_in_addendum
 reconsider: True
+  #if defined('others_protected[0].name.first'):
+  #if others_protected.number_gathered(if_started=False) > 0:
 code: |
   if need_to_gather_others:
-    if others_protected.number_gathered() > 0:
-      for index, other in enumerate(others_protected):
-        if trial_court_index == -1:
+
+    for index, other in enumerate(others_protected):
+      if trial_court_index == -1:
+        other.include_in_addendum = True
+      else:
+        if index > 1:
           other.include_in_addendum = True
         else:
-          if index > 1:
-            other.include_in_addendum = True
-          else:
-            other.include_in_addendum = False
+          other.include_in_addendum = False
   for index, event in enumerate(stalking_events):
     if trial_court_index == -1:
       if index > 2:
@@ -2621,8 +2623,9 @@ code: |
       emergency_order.enabled = True
     else:
       emergency_order.enabled = False
-    if others_protected.number_gathered() > 2:
-      others_protected_addendum.enabled = True
+    if need_to_gather_others:
+      if others_protected.number_gathered() > 2:
+        others_protected_addendum.enabled = True
     if stalking_events.number_gathered() > 2:
       snco_events_addendum.enabled = True
       
@@ -2929,27 +2932,27 @@ attachment:
     - "respondent_eye": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
     - "emergency_reason": ${emergency_reason if order_type['emergency'] else ""}
     - "protected_persons": |
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif need_to_gather_others and others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
         % endif
         % endif 
-    - "minor_children": ${child_list}
+    - "minor_children": ${child_list if need_to_gather_others else ""}
     - "no_stalking": ${protection_requested['stalking']}
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
         % if protection_requested['contacting']:
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
-        % elif protect_whom['me'] and not others_protected.there_are_any:
+        % elif protect_whom['me'] and not need_to_gather_others:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif need_to_gather_others and others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
@@ -3037,25 +3040,25 @@ attachment:
     - "respondent_eye": ${ other_parties[0].eyes if other_parties[0].eyes != "" else '' }
     - "emergency_reason": ${emergency_reason if order_type['emergency'] else ""}
     - "protected_persons": |
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif need_to_gather_others and others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
         ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
         % endif
         % endif 
-    - "minor_children": ${child_list}
+    - "minor_children": ${child_list if need_to_gather_others else ""}
     - "no_stalking": ${protection_requested['stalking']}
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
         % if protection_requested['contacting']:
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
-        % elif protect_whom['me'] and not others_protected.there_are_any:
+        % elif protect_whom['me'] and not need_to_gather_others:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
@@ -3138,8 +3141,8 @@ attachment:
     - "plenary_check": ${order_type['plenary']}
     - "petitioner_name": ${users[0].name.full(middle='full')}
     #These child name and adult name variables seem to be distinct from the others protected list. How should they be populated?
-    - "child_name": ${child_list}
-    - "adult_name": ${adult_list}
+    - "child_name": ${child_list if need_to_gather_others else ""}
+    - "adult_name": ${adult_list if need_to_gather_others else ""}
     - "safe_address": ${hide_address}
     - "petitioner_address_line_one": ${users[0].address.line_one(bare=True)}
     - "petitioner_city": ${users[0].address.city}
@@ -3169,7 +3172,7 @@ attachment:
     - "employer_city": ${ other_parties[0].employer_address.city if other_parties[0].has_job else ""}
     - "employer_state": ${ other_parties[0].employer_address.state if other_parties[0].has_job else ""}
     - "employer_zip": ${ other_parties[0].employer_address.zip if other_parties[0].has_job else ""}
-    - "protect_others_check": ${ True if others_protected.there_are_any else False}
+    - "protect_others_check": ${ True if need_to_gather_others and others_protected.there_are_any else False}
     #- "others_protected_list": ${comma_and_list(others_protected) if others_protected.there_are_any else ""}
     - "incidents_check": ${True}
     - "date_incident_1": ${stalking_events[0].name.text}
@@ -3200,11 +3203,11 @@ attachment:
         Additional incidents are attached.
         % endif
     - "others_protected_list": |     
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
-        % elif protect_whom['me'] and not others_protected.there_are_any:
+        % elif protect_whom['me'] and not need_to_gather_others:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif need_to_gather_others and others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
@@ -3215,11 +3218,11 @@ attachment:
     - "no_contact": ${protection_requested['contacting']}
     - "no_contact_list": |
         % if protection_requested['contacting']:
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if need_to_gather_others and others_protected.there_are_any and not protect_whom['me']:
         ${comma_and_list(others_protected)}
-        % elif protect_whom['me'] and not others_protected.there_are_any:
+        % elif protect_whom['me'] and not need_to_gather_others:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif need_to_gather_others and others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
         % else:
@@ -3272,30 +3275,34 @@ attachment:
     - "circuit_court": ${court_circuit.upper()}
     - "filing_county": ${trial_court.address.county.upper()}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${comma_and_list(others_protected)}
+    - "others_protected": ${comma_and_list(others_protected) if need_to_gather_others else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "behalf_of_names": |
-        % if others_protected.there_are_any and others_protected.number_gathered() > 0:
+        % if need_to_gather_others and others_protected.there_are_any and others_protected.number_gathered() > 0:
         ${ comma_and_list(others_protected)}
         % endif
     - "stalker_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_1": |
+        % if need_to_gather_others:
         % if hide_address and others_protected[0].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % elif others_protected[0].address.address != "":
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
+        % endif
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_2": |
+        % if need_to_gather_others:
         % if hide_address and others_protected[0].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % elif others_protected[1].address.address != "":
         ${others_protected[1].address.on_one_line(bare=True)}
+        % endif
         % endif
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_home_check": ${other_parties[0].last_address_known if other_parties[0].address_known == False else other_parties[0].address_known}
@@ -3372,7 +3379,7 @@ attachment:
     - "protected_work_addresses": ${protected_workplace.name.first + ", " + protected_workplace.address.on_one_line()}
     - "school_daycare_addresses": ${comma_and_list(away_school_daycare_list)}
     - "others_addendum": |
-        % if others_protected.number_gathered() > 2:
+        % if need_to_gather_others and others_protected.number_gathered() > 2:
         A list of additional protected persons is attached.
         % endif
 ---
@@ -3389,17 +3396,17 @@ attachment:
     - "emergency_type": ${True}
     - "plenary_type": ${False}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${comma_and_list(others_protected)}
+    - "others_protected": ${comma_and_list(others_protected) if need_to_gather_others else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
-    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "behalf_of_names": ${ comma_and_list(others_protected) if need_to_gather_others else ""}
     - "stalker_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
-      #LEAPHERE
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_1": |
+        % if need_to_gather_others:
         % if hide_address:
         % if others_protected[0].use_safe_address:       
         ${users[0].address.on_one_line(bare=True)} 
@@ -3407,14 +3414,17 @@ attachment:
         % else:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
+        % endif
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_2": |
+        % if need_to_gather_others:
         % if hide_address:
         % if others_protected[1].use_safe_address:       
         ${users[0].address.on_one_line(bare=True)} 
         % endif
         % else:
         ${others_protected[1].address.on_one_line(bare=True)}
+        % endif
         % endif
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_home_check": ${other_parties[0].address_known}
@@ -3492,16 +3502,17 @@ attachment:
     - "emergency_type": ${False}
     - "plenary_type": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${comma_and_list(others_protected)}
+    - "others_protected": ${comma_and_list(others_protected) if need_to_gather_others else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
-    - "behalf_of_names": ${ comma_and_list(others_protected)}
+    - "behalf_of_names": ${ comma_and_list(others_protected) if need_to_gather_others else ""}
     - "stalker_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full')}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_1": |
+        % if need_to_gather_others:
         % if hide_address:
         % if others_protected[0].use_safe_address:       
         ${users[0].address.on_one_line(bare=True)} 
@@ -3509,14 +3520,17 @@ attachment:
         % else:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full')}
+        % endif
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if need_to_gather_others else ""}
     - "other_protected_address_2": |
+        % if need_to_gather_others:
         % if hide_address:
         % if others_protected[1].use_safe_address:       
         ${users[0].address.on_one_line(bare=True)} 
         % endif
         % else:
         ${others_protected[1].address.on_one_line(bare=True)}
+        % endif
         % endif
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_home_check": ${other_parties[0].address_known}
