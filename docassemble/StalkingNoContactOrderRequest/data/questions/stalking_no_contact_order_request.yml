@@ -3115,8 +3115,8 @@ attachment:
   fields:
     #What are these "on behalf of" fields in the template for?
     - "people_ex_rel": ${""}
-    - "on_behalf_of": ${""}
-    - "self_name": ${users[0].name.full(middle='full')}
+    - "on_behalf_of": ${users[0].name.full(middle='full')}
+    - "self_name": ${""}
     - "behalf_petitioner": |
         % if need_to_gather_others:
         % if others_protected.number_gathered() > 0:
