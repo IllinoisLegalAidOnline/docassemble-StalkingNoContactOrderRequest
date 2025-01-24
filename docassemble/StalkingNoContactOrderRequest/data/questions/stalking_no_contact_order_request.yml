@@ -261,6 +261,7 @@ code: |
     while (popping_index < others_protected.number_gathered()) and (others_protected.number_gathered() > 0):
       if others_protected[popping_index].age_in_years() > 17 and not others_protected[popping_index].is_survivor:
       #if not others_protected[popping_index].is_survivor:
+        others_protected[popping_index].cannot_include
         others_protected.pop(popping_index)
       else:
         #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
@@ -1253,7 +1254,7 @@ fields:
     show if: 
       variable: knows_respondent_dob
       is: exact
-  - What you know about ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].birthdate_info
+  - What you know about ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].date_info
     maxlength: 25
     show if:
       variable: knows_respondent_dob
@@ -2728,7 +2729,7 @@ attachment:
         % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
         ${ other_parties[0].birthdate }
         % elif knows_respondent_dob == 'some':
-        ${ other_parties[0].birthdate_info }
+        ${ other_parties[0].date_info }
         % else:
         ${ "do not know" }
         % endif
@@ -3115,18 +3116,11 @@ attachment:
     #What are these "on behalf of" fields in the template for?
     - "people_ex_rel": ${""}
     - "on_behalf_of": ${""}
-    - "self_name": |
-        % if not protect_whom['me']:
-        ${users[0].name.full(middle='full')}
-        % endif
+    - "self_name": ${users[0].name.full(middle='full')}
     - "behalf_petitioner": |
-        % if protect_whom['me']:
-        ${users[0].name.full(middle='full')}
-        % else:
-        % if len(comma_and_list(others_protected)) < 70:
+        % if need_to_gather_others:
+        % if others_protected.number_gathered() > 0:
         ${comma_and_list(others_protected)}
-        % else:
-        See attached list of protected persons.
         % endif
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
@@ -3157,7 +3151,7 @@ attachment:
         % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
         ${ other_parties[0].birthdate }
         % elif knows_respondent_dob == 'some':
-        ${ other_parties[0].birthdate_info }
+        ${ other_parties[0].date_info }
         % else:
         ${ "do not know" }
         % endif
@@ -3311,7 +3305,7 @@ attachment:
         % if knows_respondent_dob == 'exact' and other_parties[0].birthdate != "":
         ${ other_parties[0].birthdate }
         % elif knows_respondent_dob == 'some':
-        ${ other_parties[0].birthdate_info }
+        ${ other_parties[0].date_info }
         % else:
         ${ "do not know" }
         % endif
@@ -3488,6 +3482,10 @@ attachment:
     - "no_firearms": ${other_parties[0].prohibit_firearms}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
+    - "addendum_note": |
+        % if need_to_gather_others and others_protected.number_gathered() > 2:
+        A list of additional protected persons is attached.
+        % endif
 ---
 attachment:
   variable name: plenary_order[i]
@@ -3594,6 +3592,10 @@ attachment:
     - "no_firearms": ${other_parties[0].prohibit_firearms}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
+    - "addendum_note": |
+        % if need_to_gather_others and others_protected.number_gathered() > 2:
+        A list of additional protected persons is attached.
+        % endif
 ---
 # attachment:
 #  variable name: snco_summons[i]
@@ -3835,10 +3837,10 @@ review:
     button: |
       **Name of person to protect:**
       ${x.name.full(middle='full')}
-  - Edit: x.birth
+  - Edit: x.birthdate
     button: |
       **${x.name.full(middle='full')}'s birth date:**
-      ${x.birth}
+      ${x.birthdate}
   - Edit: x.is_survivor
     button: |
       **Was ${x.name.full(middle='full')} stalked?**
@@ -3959,7 +3961,7 @@ review:
       % if knows_respondent_dob == "exact":
       ${other_parties[0].birthdate}
       % elif knows_respondent_dob == "some":
-      ${other_parties[0].birthdate_info}
+      ${other_parties[0].date_info}
       % else:
       I don't know
       % endif
@@ -4807,7 +4809,7 @@ review:
       % if knows_respondent_dob == "exact":
       ${other_parties[0].birthdate}
       % elif knows_respondent_dob == "some":
-      ${other_parties[0].birthdate_info}
+      ${other_parties[0].date_info}
       % else:
       I don't know
       % endif
