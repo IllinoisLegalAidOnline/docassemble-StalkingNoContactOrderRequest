@@ -2567,8 +2567,12 @@ objects:
   - petition_bundle: ALDocumentBundle.using(elements=[snco_petition, cook_petition, others_protected_addendum, snco_events_addendum], filename="petition.pdf", title="Verified Petition")
   - sheriff_info_bundle: ALDocumentBundle.using(elements=[sheriff_cover_sheet, cook_sheriff_info_sheet], filename="cook_sheriff_info_sheet.pdf", title="Confidential Sheriff Information Sheet")
 ---
+objects:
+ - emergency_order_bundle: ALDocumentBundle.using(elements=[emergency_order, cook_e_order, others_protected_addendum], filename="emergency_order.pdf", title="Emergency Stalking No Contact Order (draft)")
+ - plenary_order_bundle: ALDocumentBundle.using(elements=[plenary_order, cook_p_order, others_protected_addendum], filename="plenary_order.pdf", title="Plenary Stalking No Contact Order (draft)")
+---
 objects: 
-  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, sheriff_info_bundle, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
+  - al_user_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order_bundle, plenary_order_bundle, op_summons, sheriff_info_bundle, efiling_exemption], filename="stalking_no_contact_order.pdf", title="All forms")
   - al_court_bundle: ALDocumentBundle.using(elements=[snco_instructions, cook_dv_cover_sheet, petition_bundle, emergency_order, plenary_order, cook_e_order, cook_p_order, op_summons, cook_sheriff_info_sheet, efiling_exemption], filename="stalking_no_contact_order.pdf", title="Order of protection")
 ---
 code: |
@@ -2591,12 +2595,16 @@ code: |
     cook_sheriff_info_sheet.enabled = True
     cook_petition.enabled = True
     if order_type['plenary']:
+      plenary_order_bundle.enabled = True
       cook_p_order.enabled = True
     else:
+      plenary_order_bundle.enabled = False
       cook_p_order.enabled = False
     if order_type['emergency']:
+      emergency_order_bundle.enabled = True
       cook_e_order.enabled = True
     else:
+      emergency_order_bundle.enabled = False
       cook_e_order.enabled = False
     #cook_findings.enabled = True
     #cook_disposition_order.enabled = True
@@ -2617,12 +2625,16 @@ code: |
     #cook_disposition_order.enabled = False
     snco_petition.enabled = True
     if order_type['plenary']:
+      plenary_order_bundle.enabled = True
       plenary_order.enabled = True
     else:
+      plenary_order_bundle.enabled = False
       plenary_order.enabled = False
     if order_type['emergency']:
+      emergency_order_bundle.enabled = True
       emergency_order.enabled = True
     else:
+      emergency_order_bundle.enabled = False
       emergency_order.enabled = False
     if need_to_gather_others:
       if others_protected.number_gathered() > 2:
