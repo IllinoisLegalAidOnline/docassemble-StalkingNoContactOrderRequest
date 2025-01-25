@@ -742,7 +742,7 @@ fields:
     choices:
       - Myself: me
       - A minor child: minor
-      - An adult who cannot file due to age, disablility or health : adult
+      - An adult who cannot file due to age, disablility or health: adult
 validation code: |
   if protect_whom.all_false():
     validation_error("You need to pick someone to protect.")
@@ -1003,7 +1003,7 @@ fields:
   - no label: others_protected[i].is_survivor
     datatype: yesnoradio
 ---
-id: C
+id: Cannot include because adult not stalked
 continue button field: others_protected[i].cannot_include
 question: |
   Sorry
@@ -3397,8 +3397,8 @@ attachment:
   editable: False
   pdf template file: Stalking_NCO_Order.pdf
   fields:
-    - "circuit_court": ${court_circuit}
-    - "filing_county": ${trial_court.address.county}
+    - "circuit_court": ${court_circuit.upper()}
+    - "filing_county": ${trial_court.address.county.upper()}
     - "emergency_type": ${True}
     - "plenary_type": ${False}
     - "user_name": ${users[0].name.full(middle='full')}
@@ -3507,8 +3507,8 @@ attachment:
   editable: False
   pdf template file: Stalking_NCO_Order.pdf
   fields:
-    - "circuit_court": ${court_circuit}
-    - "filing_county": ${trial_court.address.county}
+    - "circuit_court": ${court_circuit.upper()}
+    - "filing_county": ${trial_court.address.county.upper()}
     - "emergency_type": ${False}
     - "plenary_type": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
