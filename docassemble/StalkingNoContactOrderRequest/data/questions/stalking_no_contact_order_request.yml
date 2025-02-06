@@ -3334,9 +3334,14 @@ attachment:
         % else:
         ${ "do not know" }
         % endif
-    - "respondent_is_male": ${True if other_parties[0].state_gender == "Male" else False}
-    - "respondent_is_female": ${True if other_parties[0].state_gender == "Female" else False}
-    - "respondent_other_gender": ${other_parties[0].state_other_gender if other_parties[0].state_gender == "Other" else ""}
+    - "respondent_gender": |
+        % if other_parties[0].state_gender == "Male":
+        Male
+        % elif other_parties[0].state_gender == "Female":
+        Female
+        % elif other_parties[0].state_gender == "Other":
+        ${other_parties[0].state_other_gender}
+        % endif
     - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
     - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "0" else ""}
     - "respondent_weight": ${other_parties[0].weight if other_parties[0].weight > 0 else ""}
@@ -3449,9 +3454,14 @@ attachment:
     - "respondent_home_check": ${other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "stalker_birth": ${other_parties[0].birthdate}
-    - "respondent_is_male": ${True if other_parties[0].state_gender == "Male" else False}
-    - "respondent_is_female": ${True if other_parties[0].state_gender == "Female" else False}
-    - "other_gender": ${other_parties[0].state_other_gender if other_parties[0].state_gender == "Other" else ""}
+    - "respondent_gender": |
+        % if other_parties[0].state_gender == "Male":
+        Male
+        % elif other_parties[0].state_gender == "Female":
+        Female
+        % elif other_parties[0].state_gender == "Other":
+        ${other_parties[0].state_other_gender}
+        % endif
     - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
     - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "0" else ""}
     - "respondent_weight": ${other_parties[0].weight if other_parties[0].weight > 0 else ""}
@@ -3559,9 +3569,14 @@ attachment:
     - "respondent_home_check": ${other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "stalker_birth": ${other_parties[0].birthdate}
-    - "respondent_is_male": ${True if other_parties[0].state_gender == "Male" else False}
-    - "respondent_is_female": ${True if other_parties[0].state_gender == "Female" else False}
-    - "other_gender": ${other_parties[0].state_other_gender if other_parties[0].state_gender == "Other" else ""}
+    - "respondent_gender": |
+        % if other_parties[0].state_gender == "Male":
+        Male
+        % elif other_parties[0].state_gender == "Female":
+        Female
+        % elif other_parties[0].state_gender == "Other":
+        ${other_parties[0].state_other_gender}
+        % endif
     - "respondent_race": ${respondent_race_other if other_parties[0].race == "Other" else other_parties[0].race}
     - "respondent_height": ${(str(other_parties[0].height_feet) + "'" + str(other_parties[0].height_inches)  + "''") if str(other_parties[0].height_feet) != "0" else ""}
     - "respondent_weight": ${other_parties[0].weight if other_parties[0].weight > 0 else ""}
