@@ -523,7 +523,7 @@ subquestion: |
   Someone may be stalking you when they:
 
   * Follow you,
-  * Conduct surveillance on you,
+  * Track or monitor on you,
   * Appear uninvited at your home, work, or school,
   * Make unwanted phone calls or send unwanted emails or texts,
   * Leave objects for you,
@@ -3149,7 +3149,7 @@ attachment:
     - "case_number": ${""}
     - "respondent_birth": ${other_parties[0].birthdate}
     #What does it mean for an SNCO to be an independent proceeding, cirminal proceeding, or deliquency petition? 
-    - "independent": ${False}
+    - "independent": ${True}
     - "criminal": ${False}
     - "juvenile": ${False}
     - "emergency_check": ${order_type['emergency']}
@@ -3297,6 +3297,7 @@ attachment:
     - "others_protected": ${comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
+    - "independent": ${True}
     - "behalf_of_names": |
         % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 0:
         ${ comma_and_list(others_protected)}
@@ -3723,7 +3724,7 @@ attachment:
     - "respondent_alt_phone": ${ phone_number_formatted(other_parties[0].alt_phone) if other_parties[0].bonus_contact_info == True else "" }
     - "respondent_alt_email": ${ other_parties[0].alt_email if other_parties[0].bonus_contact_info == True else "" }
     - "service_method_sheriff": ${ True if service_method == "sheriff" and service_state == "IL" else ""}
-    - "service_method_sheriff_outside_il": ${ True if service_method == "sheriff" and service_state != "IL" else ""}
+    - "service_method_sheriff_outside_il": ${ True if service_method == "sheriff" and service_state != "IL" and service_state != "" else ""}
     - "service_location_outside_il": |
         % if service_method == "sheriff" and service_state != "IL":
         ${ service_county + ", " + service_state }
