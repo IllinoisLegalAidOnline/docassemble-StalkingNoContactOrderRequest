@@ -889,20 +889,17 @@ validation code: |
         validation_error("If you have any of the listed relationships with the person you are filing against, you should not select the 'We are not related.'")
 ---
 id: related note
-event: related_note
+continue button field: related_note
 question: |
-  Other protective orders
+  Order of Protection
 subquestion: |
-  If the person stalking you is family member, household member, boyfriend, girlfriend, or ex, you may need to file for an Order of Protection or a Civil No Contact Order instead.
+  If the person stalking you is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of an SNCO. An Order of Protection can help with more issues and may be easier to get.
   
   ILAO's article on [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) can help you find the protective order for your situation.
   
   If you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection). If you would like to file a Civil No Contact Order, you can use ILAO's [**Civil no contact order request Easy Form**](https://www.illinoislegalaid.org/legal-information/civil-no-contact-order-request).
 
-  Click **Back** if you made a mistake. Or you can talk with a lawyer to discuss your options. Use **[Get Legal Help](https://www.illinoislegalaid.org/get-legal-help)** to find free or low-cost legal services in your area.
-buttons:
-  - Exit: exit
-  - Restart: restart
+  If you would still like to make a SNCO, you can click **Next.**
 ---
 id: user birthdate
 question: |
