@@ -814,9 +814,9 @@ fields:
 ---
 id: others protected address
 question: |
-  What is ${others_protected[i].name.full(middle='full')}'s mailing address?
+  What is ${others_protected[i].name_full()}'s mailing address?
 subquestion: |
-  **This address will appear on your court papers.** If you do not want to list ${others_protected[0].name.full(middle='full')}'s address, you can leave this blank.
+  **This address will appear on your court papers.** If you do not want to list ${others_protected[0].name_full()}'s address, you can leave this blank.
 fields:
   - Street address: others_protected[i].address.address
     address autocomplete: True
@@ -868,7 +868,7 @@ fields:
 #SME question: can an SNCO be issued against someone regardless of relationship, or only against someone the filer is not related to?
 id: relationship
 question: |
-  How are you related to ${other_parties[0].name.full(middle='full')}?
+  How are you related to ${other_parties[0].name_full()}?
 fields:
   - Relationship: user_relationship
     datatype: checkboxes
@@ -981,7 +981,7 @@ fields:
 ---
 id: others protected birthday
 question: |
-  When was ${others_protected[i].name.full(middle='full')} born? 
+  When was ${others_protected[i].name_full()} born? 
 fields:
   - Their date of birth: others_protected[i].birthdate
     datatype: BirthDate
@@ -989,14 +989,14 @@ fields:
 ---
 #id: others protected sexual assualt cook county
 #question: |
-#  Is ${others_protected[i].name.full(middle='full')} a survivor of rape, sexual assault, or sexual abuse?
+#  Is ${others_protected[i].name_full()} a survivor of rape, sexual assault, or sexual abuse?
 #fields:
 #  - no label: others_protected[i].is_survivor
 #    datatype: yesnoradio
 ---
 id: others protected stalked
 question: |
-  Has ${others_protected[i].name.full(middle='full')} been stalked by ${other_parties[0].name.full(middle='full')}?
+  Has ${others_protected[i].name_full()} been stalked by ${other_parties[0].name_full()}?
 fields:
   - no label: others_protected[i].is_survivor
     datatype: yesnoradio
@@ -1006,14 +1006,14 @@ continue button field: others_protected[i].cannot_include
 question: |
   Sorry
 subquestion: |
-  ${others_protected[i].name.full(middle='full')} cannot be included in the SNCO unless they have been stalked.
+  ${others_protected[i].name_full()} cannot be included in the SNCO unless they have been stalked.
 
-   Click **< Back** if you made a mistake. Otherwise, click **Next** to continue making your forms without including ${others_protected[i].name.full(middle='full')}.
+   Click **< Back** if you made a mistake. Otherwise, click **Next** to continue making your forms without including ${others_protected[i].name_full()}.
 ---
 #review amount of space available and figure out max length
 id: protection reason cook county
 question: |
-  Why are you including ${others_protected[i].name.full(middle='full')} in the Stalking No Contact Order?
+  Why are you including ${others_protected[i].name_full()} in the Stalking No Contact Order?
 subquestion: |
   Here are some example answers:
   
@@ -1027,7 +1027,7 @@ fields:
 ---
 id:  others protected safe address check
 question: |
-  Do you want to use the safe mailing address for ${others_protected[i].name.full(middle='full')}?
+  Do you want to use the safe mailing address for ${others_protected[i].name_full()}?
 subquestion: |
   The safe mailing address you entered is:
   
@@ -1039,7 +1039,7 @@ fields:
 ---
 #id: others protected address
 #question: |
-#  What is ${others_protected[i].name.full(middle='full')}'s address?
+#  What is ${others_protected[i].name_full()}'s address?
 #subquestion: |
 #  This address will appear on court papers.
 #fields:
@@ -1084,9 +1084,9 @@ fields:
 ---
 id: stalker gender cook
 question: |
-  What is ${other_parties[0].name.full(middle="full")}'s sex and gender identity?
+  What is ${other_parties[0].name_full()}'s sex and gender identity?
 subquestion: |
-  This information is used to help law enforcement identify ${other_parties[0].name.full(middle="full")} and enforce the Stalking No Contact Order. If you do not know this information, you can leave it blank.
+  This information is used to help law enforcement identify ${other_parties[0].name_full()} and enforce the Stalking No Contact Order. If you do not know this information, you can leave it blank.
 fields:
   - Sex (will be public, used by any law enforement): other_parties[0].cook_sex
     datatype: radio
@@ -1095,7 +1095,7 @@ fields:
       - Male: Male
       - Female: Female
       - Other: other
-  - ${other_parties[0].name.full(middle="full")}'s sex (will be public, used by any law enforement): other_parties[0].cook_sex_other
+  - ${other_parties[0].name_full()}'s sex (will be public, used by any law enforement): other_parties[0].cook_sex_other
     maxlength: 20
     required: False
     show if:
@@ -1108,7 +1108,7 @@ fields:
       - Male: male
       - Female: female
     help: |
-      Sex assigned at birth refers to the sex or gender marker on ${other_parties[0].name.full(middle="full")}'s original birth certificate. If they were born intersex, you may want to mention that in gender/other.
+      Sex assigned at birth refers to the sex or gender marker on ${other_parties[0].name_full()}'s original birth certificate. If they were born intersex, you may want to mention that in gender/other.
   - Gender identity (confidential, used by sheriff only): other_parties[0].cook_gender
     datatype: checkboxes
     none of the above: False
@@ -1120,7 +1120,7 @@ fields:
       - Transgender man / Transmasculine: transmasc
       - Nonbinary / Gender non-conforming: nonbinary
       - Other: other
-  - ${other_parties[0].name.full(middle="full")}'s gender identity (confidential, used by sheriff only): respondent_cook_gender_other
+  - ${other_parties[0].name_full()}'s gender identity (confidential, used by sheriff only): respondent_cook_gender_other
     maxlength: 20
     required: False
     show if:
@@ -1129,7 +1129,7 @@ fields:
 ---
 id: stalker gender statewide
 question: |
-  What gender is ${other_parties[0].name.full(middle='full')}?
+  What gender is ${other_parties[0].name_full()}?
 subquestion: |
   This information is used to help enforce the Stalking No Contact Order.
   
@@ -1151,7 +1151,7 @@ fields:
 ---
 id: stalker race stalker skin tone
 question: |
-  What race is ${other_parties[0].name.full(middle='full')}?
+  What race is ${other_parties[0].name_full()}?
 subquestion: |
   This information is used to help enforce the Stalking No Contact Order.
   
@@ -1200,13 +1200,13 @@ fields:
 ---
 id: stalker any other names
 question: |
-  Has ${other_parties[0].name.full(middle='full')} gone by any other names?
+  Has ${other_parties[0].name_full()} gone by any other names?
 subquestion: |
-  If you know of any old legal name, nickname, or alias that ${other_parties[0].name.full(middle='full')} has used, click **Yes**.
+  If you know of any old legal name, nickname, or alias that ${other_parties[0].name_full()} has used, click **Yes**.
 fields:
   - no label: other_parties[0].has_alias
     datatype: yesnomaybe
-  - Other names used by ${other_parties[0].name.full(middle="full")}:: other_parties[0].alias_names
+  - Other names used by ${other_parties[0].name_full()}:: other_parties[0].alias_names
     input type: area
     rows: 3
     maxlength: 120
@@ -1216,9 +1216,9 @@ fields:
 ---
 id: stalker ssn
 question: |
-  What are the last four digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number?
+  What are the last four digits of ${other_parties[0].name_full()}'s Social Security Number?
 subquestion: |
-  This information is used to help identify ${other_parties[0].name.full(middle='full')}.
+  This information is used to help identify ${other_parties[0].name_full()}.
 
   If you do not know, you can leave this blank.
 fields:
@@ -1228,7 +1228,7 @@ fields:
 ---
 id: know respondent birthdate
 question: |
-  Do you know ${other_parties[0].name.full(middle="full")}'s birthdate?
+  Do you know ${other_parties[0].name_full()}'s birthdate?
 subquestion: |
   If you do not know their birthday but can guess their age, you can select "I know some of it" and note their age there. For example, if you think they are around 30 years old, you could write "About 30 years ago."
 fields:   
@@ -1246,13 +1246,13 @@ fields:
           % else:
           You may want to update the sheriff's office when you have this information.
           % endif
-  - ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].birthdate
+  - ${other_parties[0].name_full()}'s date of birth: other_parties[0].birthdate
     datatype: birthdate
     max: ${ today().format("yyyy-MM-dd") }
     show if: 
       variable: knows_respondent_dob
       is: exact
-  - What you know about ${other_parties[0].name.full(middle="full")}'s date of birth: other_parties[0].date_info
+  - What you know about ${other_parties[0].name_full()}'s date of birth: other_parties[0].date_info
     maxlength: 25
     show if:
       variable: knows_respondent_dob
@@ -1260,7 +1260,7 @@ fields:
 ---
 id: cook county physical characteristics
 question: |
-  Tell us about ${other_parties[0].name.full(middle="full")}'s appearance
+  Tell us about ${other_parties[0].name_full()}'s appearance
 subquestion: |
   This information is used to help enforce the Stalking No Contact Order.
   
@@ -1303,7 +1303,7 @@ fields:
       - Brown: Brown
       - Dark brown: Dark brown
       - Other: other
-  - ${other_parties[0].name.full(middle="full")}'s skin color: respondent_skin_other
+  - ${other_parties[0].name_full()}'s skin color: respondent_skin_other
     maxlength: 20
     show if:
       variable: other_parties[0].skin
@@ -1318,7 +1318,7 @@ fields:
     required: False
     help: |
       Examples: brown, blue, hazel, green
-  - Does ${other_parties[0].name.full(middle="full")} wear glasses?: other_parties[0].glasses
+  - Does ${other_parties[0].name_full()} wear glasses?: other_parties[0].glasses
     datatype: radio
     required: False
     choices: 
@@ -1328,7 +1328,7 @@ fields:
 ---
 #id: stalker height stalker weight
 #question: |
-#  What is ${other_parties[0].name.full(middle='full')}'s height and weight?
+#  What is ${other_parties[0].name_full()}'s height and weight?
 #subquestion: |
 #  If you do not know, you can leave this blank. 
 #fields:
@@ -1358,7 +1358,7 @@ fields:
 #---
 #id: stalker eyes
 #question: |
-#  What color are ${other_parties[0].name.full(middle='full')}'s hair and eyes?
+#  What color are ${other_parties[0].name_full()}'s hair and eyes?
 #subquestion: |
 #  If you do not know, you can leave this blank. 
 #fields:
@@ -1372,7 +1372,7 @@ fields:
 #    required: False
 #    help: |
 #      Examples: brown, blue, hazel, green
-#  - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].glasses
+#  - Does ${other_parties[0].name_full()} wear glasses?: other_parties[0].glasses
 #    datatype: radio
 #    required: False
 #    choices:
@@ -1384,7 +1384,7 @@ fields:
 #check how much space is available
 id: stalker notable features
 question: |
-  What are ${other_parties[0].name.full(middle='full')}'s notable features?
+  What are ${other_parties[0].name_full()}'s notable features?
 subquestion: |
   Scars, tattoos, or birthmarks are all notable features.
   
@@ -1401,7 +1401,7 @@ fields:
 ---
 id: stalker in jail
 question: |
-    Is ${other_parties[0].name.full(middle='full')} incarcerated?
+    Is ${other_parties[0].name_full()} incarcerated?
 subquestion: |
     **Incarcerated** means "in prison" or "in jail."
 fields:
@@ -1410,7 +1410,7 @@ fields:
 ---
 id: stalker jail name
 question: |
-  Where is ${other_parties[0].name.full(middle='full')} incarcerated?
+  Where is ${other_parties[0].name_full()} incarcerated?
 subquestion: |
     If you do not know, you may leave this blank.
 fields:
@@ -1420,7 +1420,7 @@ fields:
 ---
 id: stalker probation
 question: |
-  Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
+  Is ${other_parties[0].name_full()} on court-ordered probation?
 fields:
   - no label: respondent_on_probation
     datatype: radio
@@ -1439,7 +1439,7 @@ fields:
 ---
 id: stalker drivers license
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s driver's license number?
+  What is ${other_parties[0].name_full()}'s driver's license number?
 subquestion: |
   If you do not know or they do not have a driver's license, you can leave this blank.
 fields:
@@ -1449,16 +1449,16 @@ fields:
 ---
 id: stalker access to vehicle
 question: |
-  Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?
+  Does ${other_parties[0].name_full()} have access to a vehicle?
 fields:
   - no label: other_parties[0].has_vehicle
     datatype: yesnomaybe
 ---
 id: stalker vehicle details
 question: |
-  Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s vehicle.
+  Enter as much information as you can about ${other_parties[0].name_full()}'s vehicle.
 subquestion: |
-  If ${other_parties[0].name.full(middle='full')} has more than one car, describe the car they use most often.
+  If ${other_parties[0].name_full()} has more than one car, describe the car they use most often.
 
   If you do not know the answer to something, you can leave it blank.
 fields:
@@ -1488,7 +1488,7 @@ fields:
 ---
 id: stalker another number check
 question: |
-  Do you know another number that can identify ${other_parties[0].name.full(middle='full')}?
+  Do you know another number that can identify ${other_parties[0].name_full()}?
 subquestion: |
   This could be a passport number, a military ID number, or something similar.
 fields:
@@ -1505,7 +1505,7 @@ fields:
 ---
 #id: stalker another number
 #question: |
-#  What is ${other_parties[0].name.full(middle='full')} other identifying number?
+#  What is ${other_parties[0].name_full()} other identifying number?
 #fields:
 #  - Number: other_parties[0].another_number
 #  - Describe the ID number: other_parties[0].another_number_description
@@ -1514,9 +1514,9 @@ fields:
 ---
 id: respondent social media
 question: |
-  Is ${other_parties[0].name.full(middle="full")} active on social media?
+  Is ${other_parties[0].name_full()} active on social media?
 subquestion: |
-  If you know about ${other_parties[0].name.full(middle="full")}'s accounts, this could help the sheriff find them.
+  If you know about ${other_parties[0].name_full()}'s accounts, this could help the sheriff find them.
   
   This information **will not** appear on public court documents.
 fields:
@@ -1538,7 +1538,7 @@ fields:
 ---
 id: stalker phone number stalker email address
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s contact information?
+  What is ${other_parties[0].name_full()}'s contact information?
 subquestion: |
   If you do not know, you can leave this blank.
 fields:
@@ -1557,14 +1557,14 @@ fields:
 ---
 id: stalker any additional contact info
 question: |
-  Does ${other_parties[0].name.full(middle='full')} have another phone number or email address?
+  Does ${other_parties[0].name_full()} have another phone number or email address?
 fields:
   - no label: other_parties[0].bonus_contact_info
     datatype: yesnoradio
 ---
 id: stalker alt email phone
 question: |
-  What is ${other_parties[0].name.full(middle='full')}'s additional contact information?
+  What is ${other_parties[0].name_full()}'s additional contact information?
 fields:
   - Phone number: other_parties[0].alt_phone
     datatype: al_international_phone
@@ -1575,14 +1575,14 @@ fields:
 ---
 id: stalker address known
 question: |
-  Do you know ${other_parties[0].name.full(middle='full')}'s current home address?
+  Do you know ${other_parties[0].name_full()}'s current home address?
 fields:
   - no label: other_parties[0].address_known
     datatype: yesnoradio
 ---
 id: stalker last known address
 question: |
-  Do you know ${other_parties[0].name.full(middle="full")}'s last known address?
+  Do you know ${other_parties[0].name_full()}'s last known address?
 fields:
   - no label: other_parties[0].last_address_known
     datatype: yesnoradio
@@ -1592,16 +1592,16 @@ continue button field: unknown_address_note
 question: |
   Note about the unknown address
 subquestion: |
-  If you do not know ${other_parties[0].name.full(middle='full')}'s address, you may still file. However, you may need to show the court that you tried to find their address. 
+  If you do not know ${other_parties[0].name_full()}'s address, you may still file. However, you may need to show the court that you tried to find their address. 
   
-  You can do this by filing a written statement called an “affidavit” telling how you tried to find ${other_parties[0].name.full(middle='full')}'s address. If you need to file one of these, the judge or court clerk should provide it.
+  You can do this by filing a written statement called an “affidavit” telling how you tried to find ${other_parties[0].name_full()}'s address. If you need to file one of these, the judge or court clerk should provide it.
 ---
 id: stalker current address
 question: |
   % if other_parties[0].address_known:
-  What is ${other_parties[0].name.full(middle='full')}'s current home address?
+  What is ${other_parties[0].name_full()}'s current home address?
   % else:
-  What is ${other_parties[0].name.full(middle='full')}'s last known address?
+  What is ${other_parties[0].name_full()}'s last known address?
   % endif
 fields:
   - Street address: other_parties[0].address.address
@@ -1617,7 +1617,7 @@ fields:
 ---
 id: stalker currently employed
 question: |
-  Do you know if ${other_parties[0].name.full(middle='full')} is employed?
+  Do you know if ${other_parties[0].name_full()} is employed?
 fields:
   - no label: other_parties[0].has_job
     datatype: yesnoradio
@@ -1625,9 +1625,9 @@ fields:
 #what if they have more than one employer?
 id: stalker employer
 question: |
-  Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s employer.
+  Enter as much information as you can about ${other_parties[0].name_full()}'s employer.
 subquestion: |
-  If you do not know who ${other_parties[0].name.full(middle='full')}'s employer is, you can leave this blank.
+  If you do not know who ${other_parties[0].name_full()}'s employer is, you can leave this blank.
 fields:
   - Employer name: other_parties[0].employer_name
     required: False
@@ -1658,11 +1658,11 @@ fields:
 ---
 id: respondent caution
 question: |
-  Are there reasons to use caution when approaching ${other_parties[0].name.full(middle="full")}?
+  Are there reasons to use caution when approaching ${other_parties[0].name_full()}?
 subquestion: |
   Check all that apply.
 fields:
-  - ${other_parties[0].name.full(middle="full")}: caution_reasons
+  - ${other_parties[0].name_full()}: caution_reasons
     datatype: checkboxes
     none of the above: True
     required: False
@@ -1693,7 +1693,7 @@ fields:
 ---
 #id: weapons info
 #question: |
-#  What weapons does ${other_parties[0].name.full(middle="full")} have?
+#  What weapons does ${other_parties[0].name_full()} have?
 #subquestion: |
 #  If you do not know, you can leave this blank.
 #fields:
@@ -1705,56 +1705,56 @@ fields:
 ---
 #id: stalker suicide risk
 #question: |
-#  Do you think ${other_parties[0].name.full(middle='full')} is a suicide risk?
+#  Do you think ${other_parties[0].name_full()} is a suicide risk?
 #fields:
 #  - no label: other_parties[0].suicide_risk
 #    datatype: yesnomaybe
 #---
 #id: stalker armed
 #question: |
-#  Do you think ${other_parties[0].name.full(middle='full')} is armed or dangerous to you or others?
+#  Do you think ${other_parties[0].name_full()} is armed or dangerous to you or others?
 #fields:
 #  - no label: other_parties[0].armed
 #    datatype: yesnomaybe
 #---
 #id: stalker mental illness
 #question: |
-#  Does ${other_parties[0].name.full(middle='full')} have a history of mental illness?
+#  Does ${other_parties[0].name_full()} have a history of mental illness?
 #fields:
 #  - no label: other_parties[0].mental_illness
 #    datatype: yesnomaybe
 #---
 #id: stalker alcohol
 #question: |
-#  Is ${other_parties[0].name.full(middle='full')} likely to be drunk or under the influence of alcohol?
+#  Is ${other_parties[0].name_full()} likely to be drunk or under the influence of alcohol?
 #fields:
 #  - no label: other_parties[0].alcohol
 #    datatype: yesnomaybe
 #---
 #id: stalker drugs
 #question: |
-#  Is ${other_parties[0].name.full(middle='full')} likely to be high or under the influence of drugs?
+#  Is ${other_parties[0].name_full()} likely to be high or under the influence of drugs?
 #fields:
 #  - no label: other_parties[0].drugs
 #    datatype: yesnomaybe
 #---
 #id: stalker carrying weapon
 #question: |
-#  Is ${other_parties[0].name.full(middle='full')} likely to be carrying a weapon?
+#  Is ${other_parties[0].name_full()} likely to be carrying a weapon?
 #fields:
 #  - no label: other_parties[0].carrying_weapon
 #    datatype: yesnomaybe
 #---
 #id: stalker home weapon
 #question: |
-#  Does ${other_parties[0].name.full(middle='full')} have weapons at home?
+#  Does ${other_parties[0].name_full()} have weapons at home?
 #fields:
 #  - no label: other_parties[0].home_weapon
 #    datatype: yesnomaybe
 #---
 #id: stalker weapon info
 #question: |
-#  What kind of weapons does ${other_parties[0].name.full(middle='full')} have and where do they keep them?
+#  What kind of weapons does ${other_parties[0].name_full()} have and where do they keep them?
 #subquestion: |
 #  If you do not know, you can leave this blank
 #fields:
@@ -1765,7 +1765,7 @@ fields:
 #The divorce and parentage action questions are for the general DV cover sheet, not SNCO. These can be removed.
 #id: stalker user divorce
 #question: |
-#  Have you and ${other_parties[0].name.full(middle='full')} previously filed a divorce in Cook County?
+#  Have you and ${other_parties[0].name_full()} previously filed a divorce in Cook County?
 #fields:
 #  - no label: other_parties[0].divorced_user
 #    datatype: yesnoradio
@@ -1786,7 +1786,7 @@ fields:
 ---
 #id:   action
 #question: |
-#  Have you and ${other_parties[0].name.full(middle='full')} previously filed a parentage action in Cook County?
+#  Have you and ${other_parties[0].name_full()} previously filed a parentage action in Cook County?
 #fields:
 #  - no label: other_parties[0].parentage_action
 #    datatype: yesnoradio
@@ -1809,14 +1809,14 @@ id: stalker any order of protection
 question: |
   Other Orders of Protection
 subquestion: |
-  Is there now, or has there ever been, an Order of Protection in any state against ${other_parties[0].name.full(middle="full")} involving you or other people you want to protect in this Order?
+  Is there now, or has there ever been, an Order of Protection in any state against ${other_parties[0].name_full()} involving you or other people you want to protect in this Order?
 fields:
   - no label: other_parties[0].order_of_protection
     datatype: yesnomaybe
 ---
 #id: stalker about order of protection
 #question: |
-#  Where was the Order of Protection issued against ${other_parties[0].name.full(middle='full')}?
+#  Where was the Order of Protection issued against ${other_parties[0].name_full()}?
 #subquestion: |
 #  If you do not know, you can leave this blank.
 #fields:
@@ -1884,7 +1884,7 @@ code: |
 ---
 id: service method
 question: |
-  Who do you want to deliver court papers to ${other_parties[0].name.full(middle="full")}?
+  Who do you want to deliver court papers to ${other_parties[0].name_full()}?
 subquestion: |
   This is called service. In Illinois, **Sheriffs usually serve SNCOs.**
   
@@ -1900,10 +1900,10 @@ fields:
 ---
 id: out of state county
 question: |
-  In which county can the sheriff find ${other_parties[0].name.full(middle="full")}?
+  In which county can the sheriff find ${other_parties[0].name_full()}?
 subquestion: |
   % if other_parties[0].which_address != "add_service_address" or other_parties[0].service_address.address != "":
-  You said the sheriff can serve court papers on ${other_parties[0].name.full(middle="full")} at:
+  You said the sheriff can serve court papers on ${other_parties[0].name_full()} at:
   
   % if other_parties[0].which_address == "add_service_address":
   * ${ other_parties[0].service_address.on_one_line(bare=True) }
@@ -1914,11 +1914,11 @@ subquestion: |
   % endif
   % endif
   
-  Enter the county below so the sheriff can find ${other_parties[0].name.full(middle="full")}.
+  Enter the county below so the sheriff can find ${other_parties[0].name_full()}.
   
   ${ collapse_template(county_lookup_help) }
 fields:
-  - County where ${other_parties[0].name.full(middle="full")} can be served: service_county
+  - County where ${other_parties[0].name_full()} can be served: service_county
     maxlength: 40
     required: False
 ---
@@ -1948,19 +1948,19 @@ reconsider: True
 code: |
   service_list = []
   if other_parties[0].address_known:
-    service_list.append( { "home_address": other_parties[0].name.full(middle="full") + "'s home address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
+    service_list.append( { "home_address": other_parties[0].name_full() + "'s home address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
   else:
     if other_parties[0].last_address_known == True:
-      service_list.append( { "home_address": other_parties[0].name.full(middle="full") + "'s last known address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
+      service_list.append( { "home_address": other_parties[0].name_full() + "'s last known address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
   if other_parties[0].has_job and other_parties[0].employer_address.address != "":
-    service_list.append({ "employer_address": other_parties[0].name.full(middle="full")+ "'s work address (" + other_parties[0].employer_address.on_one_line(bare=True) + ")" })
+    service_list.append({ "employer_address": other_parties[0].name_full()+ "'s work address (" + other_parties[0].employer_address.on_one_line(bare=True) + ")" })
   service_list.append({ "add_service_address": "An address I will enter" })
 ---
 id: stalker which address
 question: |
-  Where should court papers be delivered to ${other_parties[0].name.full(middle='full')}?
+  Where should court papers be delivered to ${other_parties[0].name_full()}?
 subquestion: |
-  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for an SNCO without knowing their address, but that may make it harder to get the SNCO.
+  The court will need an address where they can deliver the court forms to ${other_parties[0].name_full()}. If necessary, you could try an Internet search to find one. You can ask for an SNCO without knowing their address, but that may make it harder to get the SNCO.
 fields: 
   - no label: other_parties[0].which_address
     input type: radio
@@ -2009,7 +2009,7 @@ validation code: |
 ---
 id: list bonus service check
 question: |
-  Do you want to list another place where court papers could be delivered to ${other_parties[0].name.full(middle='full')}?
+  Do you want to list another place where court papers could be delivered to ${other_parties[0].name_full()}?
 fields:
   - no label: other_parties[0].bonus_service_check
     datatype: yesnoradio
@@ -2019,17 +2019,17 @@ code: |
   alt_service_list = []
   if other_parties[0].which_address != "home_address":
     if other_parties[0].address_known:
-      alt_service_list.append( { "home_address": other_parties[0].name.full(middle="full") + "'s home address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
+      alt_service_list.append( { "home_address": other_parties[0].name_full() + "'s home address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
     else:
       if other_parties[0].last_address_known == True:
-        alt_service_list.append( { "home_address": other_parties[0].name.full(middle="full") + "'s last known address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
+        alt_service_list.append( { "home_address": other_parties[0].name_full() + "'s last known address (" + other_parties[0].address.on_one_line(bare=True) + ")" })
   if other_parties[0].has_job and other_parties[0].employer_address.address != "" and other_parties[0].which_address != "employer_address":
-    alt_service_list.append({ "employer_address": other_parties[0].name.full(middle="full")+ "'s work address (" + other_parties[0].employer_address.on_one_line(bare=True) + ")" })
+    alt_service_list.append({ "employer_address": other_parties[0].name_full()+ "'s work address (" + other_parties[0].employer_address.on_one_line(bare=True) + ")" })
   alt_service_list.append({ "service_address": "An address I will enter" })
 ---
 id: bonus service address
 question: |
-  Where else can the sheriff go to deliver court papers to ${other_parties[0].name.full(middle='full')}?
+  Where else can the sheriff go to deliver court papers to ${other_parties[0].name_full()}?
 fields: 
   - no label: other_parties[0].which_bonus_address
     input type: radio
@@ -2064,7 +2064,7 @@ continue button field: stalking_event_intro
 question: |
   Reasons for the Stalking No Contact Order
 subquestion: |
-  The following questions will ask about what ${other_parties[0].name.full(middle='full')} did to make you or the people you want to protect afraid or distressed.
+  The following questions will ask about what ${other_parties[0].name_full()} did to make you or the people you want to protect afraid or distressed.
   
   You should be specific. Tell when and where each event happened, and how it affected you.
   
@@ -2082,8 +2082,8 @@ question: |
 subquestion: |
   Try to be specific about:
 
-  * What ${other_parties[0].name.full(middle='full')} did,
-  * What ${other_parties[0].name.full(middle='full')} said,
+  * What ${other_parties[0].name_full()} did,
+  * What ${other_parties[0].name_full()} said,
   * Where the stalking happened,
   * How the stalking happened, such as in person, by phone or text, etc.,
   * Who was there when the stalking happened, and
@@ -2186,11 +2186,11 @@ fields:
 ---
 id: protection requested
 question: |
-  What do you want the court to make ${other_parties[0].name.full(middle='full')} stop doing?
+  What do you want the court to make ${other_parties[0].name_full()} stop doing?
 subquestion: |
   ${collapse_template(stay_away_contact)}
 fields:
-  - I want the court to order ${other_parties[0].name.full(middle='full')} to...: protection_requested
+  - I want the court to order ${other_parties[0].name_full()} to...: protection_requested
     datatype: checkboxes
     none of the above: True
     choices:
@@ -2208,7 +2208,7 @@ content: |
 ---
 id: distance away
 question: |
-  How far should ${other_parties[0].name.full(middle='full')} stay away?
+  How far should ${other_parties[0].name_full()} stay away?
 subquestion: |
   You should enter a distance in feet.
 
@@ -2222,9 +2222,9 @@ fields:
 ---
 id: protected place types
 question: |
-  What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What kinds of places do you want ${other_parties[0].name_full()} to stay away from?
 subquestion: |
-  **Caution:** You must tell ${other_parties[0].name.full(middle='full')} the address of any place you want them to stay away from. If you do not want ${other_parties[0].name.full(middle='full')} to know an address, you should not pick that location.
+  **Caution:** You must tell ${other_parties[0].name_full()} the address of any place you want them to stay away from. If you do not want ${other_parties[0].name_full()} to know an address, you should not pick that location.
 fields:
   - no label: protected_place_types
     datatype: checkboxes
@@ -2242,9 +2242,9 @@ question: |
 subquestion: |
   You answered earlier that you want to hide your real address.
   
-  If you do not want ${other_parties[0].name.full(middle='full')} to know your home address, do not list it here. You may want to click **Back** and not include your home as a protected place.
+  If you do not want ${other_parties[0].name_full()} to know your home address, do not list it here. You may want to click **Back** and not include your home as a protected place.
   
-  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+  The address entered here will be printed on a form telling ${other_parties[0].name_full()} where they cannot go.
 fields:
   - Street address: home_address.address
     address autocomplete: True
@@ -2259,13 +2259,13 @@ fields:
 ---
 id: other places
 question: |
-  What other places do you want the court to order ${other_parties[0].name.full(middle='full')} to stay away from?
+  What other places do you want the court to order ${other_parties[0].name_full()} to stay away from?
 subquestion: |
   For example, you could name a store you go to regularly.
   
-  Include any addresses if you know them. If you do not want ${other_parties[0].name.full(middle='full')} to know the addresses, do not list them here.
+  Include any addresses if you know them. If you do not want ${other_parties[0].name_full()} to know the addresses, do not list them here.
   
-  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+  The address entered here will be printed on a form telling ${other_parties[0].name_full()} where they cannot go.
 fields:
   - Name or type of place, and address (if known): other_places
     maxlength: |
@@ -2279,11 +2279,11 @@ fields:
 ---
 id: workplace name workplace address
 question: |
-  What is the name and address of the workplace you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the workplace you want ${other_parties[0].name_full()} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this work address, do not list it here. You may want to click **Back** and not include a workplace as a protected place.
+  If you do not want ${other_parties[0].name_full()} to know this work address, do not list it here. You may want to click **Back** and not include a workplace as a protected place.
   
-  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+  The address entered here will be printed on a form telling ${other_parties[0].name_full()} where they cannot go.
 fields:
   - Workplace name: protected_workplace.name.first
     maxlength: 25
@@ -2300,11 +2300,11 @@ fields:
 ---
 id: school name school address
 question: |
-  What is the name and address of the school you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the school you want ${other_parties[0].name_full()} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this school address, do not list it here. You may want to click **Back** and not include a school as a protected place.
+  If you do not want ${other_parties[0].name_full()} to know this school address, do not list it here. You may want to click **Back** and not include a school as a protected place.
   
-  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+  The address entered here will be printed on a form telling ${other_parties[0].name_full()} where they cannot go.
 fields:
   - School name: protected_school.name.first
     maxlength: 30
@@ -2321,11 +2321,11 @@ fields:
 ---
 id: day care name day care address
 question: |
-  What is the name and address of the daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the daycare you want ${other_parties[0].name_full()} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this daycare address, do not list it here. You may want to click **Back** and not include a daycare as a protected place.
+  If you do not want ${other_parties[0].name_full()} to know this daycare address, do not list it here. You may want to click **Back** and not include a daycare as a protected place.
   
-  The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
+  The address entered here will be printed on a form telling ${other_parties[0].name_full()} where they cannot go.
 fields:
   - Daycare name: protected_day_care.name.first
     maxlength: 30
@@ -2342,23 +2342,23 @@ fields:
 ---
 id: live with stalker
 question: |
-  Does ${other_parties[0].name.full(middle='full')} live at the same address as you?
+  Does ${other_parties[0].name_full()} live at the same address as you?
 subquestion: |
-  If you click **Yes**, your forms will ask to give you exclusive access to your home. This means the court **might** order ${other_parties[0].name.full(middle='full')} to stay away, even temporarily.
+  If you click **Yes**, your forms will ask to give you exclusive access to your home. This means the court **might** order ${other_parties[0].name_full()} to stay away, even temporarily.
 fields:
   - no label: live_with_stalker
     datatype: yesnoradio
 ---
 id: school with stalker
 question: |
-  Do you and ${other_parties[0].name.full(middle='full')} go to the same school?
+  Do you and ${other_parties[0].name_full()} go to the same school?
 fields:
   - no label: school_with_stalker
     datatype: yesnoradio
 ---
 id: which stalker school
 question: |
-  Which school do you and ${other_parties[0].name.full(middle='full')} go to?
+  Which school do you and ${other_parties[0].name_full()} go to?
 field: which_stalker_school
 datatype: checkboxes
 choices:
@@ -2367,14 +2367,14 @@ choices:
 ---
 id: work with stalker
 question: |
-  Do you and ${other_parties[0].name.full(middle='full')} have the same workplace?
+  Do you and ${other_parties[0].name_full()} have the same workplace?
 fields:
   - no label: work_with_stalker
     datatype: yesnoradio
 ---
 id: which stalker work
 question: |
-  Which work place do you and ${other_parties[0].name.full(middle='full')} work at?
+  Which work place do you and ${other_parties[0].name_full()} work at?
 field: which_stalker_work
 datatype: checkboxes
 choices:
@@ -2383,25 +2383,25 @@ choices:
 ---
 id: stalker prohibit firearms
 question: |
-  Do you want the court to stop ${other_parties[0].name.full(middle='full')} from having firearms or a Firearms Owner Identification Card?
+  Do you want the court to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?
 fields:
   - no label: other_parties[0].prohibit_firearms
     datatype: yesnoradio
 ---
 id: stalker pay costs describe costs
 question: |
-    Do you want the court to make ${other_parties[0].name.full(middle='full')} pay your court fees and other costs, if any?
+    Do you want the court to make ${other_parties[0].name_full()} pay your court fees and other costs, if any?
 fields: 
   - no label: other_parties[0].pay_costs
     datatype: yesnoradio
 ---
 id: stalker anything else
 question: |
-  Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?
+  Do you want the court to make ${other_parties[0].name_full()} to do or stop doing anything else?
 fields: 
   - no label: other_parties[0].anything_else
     datatype: yesnoradio
-  - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+  - What do you want ${other_parties[0].name_full()} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: |
       % if trial_court_index == -1:
@@ -2426,13 +2426,13 @@ buttons:
 ---
 id: additional service information cook
 question: |
-  What other information will help the sheriff deliver court papers to ${other_parties[0].name.full(middle="full")}?
+  What other information will help the sheriff deliver court papers to ${other_parties[0].name_full()}?
 subquestion: |
   You can add things like:
   
   * Best days and times to serve court papers,
-  * Details about the places where ${other_parties[0].name.full(middle="full")} can be found, and
-  * Information about other people at those locations that can help find ${other_parties[0].name.full(middle="full")}.
+  * Details about the places where ${other_parties[0].name_full()} can be found, and
+  * Information about other people at those locations that can help find ${other_parties[0].name_full()}.
 
   This will not appear on the forms that will be filed with the court. It goes on the Confidential Protective Order Information Sheet for the Sheriff.
 fields:
@@ -2446,7 +2446,7 @@ id: signature
 question: |
   Do you want to add your e-signature to your forms?
 subquestion: |
-  This program can put "**/s/ ${users[0].name.full(middle='full')}**" where you would sign your name. The court will accept this as your signature.
+  This program can put "**/s/ ${users[0].name_full()}**" where you would sign your name. The court will accept this as your signature.
   
   If you do not add your **{e-signature}** now, you must sign your forms before you file them.
   
@@ -2675,8 +2675,8 @@ attachment:
   editable: False
   pdf template file: cook_dv_cover_sheet.pdf
   fields:
-    - "petitioner__1": ${ users[0].name.full(middle="full") }
-    - "respondent": ${other_parties[0].name.full(middle="full")}
+    - "petitioner__1": ${ users[0].name_full() }
+    - "respondent": ${other_parties[0].name_full()}
     - "case_number__1": ${ case_number }
     - "stalking_petition": ${ True }
 
@@ -2713,7 +2713,7 @@ attachment:
         ${''} 
         % endif
     - "pro_se_cb": ${ True }
-    - "petitioner__2": ${ users[0].name.full(middle="full") }
+    - "petitioner__2": ${ users[0].name_full() }
     - "preparer_address_line_1": ${ users[0].address.line_one(bare=True) }
     - "petitioner_city": ${ users[0].address.city }
     - "petitioner_state": ${ users[0].address.state }
@@ -2729,7 +2729,7 @@ attachment:
   editable: False
   pdf template file: cook_sheriff_info_sheet.pdf
   fields:
-    - "respondent": ${other_parties[0].name.full(middle="full")}
+    - "respondent": ${other_parties[0].name_full()}
     #- "case_number__1": ${ "" }
     - "alias_names": ${ other_parties[0].alias_names if other_parties[0].has_alias else ""}
     - "respondent_race": ${ respondent_race_other if other_parties[0].race == 'Other' else other_parties[0].race }
@@ -2876,7 +2876,7 @@ attachment:
     - "cook_vehicle_plate": ${ other_parties[0].license_plate }
     - "cook_vehicle_state": ${ state_name(other_parties[0].vehicle_state) }
 
-    - "preparer_name": ${ users[0].name.full(middle="full") }
+    - "preparer_name": ${ users[0].name_full() }
     - "preparer_phone": ${ phone_number_formatted(users[0].phone_number) }
 ---
 attachment:
@@ -2888,12 +2888,12 @@ attachment:
   pdf template file: efiling_exemption.pdf
   fields:
     - "county": ${trial_court.address.county}
-    - "petitioner__1": ${ users[0].name.full(middle="full") }
-    - "respondent": ${other_parties[0].name.full(middle="full")}
+    - "petitioner__1": ${ users[0].name_full() }
+    - "respondent": ${other_parties[0].name_full()}
     - "case_number__1": ${ case_number }
     - "reason_dv": ${ True }
-    - "e_signature": ${ users[0].name.full(middle="full") if e_signature else '' }
-    - "petitioner__2": ${ users[0].name.full(middle="full") }
+    - "e_signature": ${ users[0].name_full() if e_signature else '' }
+    - "petitioner__2": ${ users[0].name_full() }
     - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
     - "user_phone_number": ${ phone_number_formatted(users[0].phone_number) }
     - "user_email": ${ users[0].email if users[0].has_email_address else ""}
@@ -2906,12 +2906,12 @@ attachment:
   editable: False
   pdf template file: cook_snco_order.pdf
   fields:
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_name": ${users[0].name_full()}
     - "additional_protected": |
         % if protect_whom["minor"] or protect_whom["adult"]:
         ${comma_and_list(others_protected)}
         % endif
-    - "respondent": ${other_parties[0].name.full(middle='full')}
+    - "respondent": ${other_parties[0].name_full()}
     - "case_number": ${""}
     - "respondent_birth_date": ${year_of(other_parties[0].birthdate)}
     - "independent": ${False}
@@ -2919,7 +2919,7 @@ attachment:
     - "juvenile": ${False}
     - "emergency": ${True}
     - "plenary": ${False}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name": ${users[0].name_full()}
     - "safe_address": ${hide_address}
     - "petitioner_address_line_one": ${"" if hide_address else users[0].address.line_one(bare=True)}
     - "petitioner_address_line_two": ${"" if hide_address else users[0].address.line_two()}
@@ -2944,14 +2944,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif 
     - "minor_children": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
@@ -2962,14 +2962,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif 
         % endif
@@ -3017,12 +3017,12 @@ attachment:
   editable: False
   pdf template file: cook_snco_order.pdf
   fields:
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_name": ${users[0].name_full()}
     - "additional_protected": |
         % if protect_whom["minor"] or protect_whom["adult"]:
         ${comma_and_list(others_protected)}
         % endif
-    - "respondent": ${other_parties[0].name.full(middle='full')}
+    - "respondent": ${other_parties[0].name_full()}
     - "case_number": ${""}
     #- "respondent_birth": ${other_parties[0].birthdate.format_date('YYYY')}
     - "respondent_birth_date": ${year_of(other_parties[0].birthdate)}
@@ -3031,7 +3031,7 @@ attachment:
     - "juvenile": ${False}
     - "emergency": ${False}
     - "plenary": ${True}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name": ${users[0].name_full()}
     - "safe_address": ${hide_address}
     - "petitioner_address_line_one": ${"" if hide_address else users[0].address.line_one(bare=True)}
     - "petitioner_address_line_two": ${"" if hide_address else users[0].address.line_two()}
@@ -3056,14 +3056,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif 
     - "minor_children": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
@@ -3074,14 +3074,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif 
         % endif
@@ -3131,7 +3131,7 @@ attachment:
   fields:
     #What are these "on behalf of" fields in the template for?
     - "people_ex_rel": ${""}
-    - "on_behalf_of": ${users[0].name.full(middle='full')}
+    - "on_behalf_of": ${users[0].name_full()}
     - "self_name": ${""}
     - "behalf_petitioner": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
@@ -3139,7 +3139,7 @@ attachment:
         ${comma_and_list(others_protected)}
         % endif
         % endif
-    - "respondent": ${other_parties[0].name.full(middle='full')}
+    - "respondent": ${other_parties[0].name_full()}
     #Can the case number be known?
     - "case_number": ${""}
     - "respondent_birth": ${other_parties[0].birthdate}
@@ -3149,7 +3149,7 @@ attachment:
     - "juvenile": ${False}
     - "emergency_check": ${order_type['emergency']}
     - "plenary_check": ${order_type['plenary']}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name": ${users[0].name_full()}
     #These child name and adult name variables seem to be distinct from the others protected list. How should they be populated?
     - "child_name": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "adult_name": ${adult_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
@@ -3158,7 +3158,7 @@ attachment:
     - "petitioner_city": ${users[0].address.city}
     - "petitioner_state": ${ users[0].address.state}
     - "petitioner_zip": ${users[0].address.zip}
-    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name_full()}
     - "respondent_address_line_one": ${other_parties[0].address.line_one(bare=True)}
     - "respondent_city": ${other_parties[0].address.city}
     - "respondent_state": ${ other_parties[0].address.state}
@@ -3216,14 +3216,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif
     - "no_stalking": ${protection_requested['stalking']}
@@ -3233,14 +3233,14 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
         ${comma_and_list(others_protected)}
         % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${comma_and_list(others_protected)}
+        ${users[0].name_full()} and ${comma_and_list(others_protected)}
         % elif others_protected.number_gathered() == 0:
-        ${users[0].name.full(middle='full')}
+        ${users[0].name_full()}
         % else:
-        ${users[0].name.full(middle='full')}, ${comma_and_list(others_protected)}
+        ${users[0].name_full()}, ${comma_and_list(others_protected)}
         % endif
         % endif
         % endif
@@ -3267,8 +3267,8 @@ attachment:
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
     - "pay_costs_check": ${other_parties[0].pay_costs}
-    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "e_signature": ${ "/s/ " + users[0].name_full() if e_signature else ""}
+    - "user_name": ${users[0].name_full()}
     - "user_address_line_one": ${ users[0].address.line_one(bare=True)}
     - "user_city": ${ users[0].address.city}
     - "user_state": ${ users[0].address.state}
@@ -3288,7 +3288,7 @@ attachment:
   fields:
     - "circuit_court": ${court_circuit.upper()}
     - "filing_county": ${trial_court.address.county.upper()}
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_name": ${users[0].name_full()}
     - "others_protected": ${comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
@@ -3297,11 +3297,11 @@ attachment:
         % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 0:
         ${ comma_and_list(others_protected)}
         % endif
-    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "stalker_name": ${ other_parties[0].name_full()}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_1": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address and others_protected[0].use_safe_address:
@@ -3310,7 +3310,7 @@ attachment:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address and others_protected[0].use_safe_address:
@@ -3319,7 +3319,7 @@ attachment:
         ${others_protected[1].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name_full()}
     - "respondent_home_check": ${other_parties[0].last_address_known if other_parties[0].address_known == False else other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "stalker_birth": |
@@ -3388,8 +3388,8 @@ attachment:
     - "no_firearms": ${other_parties[0].prohibit_firearms}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
-    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "e_signature": ${ "/s/ " + users[0].name_full() if e_signature else ""}
+    - "petitioner_name": ${users[0].name_full()}
     - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True)}
     - "petitioner_address_line_2": ${ users[0].address.line_two()}
     - "petitioner_phone": ${ phone_number_formatted(users[0].phone_number)}
@@ -3415,16 +3415,16 @@ attachment:
     - "filing_county": ${trial_court.address.county.upper()}
     - "emergency_type": ${True}
     - "plenary_type": ${False}
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_name": ${users[0].name_full()}
     - "others_protected": ${comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "behalf_of_names": ${ comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
-    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "stalker_name": ${ other_parties[0].name_full()}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_1": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address:
@@ -3435,7 +3435,7 @@ attachment:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address:
@@ -3446,7 +3446,7 @@ attachment:
         ${others_protected[1].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name_full()}
     - "respondent_home_check": ${other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "stalker_birth": ${other_parties[0].birthdate}
@@ -3530,16 +3530,16 @@ attachment:
     - "filing_county": ${trial_court.address.county.upper()}
     - "emergency_type": ${False}
     - "plenary_type": ${True}
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "user_name": ${users[0].name_full()}
     - "others_protected": ${comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "behalf_of_names": ${ comma_and_list(others_protected) if (protect_whom["minor"] or protect_whom["adult"]) else ""}
-    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+    - "stalker_name": ${ other_parties[0].name_full()}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_1": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address:
@@ -3550,7 +3550,7 @@ attachment:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name_full() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
         % if hide_address:
@@ -3561,7 +3561,7 @@ attachment:
         ${others_protected[1].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "respondent_name": ${other_parties[0].name.full(middle='full')}
+    - "respondent_name": ${other_parties[0].name_full()}
     - "respondent_home_check": ${other_parties[0].address_known}
     - "respondent_home_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "stalker_birth": ${other_parties[0].birthdate}
@@ -3643,17 +3643,17 @@ attachment:
 #  fields:
 #    - "circuit_court": ${court_circuit}
 #    - "filing_county": ${trial_court.address.county}
-#    - "user_name": ${users[0].name.full(middle='full')}
+#    - "user_name": ${users[0].name_full()}
 #    - "protect_a_minor": ${any_minors}
 #    - "protect_an_adult": ${any_adults}
 #    - "others_protected": ${ comma_and_list(others_protected)}
 #    - "behalf_of_names": ${ comma_and_list(others_protected)}
-#    - "stalker_name": ${ other_parties[0].name.full(middle='full')}
+#    - "stalker_name": ${ other_parties[0].name_full()}
 #    - "main_service_address": ${other_parties[0].service_address.on_one_line(bare=True)}
 #    - "independent": ${False}
 #    - "criminal": ${False}
 #    - "juvenile": ${False}
-#    - "petitioner_name": ${users[0].name.full(middle='full')}
+#    - "petitioner_name": ${users[0].name_full()}
 #    - "petitioner_phone": ${ phone_number_formatted(users[0].phone_number) }
 #    - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True) }
 #    - "petitioner_address_line_2": ${ users[0].address.line_two() }
@@ -3668,15 +3668,15 @@ attachment:
   fields:
     - "county__1": ${ trial_court.address.county.upper() }
     - "county__2": ${ trial_court.address.county.upper() }
-    - "petitioner__1": ${ users[0].name.full(middle="full") }
-    - "petitioner__2": ${ users[0].name.full(middle="full") }
-    - "petitioner__3": ${ users[0].name.full(middle="full") }
-    - "respondent__1": ${other_parties[0].name.full(middle="full")}
-    - "respondent__4": ${other_parties[0].name.full(middle="full")}
+    - "petitioner__1": ${ users[0].name_full() }
+    - "petitioner__2": ${ users[0].name_full() }
+    - "petitioner__3": ${ users[0].name_full() }
+    - "respondent__1": ${other_parties[0].name_full()}
+    - "respondent__4": ${other_parties[0].name_full()}
     - "case_number__1": ${ case_number }
     - "case_number__2": ${ case_number }
     - "case_number__3": ${ case_number }
-    - "respondent__2": ${other_parties[0].name.full(middle="full")}
+    - "respondent__2": ${other_parties[0].name_full()}
     - "service_address_line_1": |
         % if other_parties[0].which_address == "add_service_address":
         ${other_parties[0].service_address.line_one(bare=True)}
@@ -3695,7 +3695,7 @@ attachment:
         % endif
     - "respondent_phone": ${phone_number_formatted(other_parties[0].mobile_number) if trial_court_index == -1 and other_parties[0].phone_number == "" else phone_number_formatted(other_parties[0].phone_number)}
     - "respondent_email": ${ other_parties[0].email_address }
-    - "respondent__3": ${other_parties[0].name.full(middle="full") if other_parties[0].bonus_service_check == True else ""}
+    - "respondent__3": ${other_parties[0].name_full() if other_parties[0].bonus_service_check == True else ""}
     - "service_alt_address_line_1": |
         % if other_parties[0].bonus_service_check:
         % if other_parties[0].which_bonus_address == "home_address":
@@ -3766,7 +3766,7 @@ review:
   - Edit: users[0].name.first
     button: |
       **Your name:**
-      ${users[0].name.full(middle='full')}
+      ${users[0].name_full()}
   - Edit: users[0].phone_number
     button: |
       **Your safe phone number:**
@@ -3783,7 +3783,7 @@ review:
   - Edit: other_parties[0].name.first
     button: |  
       **Stalker's name:**
-      ${other_parties[0].name.full(middle='full')}
+      ${other_parties[0].name_full()}
   - Edit: hide_address
     button: |
       **Do you want to keep your home address hidden?**
@@ -3840,7 +3840,7 @@ review:
       **Others to protect: (Edit to change names, addresses, and other information)**
 
       % for my_var in others_protected:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
     show if: (protect_whom["minor"] or protect_whom["adult"])
 ---
@@ -3857,7 +3857,7 @@ table: others_protected.table
 rows: others_protected
 columns:
   - Name: |
-      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+      row_item.name_full() if defined("row_item.name.first") else ""
   - Address, birth date, additional information: |
       action_button_html(url_action(row_item.attr_name("others_protected_info")), label="Edit", icon="pencil-alt")
 delete buttons: True
@@ -3867,33 +3867,33 @@ id: other protected info review screen
 continue button field: x.others_protected_info
 generic object: ALIndividual
 question: |
-  Edit ${ x.name.full(middle="full") }'s information
+  Edit ${ x.name_full() }'s information
 review: 
   - Edit: x.name.first
     button: |
       **Name of person to protect:**
-      ${x.name.full(middle='full')}
+      ${x.name_full()}
   - Edit: x.birthdate
     button: |
-      **${x.name.full(middle='full')}'s birth date:**
+      **${x.name_full()}'s birth date:**
       ${x.birthdate}
   - Edit: x.is_survivor
     button: |
-      **Was ${x.name.full(middle='full')} stalked?**
+      **Was ${x.name_full()} stalked?**
       ${word(yesno(x.is_survivor))}
   - Edit: x.protection_reason
     button: |
-      **Why are you including ${x.name.full(middle='full')} in the Stalking No Contact Order?**
+      **Why are you including ${x.name_full()} in the Stalking No Contact Order?**
       ${x.protection_reason}
     show if: trial_court.address.county.lower() == "cook" and not x.is_survivor
   - Edit: x.use_safe_address
     button: |
-      **Do you want to use the safe mailing address for ${x.name.full(middle='full')}?**
+      **Do you want to use the safe mailing address for ${x.name_full()}?**
       ${word(yesno(x.use_safe_address))}
     show if: hide_address
   - Edit: x.address.address
     button: |
-      **${x.name.full(middle='full')}'s address:**
+      **${x.name_full()}'s address:**
       ${x.address.on_one_line(bare=True)}
     show if: not hide_address or not x.use_safe_address
 ---
@@ -3908,10 +3908,10 @@ review:
   - Edit: other_parties[0].name.first
     button: |  
       **Stalker's name:**
-      ${other_parties[0].name.full(middle='full')}
+      ${other_parties[0].name_full()}
   - Edit: other_parties[0].state_gender
     button: |
-      **${other_parties[0].name.full(middle='full')}'s gender:**
+      **${other_parties[0].name_full()}'s gender:**
       % if other_parties[0].state_gender == "Other":
       ${other_parties[0].state_other_gender}
       % else:
@@ -3920,7 +3920,7 @@ review:
     show if: trial_court_index != -1
   - Edit: other_parties[0].cook_sex
     button: |
-      **${other_parties[0].name.full(middle='full')}'s sex:**
+      **${other_parties[0].name_full()}'s sex:**
       % if other_parties[0].cook_sex == "other":
       ${other_parties[0].cook_sex_other}
       % else:
@@ -3929,12 +3929,12 @@ review:
     show if: trial_court_index == -1
   - Edit: other_parties[0].respondent_sex_at_birth
     button: |
-      **${other_parties[0].name.full(middle='full')}'s sex assigned at birth:**
+      **${other_parties[0].name_full()}'s sex assigned at birth:**
       *${respondent_sex_at_birth}
     show if: trial_court_index == -1
   - Edit: other_parties[0].cook_gender
     button: |
-      **${other_parties[0].name.full(middle='full')}'s gender identity:**
+      **${other_parties[0].name_full()}'s gender identity:**
       
       % if other_parties[0].cook_gender["male"]:
       * Male
@@ -3957,7 +3957,7 @@ review:
     show if: trial_court_index == -1
   - Edit: other_parties[0].race
     button: |
-      **${other_parties[0].name.full(middle='full')}'s race:**
+      **${other_parties[0].name_full()}'s race:**
       % if other_parties[0].race == "Other":
       ${respondent_race_other}
       % else:
@@ -3965,7 +3965,7 @@ review:
       % endif
   - Edit: other_parties[0].skin
     button: |
-      **${other_parties[0].name.full(middle='full')}'s skin tone:**
+      **${other_parties[0].name_full()}'s skin tone:**
       % if other_parties[0].skin_tone == "Other":
       ${respondent_skin_other}
       % else:
@@ -3974,18 +3974,18 @@ review:
   - Edit: other_parties[0].has_alias
     button: |
       % if other_parties[0].has_alias:
-      **${other_parties[0].name.full(middle='full')} other names:**
+      **${other_parties[0].name_full()} other names:**
       ${other_parties[0].alias_names}
       % elif other_parties[0].has_alias is None:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      **Has ${other_parties[0].name_full()} gone by any other names?**
       I don't know
       % else:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      **Has ${other_parties[0].name_full()} gone by any other names?**
       No
       % endif
   - Edit: other_parties[0].ssn
     button: |
-      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
+      **The last 4 digits of ${other_parties[0].name_full()}'s Social Security Number:**
       % if other_parties[0].ssn == "":
       I don't know
       % else:
@@ -3993,7 +3993,7 @@ review:
       % endif
   - Edit: knows_respondent_dob
     button: |
-      **${other_parties[0].name.full(middle='full')}'s birth date:**
+      **${other_parties[0].name_full()}'s birth date:**
       % if knows_respondent_dob == "exact":
       ${other_parties[0].birthdate}
       % elif knows_respondent_dob == "some":
@@ -4003,7 +4003,7 @@ review:
       % endif
   - Edit: other_parties[0].weight
     button: |
-      **${other_parties[0].name.full(middle='full')}'s height and weight:**
+      **${other_parties[0].name_full()}'s height and weight:**
       % if other_parties[0].height_feet != "" and other_parties[0].height_inches != "":
       % if other_parties[0].weight != "":
       ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties.weight} pounds
@@ -4019,19 +4019,19 @@ review:
       % endif
   - Edit: other_parties[0].eyes
     button: |
-      **${other_parties[0].name.full(middle='full')}'s eye color:**
+      **${other_parties[0].name_full()}'s eye color:**
       ${other_parties[0].eyes}
   - Edit: other_parties[0].glasses
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} wear glasses?**
+      **Does ${other_parties[0].name_full()} wear glasses?**
       ${other_parties[0].glasses}
   - Edit: other_parties[0].hair
     button: |
-      **${other_parties[0].name.full(middle='full')}'s hair color:**
+      **${other_parties[0].name_full()}'s hair color:**
       ${other_parties[0].hair}
   - Edit: other_parties[0].features
     button: |
-      **${other_parties[0].name.full(middle='full')}'s notable features:**
+      **${other_parties[0].name_full()}'s notable features:**
       % if other_parties[0].features == "":
       I don't know
       % else:
@@ -4039,7 +4039,7 @@ review:
       % endif
   - Edit: other_parties[0].drivers_license
     button: |
-      **${other_parties[0].name.full(middle='full')}'s driver's license number:**
+      **${other_parties[0].name_full()}'s driver's license number:**
       % if other_parties[0].drivers_license == "":
       I don't know
       % else:
@@ -4047,11 +4047,11 @@ review:
       % endif
   - Edit: other_parties[0].has_vehicle
     button: |  
-      **Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?**
+      **Does ${other_parties[0].name_full()} have access to a vehicle?**
       ${word(yesno(other_parties[0].has_vehicle))}
   - Edit: other_parties[0].license_plate
     button: |
-      **${other_parties[0].name.full(middle='full')}'s vehicle information:**
+      **${other_parties[0].name_full()}'s vehicle information:**
       
       % if other_parties[0].vehicle_year == "":
       * Year: I don't know
@@ -4086,16 +4086,16 @@ review:
     show if: other_parties[0].has_vehicle
   - Edit: other_parties[0].another_number_check
     button: |
-      **Do you know another number that can identify ${other_parties[0].name.full(middle='full')}?**
+      **Do you know another number that can identify ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].another_number_check))}
   - Edit: other_parties[0].another_number
     button: |
-      **${other_parties[0].name.full(middle='full')} other identifying number:**
+      **${other_parties[0].name_full()} other identifying number:**
       ${other_parties[0].another_number}, ${other_parties[0].another_number_description}
     show if: other_parties[0].another_number_check
   - Edit: other_parties[0].phone_number
     button: |
-      **${other_parties[0].name.full(middle="full")}'s home phone number:**
+      **${other_parties[0].name_full()}'s home phone number:**
       % if other_parties[0].phone_number != "":
       ${ phone_number_formatted(other_parties[0].phone_number) }      
       % else:
@@ -4103,7 +4103,7 @@ review:
       % endif
   - Edit: other_parties[0].mobile_number
     button: |
-      **${other_parties[0].name.full(middle="full")}'s cell number:**
+      **${other_parties[0].name_full()}'s cell number:**
       % if other_parties[0].mobile_number != "":
       ${ phone_number_formatted(other_parties[0].mobile_number) }      
       % else:
@@ -4111,7 +4111,7 @@ review:
       % endif    
   - Edit: other_parties[0].email_address
     button: |
-      **${other_parties[0].name.full(middle='full')}'s email address:**
+      **${other_parties[0].name_full()}'s email address:**
       % if other_parties[0].email_address == "":
       I don't know
       % else:
@@ -4119,12 +4119,12 @@ review:
       % endif
   - Edit: other_parties[0].bonus_contact_info
     button: |
-      **Do you want to include additional contact information  for ${other_parties[0].name.full(middle='full')}?**
+      **Do you want to include additional contact information  for ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].bonus_contact_info))}
     show if: other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != ""
   - Edit: other_parties[0].alt_email
     button: |
-      **${other_parties[0].name.full(middle='full')}'s additional contact information:**
+      **${other_parties[0].name_full()}'s additional contact information:**
       
       % if other_parties[0].alt_email != "":
       * Email: ${other_parties[0].alt_email}
@@ -4135,41 +4135,41 @@ review:
     show if: (other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != "") and other_parties[0].bonus_contact_info
   - Edit: respondent_on_social_media
     button: |
-      **Is ${other_parties[0].name.full(middle="full")} active on social media?**
+      **Is ${other_parties[0].name_full()} active on social media?**
       ${ respondent_on_social_media }      
   - Edit: respondent_social_media_accounts
     button: |
-      **${other_parties[0].name.full(middle="full")}'s social media accounts:**
+      **${other_parties[0].name_full()}'s social media accounts:**
       ${ respondent_social_media_accounts }
     show if: respondent_on_social_media == 'Yes'
 
   - Edit: other_parties[0].address_known
     button: | 
-      **Do you know ${other_parties[0].name.full(middle='full')}'s current home address?**
+      **Do you know ${other_parties[0].name_full()}'s current home address?**
       ${word(yesno(other_parties[0].address_known))}
   - Edit: other_parties[0].last_address_known
     button: |
-      **Do you know ${other_parties[0].name.full(middle='full')}'s last known address?**
+      **Do you know ${other_parties[0].name_full()}'s last known address?**
       ${word(yesno(other_parties[0].last_address_known))}
     show if: other_parties[0].address_known == False
   - Edit: other_parties[0].address.address
     button: |
       % if other_parties[0].address_known:
-      **${other_parties[0].name.full(middle='full')}'s current home address:**
+      **${other_parties[0].name_full()}'s current home address:**
       % elif other_parties[0].last_address_known:
-      **${other_parties[0].name.full(middle='full')}'s last known address:**
+      **${other_parties[0].name_full()}'s last known address:**
       % else:
-      **${other_parties[0].name.full(middle='full')}'s address:**
+      **${other_parties[0].name_full()}'s address:**
       % endif
       ${other_parties[0].address.on_one_line(bare=True)}
     show if: other_parties[0].address_known or other_parties[0].last_address_known
   - Edit: other_parties[0].has_job
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} have a job?**
+      **Does ${other_parties[0].name_full()} have a job?**
       ${word(yesno(other_parties[0].has_job))}
   - Edit: other_parties[0].employer_name
     button: |
-      **${other_parties[0].name.full(middle='full')}'s job information:**
+      **${other_parties[0].name_full()}'s job information:**
       
       * Employer name: ${showifdef('other_parties[0].employer_name')}
       * Occupation: ${showifdef('respondent_work_type')}
@@ -4179,7 +4179,7 @@ review:
   - Edit: caution_reasons
     button: |
         % if caution_reasons.any_true():
-        **${other_parties[0].name.full(middle='full')} should be approached with caution because...**
+        **${other_parties[0].name_full()} should be approached with caution because...**
         
         % if caution_reasons['illness']:
         * They have a history of mental illness.
@@ -4200,11 +4200,11 @@ review:
         * They have weapons in their home.
         % endif
         % else:
-        **${other_parties[0].name.full(middle='full')} does not need to be approached with caution.**
+        **${other_parties[0].name_full()} does not need to be approached with caution.**
         % endif
   - Edit: other_parties[0].weapons_info
     button: |
-      **What weapons does ${other_parties[0].name.full(middle='full')} have?**
+      **What weapons does ${other_parties[0].name_full()} have?**
       % if other_parties[0].weapons_info == "":
       I don't know
       % else:
@@ -4213,7 +4213,7 @@ review:
     show if: trial_court_index == -1 and (caution_reasons['armed'] or caution_reasons['home'])
   - Edit: other_parties[0].divorced_user
     button: |
-      **Are you and ${other_parties[0].name.full(middle='full')} divorced?**
+      **Are you and ${other_parties[0].name_full()} divorced?**
       ${word(yesno(other_parties[0].divorced_user))}
   - Edit: other_parties[0].divorce_date
     button: |
@@ -4225,7 +4225,7 @@ review:
     show if: other_parties[0].divorced_user
   - Edit: other_parties[0].parentage_action
     button: |
-      **Have you and ${other_parties[0].name.full(middle='full')} filed a parentage action?**
+      **Have you and ${other_parties[0].name_full()} filed a parentage action?**
       ${word(yesno(other_parties[0].parentage_action))}
   - Edit: other_parties[0].parentage_date
     button: |
@@ -4237,7 +4237,7 @@ review:
     show if: other_parties[0].parentage_action
   - Edit: other_parties[0].order_of_protection
     button: |
-      **Is there an Order of Protection against ${other_parties[0].name.full(middle='full')}?**
+      **Is there an Order of Protection against ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].order_of_protection))}
   - Edit: other_parties[0].op_state
     button: |
@@ -4257,7 +4257,7 @@ review:
     show if: other_parties[0].order_of_protection
   - Edit: respondent_on_probation
     button: |
-      **Is ${other_parties[0].name.full(middle="full")} on probation?**
+      **Is ${other_parties[0].name_full()} on probation?**
       % if respondent_on_probation == "idk":
       I don't know
       % elif respondent_on_probation == "Yes":
@@ -4364,7 +4364,7 @@ review:
     show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to stop doing?**
+      **What do you want ${other_parties[0].name_full()} to stop doing?**
       
       % if protection_requested['stalking']:
       * Stop stalking and threatening me, my family and household members, and stop enlisting other people to stalk or threaten
@@ -4377,12 +4377,12 @@ review:
       % endif
   - Edit: distance_away
     button: |
-      **How far should ${other_parties[0].name.full(middle='full')} stay away?**
+      **How far should ${other_parties[0].name_full()} stay away?**
       ${distance_away} feet
     show if: protection_requested['away']
   - Edit: protected_place_types
     button: |
-      **What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What kinds of places do you want ${other_parties[0].name_full()} to stay away from?**
       
       % if protected_place_types['Home']:
       * Home
@@ -4420,70 +4420,70 @@ review:
   #  show if: protection_requested['away'] and (protected_place_types['Workplace'] or protected_place_types['School'] or protected_place_types['day_care'])
   - Edit: protected_workplace.name.first
     button: |
-      **The workplace ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The workplace ${other_parties[0].name_full()} should stay away from:**
       ${protected_workplace.name.first}, ${protected_workplace.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['Workplace']
   - Edit: protected_school.name.first
     button: |
-      **The school ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The school ${other_parties[0].name_full()} should stay away from:**
       ${protected_school.name.first}, ${protected_school.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['School']
   - Edit: protected_day_care.name.first
     button: |
-      **The daycare ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The daycare ${other_parties[0].name_full()} should stay away from:**
       ${protected_day_care.name.first}, ${protected_day_care.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['day_care']
   - Edit: other_places
     button: |
-      **What other places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What other places do you want ${other_parties[0].name_full()} to stay away from?**
       ${other_places}
     show if: protection_requested['away'] and protected_place_types['Other']
   - Edit: live_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} live with you?**
+      **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: school_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} go to the same school as you?**
+      **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   #- Edit: which_stalker_school
   #  button: |
-  #    **Which school do you and ${other_parties[0].name.full(middle='full')} go to?**
+  #    **Which school do you and ${other_parties[0].name_full()} go to?**
   #    ${which_stalker_school}
   #  show if: trial_court.address.county.lower() == "cook" and school_list.number_gathered() > 1
   - Edit: work_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} work at the same place as you?**
+      **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   #- Edit: which_stalker_work
   #  button: |
-  #    **Where do you and ${other_parties[0].name.full(middle='full')} both work?**
+  #    **Where do you and ${other_parties[0].name_full()} both work?**
   #    ${which_stalker_work}
   #  show if: trial_court.address.county.lower() == "cook" and work_list.number_gathered() > 1
   - Edit: other_parties[0].prohibit_firearms
     button: |
-      **Do you want to stop ${other_parties[0].name.full(middle='full')} from having firearms or a Firearms Owner Identification Card?**
+      **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
       ${word(yesno(other_parties[0].prohibit_firearms))}
   - Edit: other_parties[0].anything_else
     button: |
-      **Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
+      **Do you want the court to make ${other_parties[0].name_full()} to do or stop doing anything else?**
       ${word(yesno(other_parties[0].anything_else))}
   - Edit: other_parties[0].what_else
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
+      **What do you want ${other_parties[0].name_full()} to do or stop doing?**
       ${other_parties[0].what_else}
     show if: other_parties[0].anything_else
   - Edit: other_parties[0].pay_costs
     button: |
-      **Do you want ${other_parties[0].name.full(middle='full')} to pay any costs?**
+      **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
-      **What costs do you want ${other_parties[0].name.full(middle='full')} to pay**
+      **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
     show if: trial_court.address.county.lower() == "cook" and other_parties[0].pay_costs
 ---
@@ -4580,7 +4580,7 @@ review:
       % endif
   - Edit: service_method
     button: |
-      **How do you want ${other_parties[0].name.full(middle="full")} to be served?**
+      **How do you want ${other_parties[0].name_full()} to be served?**
       % if service_method == "sheriff":
       By the sheriff
       % elif service_method == "sps":
@@ -4592,7 +4592,7 @@ review:
       % endif
   - Edit: other_parties[0].which_address
     button: |
-      **Where can ${other_parties[0].name.full(middle='full')} be found for service?**
+      **Where can ${other_parties[0].name_full()} be found for service?**
       % if other_parties[0].which_address == "home_address":
       ${other_parties[0].address.on_one_line(bare=True)}
       % elif other_parties[0].which_address == "employer_address":
@@ -4602,16 +4602,16 @@ review:
       % endif
   - Edit: service_county
     button: |
-      **County where ${other_parties[0].name.full(middle='full')} can be found:**
+      **County where ${other_parties[0].name_full()} can be found:**
       ${end_in_county(service_county)}
     show if: service_method == "sheriff" and service_state != "IL"
   - Edit: other_parties[0].bonus_service_check
     button: |
-      **Do you want to list another place where ${other_parties[0].name.full(middle='full')} can be found for service?**
+      **Do you want to list another place where ${other_parties[0].name_full()} can be found for service?**
       ${word(yesno(other_parties[0].bonus_service_check))}
   - Edit: other_parties[0].which_bonus_address
     button: |
-      **Where else can ${other_parties[0].name.full(middle='full')} be found for service?**
+      **Where else can ${other_parties[0].name_full()} be found for service?**
       % if other_parties[0].which_bonus_address == "home_address":
       ${other_parties[0].address.on_one_line(bare=True)}
       % elif other_parties[0].which_bonus_address == "employer_address":
@@ -4622,7 +4622,7 @@ review:
     show if: other_parties[0].bonus_service_check
   - Edit: service_information
     button: |
-      **What other information will help serve ${other_parties[0].name.full(middle="full")}?**
+      **What other information will help serve ${other_parties[0].name_full()}?**
       ${service_information}
   - Edit: case_number
     button: |
@@ -4693,7 +4693,7 @@ review:
   - Edit: users[0].name.first
     button: |
       **Your name:**
-      ${users[0].name.full(middle='full')}
+      ${users[0].name_full()}
   - Edit: hide_address
     button: |
       **Do you want to keep your home address hidden?**
@@ -4750,16 +4750,16 @@ review:
       **Others to protect: (Edit to change names, addresses, and other information)**
 
       % for my_var in others_protected:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
     show if: (protect_whom["minor"] or protect_whom["adult"])
   - Edit: other_parties[0].name.first
     button: |  
       **Stalker's name:**
-      ${other_parties[0].name.full(middle='full')}
+      ${other_parties[0].name_full()}
   - Edit: other_parties[0].state_gender
     button: |
-      **${other_parties[0].name.full(middle='full')}'s gender:**
+      **${other_parties[0].name_full()}'s gender:**
       % if other_parties[0].state_gender == "Other":
       ${other_parties[0].state_other_gender}
       % else:
@@ -4768,7 +4768,7 @@ review:
     show if: trial_court_index != -1
   - Edit: other_parties[0].cook_sex
     button: |
-      **${other_parties[0].name.full(middle='full')}'s sex:**
+      **${other_parties[0].name_full()}'s sex:**
       % if other_parties[0].cook_sex == "other":
       ${other_parties[0].cook_sex_other}
       % else:
@@ -4777,12 +4777,12 @@ review:
     show if: trial_court_index == -1
   - Edit: other_parties[0].respondent_sex_at_birth
     button: |
-      **${other_parties[0].name.full(middle='full')}'s sex assigned at birth:**
+      **${other_parties[0].name_full()}'s sex assigned at birth:**
       *${respondent_sex_at_birth}
     show if: trial_court_index == -1
   - Edit: other_parties[0].cook_gender
     button: |
-      **${other_parties[0].name.full(middle='full')}'s gender identity:**
+      **${other_parties[0].name_full()}'s gender identity:**
       
       % if other_parties[0].cook_gender["male"]:
       * Male
@@ -4805,7 +4805,7 @@ review:
     show if: trial_court_index == -1
   - Edit: other_parties[0].race
     button: |
-      **${other_parties[0].name.full(middle='full')}'s race:**
+      **${other_parties[0].name_full()}'s race:**
       % if other_parties[0].race == "Other":
       ${respondent_race_other}
       % else:
@@ -4813,7 +4813,7 @@ review:
       % endif
   - Edit: other_parties[0].skin
     button: |
-      **${other_parties[0].name.full(middle='full')}'s skin tone:**
+      **${other_parties[0].name_full()}'s skin tone:**
       % if other_parties[0].skin == "Other":
       ${respondent_skin_other}
       % else:
@@ -4822,18 +4822,18 @@ review:
   - Edit: other_parties[0].has_alias
     button: |
       % if other_parties[0].has_alias:
-      **${other_parties[0].name.full(middle='full')} other names:**
+      **${other_parties[0].name_full()} other names:**
       ${other_parties[0].alias_names}
       % elif other_parties[0].has_alias is None:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      **Has ${other_parties[0].name_full()} gone by any other names?**
       I don't know
       % else:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      **Has ${other_parties[0].name_full()} gone by any other names?**
       No
       % endif
   - Edit: other_parties[0].ssn
     button: |
-      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
+      **The last 4 digits of ${other_parties[0].name_full()}'s Social Security Number:**
       % if other_parties[0].ssn == "":
       I don't know
       % else:
@@ -4841,7 +4841,7 @@ review:
       % endif
   - Edit: knows_respondent_dob
     button: |
-      **${other_parties[0].name.full(middle='full')}'s birth date:**
+      **${other_parties[0].name_full()}'s birth date:**
       % if knows_respondent_dob == "exact":
       ${other_parties[0].birthdate}
       % elif knows_respondent_dob == "some":
@@ -4851,7 +4851,7 @@ review:
       % endif
   - Edit: other_parties[0].weight
     button: |
-      **${other_parties[0].name.full(middle='full')}'s height and weight:**
+      **${other_parties[0].name_full()}'s height and weight:**
       % if other_parties[0].height_feet != "" and other_parties[0].height_inches != "":
       % if other_parties[0].weight != "":
       ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties.weight} pounds
@@ -4867,19 +4867,19 @@ review:
       % endif
   - Edit: other_parties[0].eyes
     button: |
-      **${other_parties[0].name.full(middle='full')}'s eye color:**
+      **${other_parties[0].name_full()}'s eye color:**
       ${other_parties[0].eyes}
   - Edit: other_parties[0].glasses
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} wear glasses?**
+      **Does ${other_parties[0].name_full()} wear glasses?**
       ${other_parties[0].glasses}
   - Edit: other_parties[0].hair
     button: |
-      **${other_parties[0].name.full(middle='full')}'s hair color:**
+      **${other_parties[0].name_full()}'s hair color:**
       ${other_parties[0].hair}
   - Edit: other_parties[0].features
     button: |
-      **${other_parties[0].name.full(middle='full')}'s notable features:**
+      **${other_parties[0].name_full()}'s notable features:**
       % if other_parties[0].features == "":
       I don't know
       % else:
@@ -4887,7 +4887,7 @@ review:
       % endif
   - Edit: other_parties[0].drivers_license
     button: |
-      **${other_parties[0].name.full(middle='full')}'s driver's license number:**
+      **${other_parties[0].name_full()}'s driver's license number:**
       % if other_parties[0].drivers_license == "":
       I don't know
       % else:
@@ -4895,11 +4895,11 @@ review:
       % endif
   - Edit: other_parties[0].has_vehicle
     button: |  
-      **Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?**
+      **Does ${other_parties[0].name_full()} have access to a vehicle?**
       ${word(yesno(other_parties[0].has_vehicle))}
   - Edit: other_parties[0].license_plate
     button: |
-      **${other_parties[0].name.full(middle='full')}'s vehicle information:**
+      **${other_parties[0].name_full()}'s vehicle information:**
       
       % if other_parties[0].vehicle_year == "":
       * Year: I don't know
@@ -4934,16 +4934,16 @@ review:
     show if: other_parties[0].has_vehicle
   - Edit: other_parties[0].another_number_check
     button: |
-      **Do you know another number that can identify ${other_parties[0].name.full(middle='full')}?**
+      **Do you know another number that can identify ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].another_number_check))}
   - Edit: other_parties[0].another_number
     button: |
-      **${other_parties[0].name.full(middle='full')} other identifying number:**
+      **${other_parties[0].name_full()} other identifying number:**
       ${other_parties[0].another_number}, ${other_parties[0].another_number_description}
     show if: other_parties[0].another_number_check
   - Edit: other_parties[0].phone_number
     button: |
-      **${other_parties[0].name.full(middle="full")}'s home phone number:**
+      **${other_parties[0].name_full()}'s home phone number:**
       % if other_parties[0].phone_number != "":
       ${ phone_number_formatted(other_parties[0].phone_number) }      
       % else:
@@ -4951,7 +4951,7 @@ review:
       % endif
   - Edit: other_parties[0].mobile_number
     button: |
-      **${other_parties[0].name.full(middle="full")}'s cell number:**
+      **${other_parties[0].name_full()}'s cell number:**
       % if other_parties[0].mobile_number != "":
       ${ phone_number_formatted(other_parties[0].mobile_number) }      
       % else:
@@ -4959,7 +4959,7 @@ review:
       % endif      
   - Edit: other_parties[0].email_address
     button: |
-      **${other_parties[0].name.full(middle='full')}'s email address:**
+      **${other_parties[0].name_full()}'s email address:**
       % if other_parties[0].email_address == "":
       I don't know
       % else:
@@ -4967,12 +4967,12 @@ review:
       % endif
   - Edit: other_parties[0].bonus_contact_info
     button: |
-      **Do you want to include additional contact information  for ${other_parties[0].name.full(middle='full')}?**
+      **Do you want to include additional contact information  for ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].bonus_contact_info))}
     show if: other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != ""
   - Edit: other_parties[0].alt_email
     button: |
-      **${other_parties[0].name.full(middle='full')}'s additional contact information:**
+      **${other_parties[0].name_full()}'s additional contact information:**
       
       % if other_parties[0].alt_email != "":
       * Email: ${other_parties[0].alt_email}
@@ -4983,41 +4983,41 @@ review:
     show if: (other_parties[0].email_address != "" or other_parties[0].phone_number != "" or other_parties[0].mobile_number != "") and other_parties[0].bonus_contact_info
   - Edit: respondent_on_social_media
     button: |
-      **Is ${other_parties[0].name.full(middle="full")} active on social media?**
+      **Is ${other_parties[0].name_full()} active on social media?**
       ${ respondent_on_social_media }      
   - Edit: respondent_social_media_accounts
     button: |
-      **${other_parties[0].name.full(middle="full")}'s social media accounts:**
+      **${other_parties[0].name_full()}'s social media accounts:**
       ${ respondent_social_media_accounts }
     show if: respondent_on_social_media == 'Yes'
 
   - Edit: other_parties[0].address_known
     button: | 
-      **Do you know ${other_parties[0].name.full(middle='full')}'s current home address?**
+      **Do you know ${other_parties[0].name_full()}'s current home address?**
       ${word(yesno(other_parties[0].address_known))}
   - Edit: other_parties[0].last_address_known
     button: |
-      **Do you know ${other_parties[0].name.full(middle='full')}'s last known address?**
+      **Do you know ${other_parties[0].name_full()}'s last known address?**
       ${word(yesno(other_parties[0].last_address_known))}
     show if: other_parties[0].address_known == False
   - Edit: other_parties[0].address.address
     button: |
       % if other_parties[0].address_known:
-      **${other_parties[0].name.full(middle='full')}'s current home address:**   
+      **${other_parties[0].name_full()}'s current home address:**   
       % elif other_parties[0].last_address_known:
-      **${other_parties[0].name.full(middle='full')}'s last known address:**
+      **${other_parties[0].name_full()}'s last known address:**
       % else:
-      **${other_parties[0].name.full(middle='full')}'s address:**
+      **${other_parties[0].name_full()}'s address:**
       % endif
       ${other_parties[0].address.on_one_line(bare=True)}
     show if: other_parties[0].address_known or other_parties[0].last_address_known
   - Edit: other_parties[0].has_job
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} have a job?**
+      **Does ${other_parties[0].name_full()} have a job?**
       ${word(yesno(other_parties[0].has_job))}
   - Edit: other_parties[0].employer_name
     button: |
-      **${other_parties[0].name.full(middle='full')}'s job information:**
+      **${other_parties[0].name_full()}'s job information:**
       
       * Employer name: ${showifdef('other_parties[0].employer_name')}
       * Occupation: ${showifdef('respondent_work_type')}
@@ -5027,7 +5027,7 @@ review:
   - Edit: caution_reasons
     button: |
         % if caution_reasons.any_true():
-        **${other_parties[0].name.full(middle='full')} should be approached with caution because...**
+        **${other_parties[0].name_full()} should be approached with caution because...**
         
         % if caution_reasons['illness']:
         * They have a history of mental illness.
@@ -5048,11 +5048,11 @@ review:
         * They have weapons in their home.
         % endif
         % else:
-        **${other_parties[0].name.full(middle='full')} does not need to be approached with caution.**
+        **${other_parties[0].name_full()} does not need to be approached with caution.**
         % endif
   - Edit: other_parties[0].weapons_info
     button: |
-      **What weapons does ${other_parties[0].name.full(middle='full')} have?**
+      **What weapons does ${other_parties[0].name_full()} have?**
       % if other_parties[0].weapons_info == "":
       I don't know
       % else:
@@ -5061,7 +5061,7 @@ review:
     show if: caution_reasons['armed'] or caution_reasons['home']
   - Edit: other_parties[0].divorced_user
     button: |
-      **Are you and ${other_parties[0].name.full(middle='full')} divorced?**
+      **Are you and ${other_parties[0].name_full()} divorced?**
       ${word(yesno(other_parties[0].divorced_user))}
   - Edit: other_parties[0].divorce_date
     button: |
@@ -5073,7 +5073,7 @@ review:
     show if: other_parties[0].divorced_user
   - Edit: other_parties[0].parentage_action
     button: |
-      **Have you and ${other_parties[0].name.full(middle='full')} filed a parentage action?**
+      **Have you and ${other_parties[0].name_full()} filed a parentage action?**
       ${word(yesno(other_parties[0].parentage_action))}
   - Edit: other_parties[0].parentage_date
     button: |
@@ -5085,7 +5085,7 @@ review:
     show if: other_parties[0].parentage_action
   - Edit: other_parties[0].order_of_protection
     button: |
-      **Is there an Order of Protection against ${other_parties[0].name.full(middle='full')}?**
+      **Is there an Order of Protection against ${other_parties[0].name_full()}?**
       ${word(yesno(other_parties[0].order_of_protection))}
   - Edit: other_parties[0].op_state
     button: |
@@ -5105,7 +5105,7 @@ review:
     show if: other_parties[0].order_of_protection
   - Edit: respondent_on_probation
     button: |
-      **Is ${other_parties[0].name.full(middle="full")} on probation?**
+      **Is ${other_parties[0].name_full()} on probation?**
       % if respondent_on_probation == "idk":
       I don't know
       % elif respondent_on_probation == "Yes":
@@ -5139,7 +5139,7 @@ review:
     show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to stop doing?**
+      **What do you want ${other_parties[0].name_full()} to stop doing?**
       
       % if protection_requested['stalking']:
       * Stop stalking and threatening me, my family and household members, and stop enlisting other people to stalk or threaten
@@ -5152,12 +5152,12 @@ review:
       % endif
   - Edit: distance_away
     button: |
-      **How far should ${other_parties[0].name.full(middle='full')} stay away?**
+      **How far should ${other_parties[0].name_full()} stay away?**
       ${distance_away} feet
     show if: protection_requested['away']
   - Edit: protected_place_types
     button: |
-      **What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What kinds of places do you want ${other_parties[0].name_full()} to stay away from?**
       
       % if protected_place_types['Home']:
       * Home
@@ -5187,75 +5187,75 @@ review:
     show if: protection_requested['away'] and protected_place_types['Home'] and not hide_address
   - Edit: protected_workplace.name.first
     button: |
-      **The workplace ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The workplace ${other_parties[0].name_full()} should stay away from:**
       ${protected_workplace.name.first}, ${protected_workplace.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['Workplace']
   - Edit: protected_school.name.first
     button: |
-      **The school ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The school ${other_parties[0].name_full()} should stay away from:**
       ${protected_school.name.first}, ${protected_school.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['School']
   - Edit: protected_day_care.name.first
     button: |
-      **The daycare ${other_parties[0].name.full(middle='full')} should stay away from:**
+      **The daycare ${other_parties[0].name_full()} should stay away from:**
       ${protected_day_care.name.first}, ${protected_day_care.address.on_one_line()}
     show if: protection_requested['away'] and protected_place_types['day_care']
   - Edit: other_places
     button: |
-      **What other places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What other places do you want ${other_parties[0].name_full()} to stay away from?**
       ${other_places}
     show if: protection_requested['away'] and protected_place_types['Other']
   - Edit: live_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} live with you?**
+      **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: school_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} go to the same school as you?**
+      **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   #- Edit: which_stalker_school
   #  button: |
-  #    **Which school do you and ${other_parties[0].name.full(middle='full')} go to?**
+  #    **Which school do you and ${other_parties[0].name_full()} go to?**
   #    ${which_stalker_school}
   #  show if: trial_court.address.county.lower() == "cook" and school_list.number_gathered() > 1
   - Edit: work_with_stalker
     button: |
-      **Does ${other_parties[0].name.full(middle='full')} work at the same place as you?**
+      **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
     show if: trial_court.address.county.lower() == "cook"
   #- Edit: which_stalker_work
   #  button: |
-  #    **Where do you and ${other_parties[0].name.full(middle='full')} both work?**
+  #    **Where do you and ${other_parties[0].name_full()} both work?**
   #    ${which_stalker_work}
   #  show if: trial_court.address.county.lower() == "cook" and work_list.number_gathered() > 1
   - Edit: other_parties[0].prohibit_firearms
     button: |
-      **Do you want to stop ${other_parties[0].name.full(middle='full')} from having firearms or a Firearms Owner Identification Card?**
+      **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
       ${word(yesno(other_parties[0].prohibit_firearms))}
   - Edit: other_parties[0].anything_else
     button: |
-      **Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
+      **Do you want the court to make ${other_parties[0].name_full()} to do or stop doing anything else?**
       ${word(yesno(other_parties[0].anything_else))}
   - Edit: other_parties[0].what_else
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
+      **What do you want ${other_parties[0].name_full()} to do or stop doing?**
       ${other_parties[0].what_else}
     show if: other_parties[0].anything_else
   - Edit: other_parties[0].pay_costs
     button: |
-      **Do you want ${other_parties[0].name.full(middle='full')} to pay any costs?**
+      **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
     show if: trial_court.address.county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
-      **What costs do you want ${other_parties[0].name.full(middle='full')} to pay**
+      **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
     show if: trial_court.address.county.lower() == "cook" and other_parties[0].pay_costs
   - Edit: service_method
     button: |
-      **How do you want ${other_parties[0].name.full(middle="full")} to be served?**
+      **How do you want ${other_parties[0].name_full()} to be served?**
       % if service_method == "sheriff":
       By the sheriff
       % elif service_method == "sps":
@@ -5267,7 +5267,7 @@ review:
       % endif
   - Edit: other_parties[0].which_address
     button: |
-      **Where can ${other_parties[0].name.full(middle='full')} be found for service?**
+      **Where can ${other_parties[0].name_full()} be found for service?**
       % if other_parties[0].which_address == "home_address":
       ${other_parties[0].address.on_one_line(bare=True)}
       % elif other_parties[0].which_address == "employer_address":
@@ -5277,16 +5277,16 @@ review:
       % endif
   - Edit: service_county
     button: |
-      **County where ${other_parties[0].name.full(middle='full')} can be found:**
+      **County where ${other_parties[0].name_full()} can be found:**
       ${end_in_county(service_county)}
     show if: service_method == "sheriff" and service_state != "IL"
   - Edit: other_parties[0].bonus_service_check
     button: |
-      **Do you want to list another place where ${other_parties[0].name.full(middle='full')} can be found for service?**
+      **Do you want to list another place where ${other_parties[0].name_full()} can be found for service?**
       ${word(yesno(other_parties[0].bonus_service_check))}
   - Edit: other_parties[0].which_bonus_address
     button: |
-      **Where else can ${other_parties[0].name.full(middle='full')} be found for service?**
+      **Where else can ${other_parties[0].name_full()} be found for service?**
       % if other_parties[0].which_bonus_address == "home_address":
       ${other_parties[0].address.on_one_line(bare=True)}
       % elif other_parties[0].which_bonus_address == "employer_address":
@@ -5297,7 +5297,7 @@ review:
     show if: other_parties[0].bonus_service_check
   - Edit: service_information
     button: |
-      **What other information will help serve ${other_parties[0].name.full(middle="full")}?**
+      **What other information will help serve ${other_parties[0].name_full()}?**
       ${service_information}
   - Edit: case_number
     button: |
