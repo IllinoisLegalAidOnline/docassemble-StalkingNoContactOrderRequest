@@ -77,9 +77,7 @@ code: |
   trial_court_index
   if jurisdiction_type.all_false():
     other_jurisdiction_location
-  
-    
-  
+
   users[0].name.first
   if users[0].age_in_years() < 18:
     too_young_kickout
@@ -165,8 +163,7 @@ code: |
     if caution_reasons['armed'] or caution_reasons['home']:
       other_parties[0].weapons_info
     respondent_on_probation
-    if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
-      previous_cook_case_type
+    previous_cook_case_type
   else:
     if respondent_jail_check:
       respondent_jail_name
@@ -2473,62 +2470,40 @@ attachment:
     - "involves_minors_yes": ${ True if any_minors else '' }
     - "involves_minors_no": ${ True if not any_minors else '' }
     - "previous_divorce_yes": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "divorce":
         ${True}
-        % else:
-        ${False}
-        % endif
         % else:
         ${False}
         % endif
     - "previous_divorce_no": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "divorce":
         ${False}
         % else:
         ${True}
         % endif
-        % else:
-        ${True}
-        % endif
     - "previous_parentage_yes": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "parentage":
         ${True}
-        % else:
-        ${False}
-        % endif
         % else:
         ${False}
         % endif
     - "previous_parentage_no": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "parentage":
         ${False}
         % else:
         ${True}
         % endif
-        % else:
-        ${True}
-        % endif
     - "previous_cook_case_date": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "parentage" or previous_cook_case_type == "divorce":
         ${previous_cook_case_date}
         % endif
-        % endif
     - "previous_cook_case_number": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "parentage" or previous_cook_case_type == "divorce":
         ${previous_cook_case_number}
         % endif
-        % endif
     - "previous_cook_case_judge": |
-        % if user_relationship['marriage'] or user_relationship['children'] or user_relationship['adopt_child']:
         % if previous_cook_case_type == "parentage" or previous_cook_case_type == "divorce":
         ${previous_cook_case_judge}
-        % endif
         % endif
     - "pro_se_cb": ${ True }
     - "petitioner__2": ${ users[0].name_full() }
