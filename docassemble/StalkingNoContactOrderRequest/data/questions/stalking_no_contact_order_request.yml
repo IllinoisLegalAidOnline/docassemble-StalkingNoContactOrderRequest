@@ -551,7 +551,7 @@ question: |
   Have you or the people you want to protect been stalked by the stalker at least two times?
   % endif
 subquestion: |
-  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel emotional distress. Someone being rude or mean may not count as stalking. The judge will decide what counts as stalking. 
+  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel emotional distress. It also includes harassment that causes a normal person emotional distress.  Someone being rude or mean may not count as stalking. The judge will decide what counts as stalking. 
 
   % if protect_whom['me'] and not protect_whom['adult'] and not protect_whom['minor']:
   If the stalker has caused **{emotional distress}** to you or made you afraid **at least two times**, click **Yes**.
@@ -571,7 +571,16 @@ subject: |
 content: |  
   **Emotional distress** means feeling a lot of mental pain, worry, or fear.
 
-  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset. Stalking does not include an exercise of the right to free speech or assembly. It does not include lawful picketing at the workplace. 
+  **Stalking** is when someone acts in a way they know, or should know, would make a normal person scared for their safety or feel very upset. It also includes harassment that causes a normal person emotional distress. Stalking does not include an exercise of the right to free speech or assembly. It does not include lawful picketing at the workplace. 
+
+  Some actions are generally assumed to have caused you emotional distress. These acts include:
+
+  * Creating a disturbance your workplace or school,
+  * Repeatedly calling your home or workplace after being told to stop,
+  * Repeatedly following you around in public,
+  * Repeatedly surveilling you by being outside your home, school, workplace, car, or other place you go to or by peering in your windows,
+  * Threatening the safety of your child or family member, or
+  * Threatening physical force, confinement, or restraint.
 ---
 id: two times kickout
 event: two_times_kickout
@@ -2690,6 +2699,7 @@ attachment:
     - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
     - "user_phone_number": ${ phone_number_formatted(users[0].phone_number) }
     - "user_email": ${ users[0].email if users[0].has_email_address else ""}
+    - "form_for_self": ${ True }
 ---
 attachment:
   variable name: cook_e_order[i]
