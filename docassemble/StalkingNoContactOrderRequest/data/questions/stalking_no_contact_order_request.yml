@@ -1862,7 +1862,7 @@ continue button field: stalking_event_intro
 question: |
   Reasons for the Stalking No Contact Order
 subquestion: |
-  The following questions will ask about what ${other_parties[0].name_full()} did to make you or the people you want to protect afraid or distressed.
+  The following questions will ask about what ${other_parties[0].name_full()} did to cause fear or stress to you or someone you want to protect.
   
   You should be specific. Tell when and where each event happened, and how it affected you.
   
