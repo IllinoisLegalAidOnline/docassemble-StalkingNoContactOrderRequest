@@ -36,7 +36,6 @@ objects:
   - protected_workplace: ALIndividual
   - protected_school: ALIndividual
   - protected_day_care: ALIndividual
-  - court_list: ALCourtLoader.using(file_name='docassemble.ILAO:data/sources/il_courts_plus.xlsx')
 ---
 code: |
   ilao_easy_form_title = "Stalking No Contact Order"
@@ -3685,7 +3684,7 @@ review:
     button: |
       **Why are you including ${x.name_full()} in the Stalking No Contact Order?**
       ${x.protection_reason}
-    show if: filing_county.lower() == "cook" and not x.is_survivor
+    show if: filing_county == "Cook" and not x.is_survivor
   - Edit: x.use_safe_address
     button: |
       **Do you want to use the safe mailing address for ${x.name_full()}?**
@@ -4142,7 +4141,7 @@ review:
     button: |
       **Why should the court grant an Emergency SNCO?**
       ${emergency_reason}
-    show if: order_type['emergency'] and filing_county.lower() == "cook"
+    show if: order_type['emergency'] and filing_county == "Cook"
   - Edit: protection_requested
     button: |
       **What do you want ${other_parties[0].name_full()} to stop doing?**
@@ -4223,27 +4222,27 @@ review:
     button: |
       **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: school_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   #- Edit: which_stalker_school
   #  button: |
   #    **Which school do you and ${other_parties[0].name_full()} go to?**
   #    ${which_stalker_school}
-  #  show if: filing_county.lower() == "cook" and school_list.number_gathered() > 1
+  #  show if: filing_county == "Cook" and school_list.number_gathered() > 1
   - Edit: work_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   #- Edit: which_stalker_work
   #  button: |
   #    **Where do you and ${other_parties[0].name_full()} both work?**
   #    ${which_stalker_work}
-  #  show if: filing_county.lower() == "cook" and work_list.number_gathered() > 1
+  #  show if: filing_county == "Cook" and work_list.number_gathered() > 1
   - Edit: other_parties[0].prohibit_firearms
     button: |
       **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
@@ -4261,12 +4260,12 @@ review:
     button: |
       **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].describe_costs
     button: |
       **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
-    show if: filing_county.lower() == "cook" and other_parties[0].pay_costs
+    show if: filing_county == "Cook" and other_parties[0].pay_costs
 ---
 section: Filing and service details
 id: filing service review screen
@@ -4812,7 +4811,7 @@ review:
     button: |
       **Why should the court grant an Emergency SNCO?**
       ${emergency_reason}
-    show if: order_type['emergency'] and filing_county.lower() == "cook"
+    show if: order_type['emergency'] and filing_county == "Cook"
   - Edit: protection_requested
     button: |
       **What do you want ${other_parties[0].name_full()} to stop doing?**
@@ -4885,17 +4884,17 @@ review:
     button: |
       **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: school_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: work_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].prohibit_firearms
     button: |
       **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
@@ -4913,12 +4912,12 @@ review:
     button: |
       **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
-    show if: filing_county.lower() == "cook"
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].describe_costs
     button: |
       **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
-    show if: filing_county.lower() == "cook" and other_parties[0].pay_costs
+    show if: filing_county == "Cook" and other_parties[0].pay_costs
   - Edit: service_method
     button: |
       **How do you want ${other_parties[0].name_full()} to be served?**
