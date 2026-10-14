@@ -36,6 +36,7 @@ objects:
   - protected_workplace: ALIndividual
   - protected_school: ALIndividual
   - protected_day_care: ALIndividual
+  - court_list: ALCourtLoader.using(file_name='docassemble.ILAO:data/sources/il_courts_plus.xlsx')
 ---
 code: |
   ilao_easy_form_title = "Stalking No Contact Order"
@@ -74,7 +75,7 @@ code: |
   if two_times_check == False:
     two_times_kickout
   nav.set_section('section_petitioner')
-  trial_court_index
+  filing_county  
   if jurisdiction_type.all_false():
     other_jurisdiction_location
 
@@ -100,7 +101,7 @@ code: |
     two_times_kickout
     
   nav.set_section('section_protections')
-  if order_type['emergency'] and trial_court_index == -1:
+  if order_type['emergency'] and filing_county == "Cook":
     emergency_reason
   if protection_requested['away']:
     distance_away
@@ -114,7 +115,7 @@ code: |
       protected_day_care.name.first
     if protected_place_types['Other']:
       other_places
-    if trial_court_index == -1:
+    if filing_county == "Cook":
       if live_with_stalker:
         home.address
       if protected_place_types['School']:
@@ -122,19 +123,19 @@ code: |
       if protected_place_types['Workplace']: 
         work_with_stalker
   other_parties[0].prohibit_firearms
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     other_parties[0].pay_costs 
   other_parties[0].anything_else
   if protection_requested.all_false() and not other_parties[0].prohibit_firearms and not other_parties[0].anything_else:
     other_parties[0].no_protection_chosen
   
   nav.set_section('section_respondent')
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     other_parties[0].cook_sex
   else:
     other_parties[0].state_gender
   other_parties[0].race
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     other_parties[0].has_alias
   other_parties[0].ssn
   knows_respondent_dob
@@ -147,19 +148,19 @@ code: |
     other_parties[0].license_plate
   if other_parties[0].another_number_check:
     other_parties[0].another_number_description
-  if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (trial_court_index == -1 and other_parties[0].mobile_number != ""):
+  if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (filing_county == "Cook" and other_parties[0].mobile_number != ""):
     if other_parties[0].bonus_contact_info:
       other_parties[0].alt_email
   if other_parties[0].address_known or other_parties[0].last_address_known:
     other_parties[0].address.address
   else:
     unknown_address_note
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     respondent_on_social_media
   if other_parties[0].has_job == True:
     other_parties[0].employer_name
   caution_reasons
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     if caution_reasons['armed'] or caution_reasons['home']:
       other_parties[0].weapons_info
     respondent_on_probation
@@ -175,7 +176,7 @@ code: |
     other_parties[0].which_address
     if other_parties[0].bonus_service_check == True:
       other_parties[0].which_bonus_address
-  if trial_court_index == -1 and service_method == "sheriff":  
+  if filing_county == "Cook" and service_method == "sheriff":  
     service_information
   users[0].phone_number
   if users[0].has_email_address:
@@ -185,7 +186,7 @@ code: |
   nav.set_section('section_download')
   check_ages
   
-  if trial_court.address.county == "Cook":
+  if filing_county == "Cook":
     make_report_list
     cook_stay_away_addresses
     cook_no_remain_addresses
@@ -197,6 +198,8 @@ code: |
   #debug_page
   forms_assembling
   adult_minor_sorting
+  #The function is called here to ensure it renders in the templates.
+  get_circuit_number(filing_county)
   snapshot_forms
   get_docs_screen
 ---
@@ -215,7 +218,7 @@ code: |
 
   stuff_to_snapshot['downloaded_forms'] = showifdef('forms_assembling')
   
-  stuff_to_snapshot['filing_county'] = showifdef('trial_court.address.county')  
+  stuff_to_snapshot['filing_county'] = showifdef('filing_county')  
   
   store_variables_snapshot(
   	data=stuff_to_snapshot, persistent=True
@@ -235,7 +238,7 @@ code: |
   others_protected[i].name.first
   others_protected[i].birthdate
   if others_protected[i].age_in_years() < 18 or others_protected[i].is_survivor:
-    if trial_court_index != -1:
+    if filing_county != "Cook":
       if hide_address:
         others_protected[i].use_safe_address
       if hide_address == False or others_protected[i].use_safe_address == False:
@@ -256,7 +259,7 @@ code: |
       else:
         #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
         others_protected[popping_index].birthdate
-        if trial_court_index != -1:
+        if filing_county != "Cook":
           if hide_address == False or others_protected[popping_index].use_safe_address == False:
             others_protected[popping_index].address.address
         popping_index += 1
@@ -267,7 +270,7 @@ code: |
   stalking_events[i].name.text
   stalking_events[i].place
   stalking_events[i].description
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     stalking_events[i].police_check
   if i > 7:
     stalking_events.there_is_another = False
@@ -382,7 +385,7 @@ code: |
   if (protect_whom["minor"] or protect_whom["adult"]):
 
     for index, other in enumerate(others_protected):
-      if trial_court_index == -1:
+      if filing_county == "Cook":
         other.include_in_addendum = True
       else:
         if index > 1:
@@ -390,7 +393,7 @@ code: |
         else:
           other.include_in_addendum = False
   for index, event in enumerate(stalking_events):
-    if trial_court_index == -1:
+    if filing_county == "Cook":
       if index > 2:
         event.include_in_addendum = True
       else:
@@ -476,7 +479,7 @@ subquestion: |
 
   If the victim of stalking is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the victim.
 
-  To learn more, read ILAO's article about [**Getting a Stalking No Contact Order**](https://www.illinoislegalaid.org/legal-information/getting-no-contact-order-stalking).
+  To learn more, see ILAO's article about [**protection from stalking**](https://www.illinoislegalaid.org/node/185851).
   
   #### Your safety is important
   
@@ -492,7 +495,7 @@ question: |
 subquestion: |
   To use this program:
 
-  * The stalker cannot be a family member, current or ex-spouse, or current or ex-boyfriend or girlfriend (use the [**Order of Protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection) instead),
+  * The stalker cannot be a family member, current or ex-spouse, or current or ex-boyfriend or girlfriend (use the [**Order of Protection Easy Form**](https://www.illinoislegalaid.org/node/30686) instead),
   * The stalker must have done something that made you or people you want to protect fearful or caused emotional distress **at least two separate times**, and
   * You must file your forms in the county were the stalking took place or in the county where you, the stalker, or someone you want to protect live.
   
@@ -591,7 +594,7 @@ question: |
 subquestion: |
   To qualify for a Stalking No Contact Order, a stalker must have done things which made a person fearful or caused them emotional distress **at least two separate times**.
   
-  A different protective order may work for your situation. Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
+  A different protective order may work for your situation. Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/node/176771) tool to learn more.
 buttons:
   - Exit: exit
   - Restart: restart
@@ -633,10 +636,9 @@ subquestion: |
   * Where the person you are filing against lives, or
   * Where the stalking occurred.
 fields:
-  - no label: trial_court_index
-    datatype: integer
+  - no label: filing_county
     code: |
-      court_county_lookup()
+      il_county_list
   - note: |
       ${ collapse_template(county_lookup_help) }  
 ---
@@ -646,72 +648,63 @@ subject: |
 content: |  
     You can use this [**City-to-County Finder**](https://www.statsamerica.org/CityCountyFinder/) to find the county.
 ---
-depends on:
-  - trial_court_index
 code: |
-  trial_court = court_list.as_court('trial_court', trial_court_index)
----
-code: |
-  def court_county_lookup(lowercase=False):
-    all_court_counties = court_list._load_courts()['address_county'].items()
-    filtered_courts = [(-1, "cook")] if lowercase else [(-1, "Cook")]
-    for court in all_court_counties:
-      if court[1] != "Cook":
-        court_name = court[1].lower() if lowercase else court[1]
-        filtered_courts.append((court[0],court_name))
-    return sorted( filtered_courts, key=lambda y: y[1])
----
-depends on:
-  - trial_court_index
-code: |
-  if trial_court_index == -1:
-    trial_court = court_list.as_court('trial_court', 21)
-  else:
-    trial_court = court_list.as_court('trial_court', trial_court_index)
-    
-  court_name = str(trial_court.name)
-  court_circuit = str(trial_court.circuit)
-  court_street_address = str(trial_court.address.address)
-  court_city = str(trial_court.address.city)
-  court_state = str(trial_court.address.state)
-  court_zip = str(trial_court.address.zip)
-  filing_county = str(trial_court.address.county)
-  courthouse_info = court_name + ", " + court_street_address + ", " + court_city + ", " + court_state + " " + court_zip
----
-#If this question gets reimplemented, add court 21 to the options.
-id: Cook County district
-question: |
-  Which Cook County courthouse will you file in?
-subquestion: |
-  ${ collapse_template(cook_district_help) }  
-field: cook_district
-choices:
-  - First Municipal District, Daley Center, 50 W. Washington Street, Chicago: 15
-  - Second Municipal District, 5600 Old Orchard Road, Skokie: 16
-  - Third Municipal District, 2121 Euclid Avenue, Rolling Meadows: 17
-  - Fourth Municipal District, 1500 Maybrook Drive, Maywood: 18
-  - Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview: 19
-  - Sixth Municipal District, 16501 South Kedzie Parkway, Markham: 20
----
-template: cook_district_help
-subject: |
-  **What if I am not sure?**
-content: |  
-  Visit **[Illinois Court Help](https://www.ilcourthelp.gov/)**, or you can call or text (833) 411-1121 for assistance.
+  def get_circuit_number(county):
+    circuits = {
+      1: ["Alexander", "Pulaski", "Massac", "Pope", "Johnson", "Union", "Jackson", "Williamson", "Saline"],
+      2: ["Hardin", "Gallatin", "White", "Hamilton", "Franklin", "Wabash", "Edwards", "Wayne", "Jefferson", "Richland", "Lawrence", "Crawford"],
+      3: ["Madison", "Bond"],
+      4: ["Clinton", "Marion", "Clay", "Fayette", "Effingham", "Jasper", "Montgomery", "Shelby", "Christian"],
+      5: ["Vermilion", "Edgar", "Clark", "Cumberland", "Coles"],
+      6: ["Champaign", "Douglas", "Moultrie", "Macon", "DeWitt", "Piatt"],
+      7: ["Sangamon", "Macoupin", "Morgan", "Scott", "Greene", "Jersey"],
+      8: ["Adams", "Schuyler", "Mason", "Cass", "Brown", "Pike", "Calhoun", "Menard"],
+      9: ["Knox", "Warren", "Henderson", "Hancock", "McDonough", "Fulton"],
+      10: ["Peoria", "Marshall", "Putnam", "Stark", "Tazewell"],
+      11: ["McLean", "Livingston", "Logan", "Ford", "Woodford"],
+      12: ["Will"],
+      13: ["Bureau", "LaSalle", "Grundy"],
+      14: ["Rock Island", "Mercer", "Whiteside", "Henry"],
+      15: ["Jo Daviess", "Stephenson", "Carroll", "Ogle", "Lee"],
+      16: ["Kane"],
+      17: ["Winnebago", "Boone"],
+      18: ["DuPage"],
+      19: ["Lake"],
+      20: ["St. Clair"],
+      21: ["Iroquois", "Kankakee"],
+      22: ["McHenry"],
+      23: ["DeKalb", "Kendall"],
+      24: ["Randolph", "Monroe", "Washington", "Perry"]
+    }
+
+    if county == "Cook":
+      return 0
+
+    for circuit, counties in circuits.items():
+      if county in [name for name in counties]:
+        if circuit == 1 or circuit == 21:
+          return str(circuit) + "st"
+        elif circuit == 2 or circuit == 22:
+          return str(circuit) + "nd"
+        elif circuit == 3 or circuit == 23:
+          return str(circuit) + "rd"
+        else:
+          return str(circuit) + "th"
+
+    return None
 ---
 id: jurisdiction
-#continue button field: jurisdiction
 question: |
-  Why do you want to file in ${ end_in_county(trial_court.address.county)}?
+  Why do you want to file in ${ end_in_county(filing_county)}?
 subquestion: |
   Check all that apply.
 fields:
   - no label: jurisdiction_type
     datatype: checkboxes
     choices:
-      - I or the person I want to protect lives in ${ trial_court.address.county } County.: I live here
-      - The person I am filing against lives in ${ trial_court.address.county } County.: Respondent lives here
-      - The stalking took place in ${ trial_court.address.county } County.: Abuse was here
+      - I or the person I want to protect lives in ${ filing_county } County.: I live here
+      - The person I am filing against lives in ${ filing_county } County.: Respondent lives here
+      - The stalking took place in ${ filing_county } County.: Abuse was here
 ---
 id: not proper location
 event: other_jurisdiction_location
@@ -777,7 +770,7 @@ id: hide address
 question: |
   Do you want to keep your home address hidden?
 subquestion: |
-  You do not need to list where you are staying on your court papers. You can give the court a mailing address where you can receive court notices instead.
+  You do not need to list where you are staying on your court papers. You can give the court a mailing address where you can receive court notices instead. You can use a PO box as your mailing address.
 field: hide_address
 choices:
   - Yes: True
@@ -792,7 +785,7 @@ question: |
   % endif
 subquestion: |
   % if hide_address:
-  **This address will appear on your court papers.** You may receive court notices and documents about your case at this address.
+  **This mailing address will appear on your court papers.** You may receive court notices and documents about your case at this mailing address. You can use a PO box as your mailing address.
   % else:
   **This address will appear on your court papers.** If you do not want this, click **Back** to keep your address hidden.
   % endif
@@ -891,9 +884,9 @@ question: |
 subquestion: |
   If the person stalking you is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of an SNCO. An Order of Protection can help with more issues and may be easier to get.
   
-  Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to help you find the protective order for your situation.
+  Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/node/176771) tool to help you find the protective order for your situation.
   
-  If you would like to make an SNCO, click **Next.** If you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection).
+  If you would like to make an SNCO, click **Next.** If you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/node/30686).
 ---
 id: user birthdate
 question: |
@@ -1171,7 +1164,7 @@ fields:
   #  input type: radio
   #  required: False
   #  show if:
-  #    variable: trial_court.address.county
+  #    variable: filing_county
   #    is: "Cook"
   #  choices:
   #    - Very light: Very light
@@ -1230,8 +1223,8 @@ fields:
           For example, "June 3rd" or "Summer of 1990."
       - I don't know it.: idk
         help: |
-          % if trial_court_index == -1:
-          You can update the Cook County Sheriff's office when you have this information. Email them anytime at ccso.protectiveorders@ccsheriff.org or call them at 312-603-2134 or 312-603-3340 (Monday through Friday, 8AM to 5PM).
+          % if filing_county == "Cook":
+          You can update the Cook County Sheriff's office when you have this information. Email them anytime at ccso.protectiveorders@ccsheriff.org or call them at <a href="tel:312-603-2134">**312-603-2134 :phone:**</a> or <a href="tel:312-603-3340">312-603-3340 :phone:**</a> (Monday through Friday, 8AM to 5PM).
           % else:
           You may want to update the sheriff's office when you have this information.
           % endif
@@ -1539,7 +1532,7 @@ fields:
     required: False
     show if:
       code: |
-        trial_court_index == -1
+        filing_county == "Cook"
   - Email address: other_parties[0].email_address
     datatype: email
     required: False
@@ -1657,18 +1650,18 @@ fields:
     required: False
     choices:
       - Has a history of mental illness.: illness
-        show if: trial_court_index == -1
+        show if: filing_county == "Cook"
       - Is now or has been suicidal.: suicide
       - Is likely to be under the influence of alcohol.: alcohol
-        show if: trial_court_index == -1
+        show if: filing_county == "Cook"
       - Is likely to be under the influence of drugs.: drugs
-        show if: trial_court_index == -1
+        show if: filing_county == "Cook"
       - Is likely to carry a weapon.: armed
-        show if: trial_court_index == -1
+        show if: filing_county == "Cook"
       - Is likely armed or dangerous.: armed
-        show if: trial_court_index != -1
+        show if: filing_county != "Cook"
       - Has weapons in the home.: home
-        show if: trial_court_index == -1        
+        show if: filing_county == "Cook"        
   - Type and location of weapons: other_parties[0].weapons_info
     required: False
     input type: area
@@ -1676,7 +1669,7 @@ fields:
     maxlength: 180
     show if: 
       code: |
-        trial_court_index == -1
+        filing_county == "Cook"
     js show if: |
      (val("caution_reasons['armed']") == true || val("caution_reasons['home']") == true)
 ---
@@ -1686,7 +1679,7 @@ question: |
 subquestion: |
   This is called service. In Illinois, **Sheriffs usually serve SNCOs.**
   
-  Note: There may be a charge for a special process server or a licensed private detective. Read ILAO's article about [**serving a summons**](https://www.illinoislegalaid.org/legal-information/serving-summons) to learn more about your service options.
+  Note: There may be a charge for a special process server or a licensed private detective. Read ILAO's article about [**serving a summons**](https://www.illinoislegalaid.org/node/147221) to learn more about your service options.
 fields:
   - no label: service_method
     datatype: radio
@@ -1889,7 +1882,7 @@ subquestion: |
   
   Include any threats or use of a weapon. If the stalking was repeated, you can note that in your description.
 
-  % if trial_court_index == -1:
+  % if filing_county == "Cook":
   The petition has space for about 500 characters including spaces for each incident.
   % else:
   The petition has space for about 800 characters including spaces for each incident.
@@ -1912,13 +1905,13 @@ fields:
     input type: area
     rows: 14
     maxlength: |
-      % if trial_court_index == -1:
+      % if filing_county == "Cook":
       500
       % else:
       800
       % endif
     help: |
-      % if trial_court_index == -1:
+      % if filing_county == "Cook":
       The petition has space for about 500 characters including spaces for each incident.
       % else:
       The petition has space for about 800 characters including spaces for each incident.
@@ -2067,7 +2060,7 @@ subquestion: |
 fields:
   - Name or type of place, and address (if known): other_places
     maxlength: |
-      % if trial_court_index == -1:
+      % if filing_county == "Cook":
       150
       % else:
       300
@@ -2202,7 +2195,7 @@ fields:
   - What do you want ${other_parties[0].name_full()} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: |
-      % if trial_court_index == -1:
+      % if filing_county == "Cook":
       140
       % else:
       280
@@ -2306,7 +2299,7 @@ subquestion: |
 id: get docs screen
 question: |
   Download
-subquestion: |  
+subquestion: |    
   Your forms are ready. View and download your forms below. Click **Make changes** to fix any mistakes.
 
   This program does not file your ${ form_name } forms with the court. You will need to do this yourself.
@@ -2382,7 +2375,7 @@ code: |
   sheriff_info_bundle.enabled = False
 
   
-  if trial_court_index == -1:
+  if filing_county == "Cook":
     cook_dv_cover_sheet.enabled = True
     sheriff_cover_sheet.enabled = True
     sheriff_info_bundle.enabled = True
@@ -2691,7 +2684,7 @@ attachment:
   editable: False
   pdf template file: efiling_exemption.pdf
   fields:
-    - "county": ${trial_court.address.county}
+    - "county": ${filing_county}
     - "petitioner__1": ${ users[0].name_full() }
     - "respondent": ${other_parties[0].name_full()}
     - "case_number__1": ${ case_number }
@@ -3091,8 +3084,8 @@ attachment:
   editable: False
   pdf template file: Stalking_NCO_Petition.pdf
   fields:
-    - "circuit_court": ${court_circuit.upper()}
-    - "filing_county": ${trial_court.address.county.upper()}
+    - "circuit_court": ${get_circuit_number(filing_county)}
+    - "filing_county": ${filing_county.upper()}
     - "user_name": ${users[0].name_full()}
     - "others_protected": ${others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "protect_a_minor": ${any_minors}
@@ -3216,8 +3209,8 @@ attachment:
   editable: False
   pdf template file: Stalking_NCO_Order.pdf
   fields:
-    - "circuit_court": ${court_circuit.upper()}
-    - "filing_county": ${trial_court.address.county.upper()}
+    - "circuit_court": ${get_circuit_number(filing_county)}
+    - "filing_county": ${filing_county.upper()}
     - "emergency_type": ${True}
     - "plenary_type": ${False}
     - "user_name": ${users[0].name_full()}
@@ -3331,8 +3324,8 @@ attachment:
   editable: False
   pdf template file: Stalking_NCO_Order.pdf
   fields:
-    - "circuit_court": ${court_circuit.upper()}
-    - "filing_county": ${trial_court.address.county.upper()}
+    - "circuit_court": ${get_circuit_number(filing_county)}
+    - "filing_county": ${filing_county.upper()}
     - "emergency_type": ${False}
     - "plenary_type": ${True}
     - "user_name": ${users[0].name_full()}
@@ -3447,7 +3440,7 @@ attachment:
 #  pdf template file: Stalking_NCO_Summons.pdf
 #  fields:
 #    - "circuit_court": ${court_circuit}
-#    - "filing_county": ${trial_court.address.county}
+#    - "filing_county": ${filing_county}
 #    - "user_name": ${users[0].name_full()}
 #    - "protect_a_minor": ${any_minors}
 #    - "protect_an_adult": ${any_adults}
@@ -3471,8 +3464,8 @@ attachment:
   editable: False
   pdf template file: op_summons.pdf
   fields:
-    - "county__1": ${ trial_court.address.county.upper() }
-    - "county__2": ${ trial_court.address.county.upper() }
+    - "county__1": ${ filing_county.upper() }
+    - "county__2": ${ filing_county.upper() }
     - "petitioner__1": ${ users[0].name_full() }
     - "petitioner__2": ${ users[0].name_full() }
     - "petitioner__3": ${ users[0].name_full() }
@@ -3498,7 +3491,12 @@ attachment:
         % elif other_parties[0].which_address == "employer_address":
         ${other_parties[0].employer_address.line_two()}
         % endif
-    - "respondent_phone": ${phone_number_formatted(other_parties[0].mobile_number) if trial_court_index == -1 and other_parties[0].phone_number == "" else phone_number_formatted(other_parties[0].phone_number)}
+    - "respondent_phone": |
+        % if filing_county == "Cook" and other_parties[0].phone_number == "":
+        ${phone_number_formatted(other_parties[0].mobile_number)}
+        % else:
+        ${phone_number_formatted(other_parties[0].phone_number)}
+        % endif
     - "respondent_email": ${ other_parties[0].email_address }
     - "respondent__3": ${other_parties[0].name_full() if other_parties[0].bonus_service_check == True else ""}
     - "service_alt_address_line_1": |
@@ -3548,10 +3546,7 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - filing_county
+  - Edit: filing_county
     button: |
       **You are filing in:**
       ${end_in_county(filing_county)}
@@ -3690,7 +3685,7 @@ review:
     button: |
       **Why are you including ${x.name_full()} in the Stalking No Contact Order?**
       ${x.protection_reason}
-    show if: trial_court.address.county.lower() == "cook" and not x.is_survivor
+    show if: filing_county.lower() == "cook" and not x.is_survivor
   - Edit: x.use_safe_address
     button: |
       **Do you want to use the safe mailing address for ${x.name_full()}?**
@@ -3722,7 +3717,7 @@ review:
       % else:
       ${other_parties[0].state_gender}
       % endif
-    show if: trial_court_index != -1
+    show if: filing_county != "Cook"
   - Edit: other_parties[0].cook_sex
     button: |
       **${other_parties[0].name_full()}'s sex:**
@@ -3731,12 +3726,12 @@ review:
       % else:
       ${other_parties[0].cook_sex}
       % endif
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].respondent_sex_at_birth
     button: |
       **${other_parties[0].name_full()}'s sex assigned at birth:**
       *${respondent_sex_at_birth}
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].cook_gender
     button: |
       **${other_parties[0].name_full()}'s gender identity:**
@@ -3759,7 +3754,7 @@ review:
       % if other_parties[0].cook_gender["other"]:
       * ${respondent_cook_gender_other}
       % endif
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].race
     button: |
       **${other_parties[0].name_full()}'s race:**
@@ -4015,12 +4010,12 @@ review:
       % else:
       ${other_parties[0].weapons_info}
       % endif
-    show if: trial_court_index == -1 and (caution_reasons['armed'] or caution_reasons['home'])
+    show if: filing_county == "Cook" and (caution_reasons['armed'] or caution_reasons['home'])
   - Edit: previous_cook_case_type
     button: |
       **Previous Cook County case involving ${other_parties[0].name_full()}:**
       ${ previous_cook_case_type.capitalize() }
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: previous_cook_case_date
     button: |
       **Previous Cook County ${ previous_cook_case_type } case info:**
@@ -4040,7 +4035,7 @@ review:
       % else:
       * Judge: None entered
       % endif
-    show if: trial_court_index == -1 and previous_cook_case_type != "none"	
+    show if: filing_county == "Cook" and previous_cook_case_type != "none"	
   - Edit: respondent_on_probation
     button: |
       **Is ${other_parties[0].name_full()} on probation?**
@@ -4147,7 +4142,7 @@ review:
     button: |
       **Why should the court grant an Emergency SNCO?**
       ${emergency_reason}
-    show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
+    show if: order_type['emergency'] and filing_county.lower() == "cook"
   - Edit: protection_requested
     button: |
       **What do you want ${other_parties[0].name_full()} to stop doing?**
@@ -4228,27 +4223,27 @@ review:
     button: |
       **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: school_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   #- Edit: which_stalker_school
   #  button: |
   #    **Which school do you and ${other_parties[0].name_full()} go to?**
   #    ${which_stalker_school}
-  #  show if: trial_court.address.county.lower() == "cook" and school_list.number_gathered() > 1
+  #  show if: filing_county.lower() == "cook" and school_list.number_gathered() > 1
   - Edit: work_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   #- Edit: which_stalker_work
   #  button: |
   #    **Where do you and ${other_parties[0].name_full()} both work?**
   #    ${which_stalker_work}
-  #  show if: trial_court.address.county.lower() == "cook" and work_list.number_gathered() > 1
+  #  show if: filing_county.lower() == "cook" and work_list.number_gathered() > 1
   - Edit: other_parties[0].prohibit_firearms
     button: |
       **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
@@ -4266,12 +4261,12 @@ review:
     button: |
       **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
       **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
-    show if: trial_court.address.county.lower() == "cook" and other_parties[0].pay_costs
+    show if: filing_county.lower() == "cook" and other_parties[0].pay_costs
 ---
 section: Filing and service details
 id: filing service review screen
@@ -4281,42 +4276,22 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - filing_county
+  - Edit: filing_county
     button: |
       **You are filing in:**
       ${end_in_county(filing_county)}
-  - Edit: cook_district
-    button: |
-      **Which courthouse will you file in?**
-      % if cook_district == '15':
-      First Municipal District, Daley Center, 50 W. Washington Street, Chicago
-      % elif cook_district == '16':
-      Second Municipal District, 5600 Old Orchard Road, Skokie
-      % elif cook_district == '17':
-      Third Municipal District, 2121 Euclid Avenue, Rolling Meadows
-      % elif cook_district == '18':
-      Fourth Municipal District, 1500 Maybrook Drive, Maywood
-      % elif cook_district == '19':
-      Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview
-      % elif cook_district == '20':
-      Sixth Municipal District, 16501 South Kedzie Parkway, Markham
-      % endif
-    show if: trial_court.address.county.lower() == "cook"
   - Edit: jurisdiction_type
     button: |
-      **You are filing in ${end_in_county(trial_court.address.county)} because:**
+      **You are filing in ${end_in_county(filing_county)} because:**
       
       % if jurisdiction_type['I live here']:
-      * I live in ${end_in_county(trial_court.address.county)}.
+      * I live in ${end_in_county(filing_county)}.
       % endif
       % if jurisdiction_type['Respondent lives here']:
-      * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
+      * The person I am filing against lives in ${end_in_county(filing_county)}.
       % endif
       % if jurisdiction_type['Abuse was here']:
-      * The stalking took place in ${end_in_county(trial_court.address.county)}.
+      * The stalking took place in ${end_in_county(filing_county)}.
       % endif
   - Edit: service_method
     button: |
@@ -4393,42 +4368,22 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - filing_county
+  - Edit: filing_county
     button: |
       **You are filing in:**
       ${end_in_county(filing_county)}
-  - Edit: cook_district
-    button: |
-      **Which courthouse will you file in?**
-      % if cook_district == '15':
-      First Municipal District, Daley Center, 50 W. Washington Street, Chicago
-      % elif cook_district == '16':
-      Second Municipal District, 5600 Old Orchard Road, Skokie
-      % elif cook_district == '17':
-      Third Municipal District, 2121 Euclid Avenue, Rolling Meadows
-      % elif cook_district == '18':
-      Fourth Municipal District, 1500 Maybrook Drive, Maywood
-      % elif cook_district == '19':
-      Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview
-      % elif cook_district == '20':
-      Sixth Municipal District, 16501 South Kedzie Parkway, Markham
-      % endif
-    show if: trial_court.address.county.lower() == "cook"
   - Edit: jurisdiction_type
     button: |
-      **You are filing in ${end_in_county(trial_court.address.county)} because:**
+      **You are filing in ${end_in_county(filing_county)} because:**
       
       % if jurisdiction_type['I live here']:
-      * I live in ${end_in_county(trial_court.address.county)}.
+      * I live in ${end_in_county(filing_county)}.
       % endif
       % if jurisdiction_type['Respondent lives here']:
-      * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
+      * The person I am filing against lives in ${end_in_county(filing_county)}.
       % endif
       % if jurisdiction_type['Abuse was here']:
-      * The stalking took place in ${end_in_county(trial_court.address.county)}.
+      * The stalking took place in ${end_in_county(filing_county)}.
       % endif
   - Edit: users[0].name.first
     button: |
@@ -4505,7 +4460,7 @@ review:
       % else:
       ${other_parties[0].state_gender}
       % endif
-    show if: trial_court_index != -1
+    show if: filing_county != "Cook"
   - Edit: other_parties[0].cook_sex
     button: |
       **${other_parties[0].name_full()}'s sex:**
@@ -4514,12 +4469,12 @@ review:
       % else:
       ${other_parties[0].cook_sex}
       % endif
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].respondent_sex_at_birth
     button: |
       **${other_parties[0].name_full()}'s sex assigned at birth:**
       *${respondent_sex_at_birth}
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].cook_gender
     button: |
       **${other_parties[0].name_full()}'s gender identity:**
@@ -4542,7 +4497,7 @@ review:
       % if other_parties[0].cook_gender["other"]:
       * ${respondent_cook_gender_other}
       % endif
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: other_parties[0].race
     button: |
       **${other_parties[0].name_full()}'s race:**
@@ -4803,7 +4758,7 @@ review:
     button: |
       **Previous Cook County case involving ${other_parties[0].name_full()}:**
       ${ previous_cook_case_type.capitalize() }
-    show if: trial_court_index == -1
+    show if: filing_county == "Cook"
   - Edit: previous_cook_case_date
     button: |
       **Previous Cook County ${ previous_cook_case_type } case info:**
@@ -4823,7 +4778,7 @@ review:
       % else:
       * Judge: None entered
       % endif
-    show if: trial_court_index == -1 and previous_cook_case_type != "none"	
+    show if: filing_county == "Cook" and previous_cook_case_type != "none"	
   - Edit: respondent_on_probation
     button: |
       **Is ${other_parties[0].name_full()} on probation?**
@@ -4857,7 +4812,7 @@ review:
     button: |
       **Why should the court grant an Emergency SNCO?**
       ${emergency_reason}
-    show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
+    show if: order_type['emergency'] and filing_county.lower() == "cook"
   - Edit: protection_requested
     button: |
       **What do you want ${other_parties[0].name_full()} to stop doing?**
@@ -4930,17 +4885,17 @@ review:
     button: |
       **Does ${other_parties[0].name_full()} live with you?**
       ${word(yesno(live_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: school_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} go to the same school as you?**
       ${word(yesno(school_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: work_with_stalker
     button: |
       **Does ${other_parties[0].name_full()} work at the same place as you?**
       ${word(yesno(work_with_stalker))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: other_parties[0].prohibit_firearms
     button: |
       **Do you want to stop ${other_parties[0].name_full()} from having firearms or a Firearms Owner Identification Card?**
@@ -4958,12 +4913,12 @@ review:
     button: |
       **Do you want ${other_parties[0].name_full()} to pay any costs?**
       ${word(yesno(other_parties[0].pay_costs))}
-    show if: trial_court.address.county.lower() == "cook"
+    show if: filing_county.lower() == "cook"
   - Edit: other_parties[0].describe_costs
     button: |
       **What costs do you want ${other_parties[0].name_full()} to pay**
       ${other_parties[0].describe_costs}
-    show if: trial_court.address.county.lower() == "cook" and other_parties[0].pay_costs
+    show if: filing_county.lower() == "cook" and other_parties[0].pay_costs
   - Edit: service_method
     button: |
       **How do you want ${other_parties[0].name_full()} to be served?**
